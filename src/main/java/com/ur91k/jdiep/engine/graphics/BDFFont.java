@@ -43,6 +43,7 @@ public class BDFFont {
         }
     }
     
+    @SuppressWarnings("unused")
     public BDFFont(InputStream inputStream) {
         try {
             // Store the entire file content first

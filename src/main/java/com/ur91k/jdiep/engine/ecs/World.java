@@ -33,7 +33,8 @@ public class World {
     }
 
     // Get entities that have all the specified components
-    public List<Entity> getEntitiesWith(Class<? extends Component>... componentTypes) {
+    @SafeVarargs
+    public final List<Entity> getEntitiesWith(Class<? extends Component>... componentTypes) {
         return entities.values().stream()
             .filter(entity -> Arrays.stream(componentTypes)
                 .allMatch(entity::hasComponent))

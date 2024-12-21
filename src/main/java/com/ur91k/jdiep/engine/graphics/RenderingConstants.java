@@ -13,6 +13,7 @@ public final class RenderingConstants {
         return new Vector4f(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
     }
     
+    @SuppressWarnings("unused")
     private static Vector4f rgb(int hex) {
         return rgb((hex >> 16) & 0xFF, (hex >> 8) & 0xFF, hex & 0xFF);
     }

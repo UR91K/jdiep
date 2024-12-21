@@ -2,11 +2,6 @@ package com.ur91k.jdiep.engine.ecs;
 
 import com.ur91k.jdiep.engine.graphics.RenderSystem;
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.lwjgl.BufferUtils;
-
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;

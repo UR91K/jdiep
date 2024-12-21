@@ -18,7 +18,10 @@ public class EntityRenderSystem extends System {
     private final RenderSystem renderSystem;
     private final int circleVao;
     private final int circleVbo;
+    private final int polygonVao;
+    private final int polygonVbo;
     private static final int CIRCLE_SEGMENTS = 32;
+    private static final int MAX_POLYGON_VERTICES = 8;  // Support up to octagons
 
     public EntityRenderSystem(RenderSystem renderSystem) {
         this.renderSystem = renderSystem;
@@ -40,6 +43,16 @@ public class EntityRenderSystem extends System {
         glBufferData(GL_ARRAY_BUFFER, circleVertices, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
+
+        // Create polygon VAO/VBO (will be updated per-polygon)
+        polygonVao = glGenVertexArrays();
+        polygonVbo = glGenBuffers();
+        
+        glBindVertexArray(polygonVao);
+        glBindBuffer(GL_ARRAY_BUFFER, polygonVbo);
+        glBufferData(GL_ARRAY_BUFFER, MAX_POLYGON_VERTICES * 2 * Float.BYTES, GL_DYNAMIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
     }
 
     @Override
@@ -55,8 +68,10 @@ public class EntityRenderSystem extends System {
             ShapeComponent shape = entity.getComponent(ShapeComponent.class);
             ColorComponent color = entity.getComponent(ColorComponent.class);
 
-            if (shape.getType() == ShapeComponent.ShapeType.CIRCLE) {
-                renderCircle(transform, shape, color);
+            switch (shape.getType()) {
+                case CIRCLE -> renderCircle(transform, shape, color);
+                case TRIANGLE, POLYGON -> renderPolygon(transform, shape, color);
+                default -> {} // Ignore unsupported shapes for now
             }
         }
     }
@@ -81,8 +96,53 @@ public class EntityRenderSystem extends System {
         glDrawArrays(GL_LINE_LOOP, 0, CIRCLE_SEGMENTS);
     }
 
+    private void renderPolygon(TransformComponent transform, ShapeComponent shape, ColorComponent color) {
+        float[] vertices;
+        int vertexCount;
+
+        if (shape.getType() == ShapeComponent.ShapeType.POLYGON && shape.getVertices() != null) {
+            // Use custom vertices if provided
+            vertices = shape.getVertices();
+            vertexCount = vertices.length / 2;
+        } else {
+            // Generate regular polygon vertices
+            vertexCount = shape.getSides();
+            vertices = new float[vertexCount * 2];
+            
+            for (int i = 0; i < vertexCount; i++) {
+                float angle = (float) (2.0f * Math.PI * i / vertexCount + Math.PI / 2);  // Start at top
+                vertices[i * 2] = (float) Math.cos(angle);
+                vertices[i * 2 + 1] = (float) Math.sin(angle);
+            }
+        }
+
+        // Upload vertices
+        glBindVertexArray(polygonVao);
+        glBindBuffer(GL_ARRAY_BUFFER, polygonVbo);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
+
+        // Create transformation matrix
+        Matrix4f model = new Matrix4f()
+            .translate(transform.getPosition().x, transform.getPosition().y, 0)
+            .rotate(transform.getRotation(), 0, 0, 1)
+            .scale(shape.getRadius() * transform.getScale().x, 
+                  shape.getRadius() * transform.getScale().y, 
+                  1);
+
+        // Draw filled polygon
+        renderSystem.setTransformAndColor(model, color.getFillColor());
+        glDrawArrays(GL_TRIANGLE_FAN, 0, vertexCount);
+
+        // Draw outline
+        renderSystem.setTransformAndColor(model, color.getOutlineColor());
+        glLineWidth(color.getOutlineThickness());
+        glDrawArrays(GL_LINE_LOOP, 0, vertexCount);
+    }
+
     public void cleanup() {
         glDeleteBuffers(circleVbo);
         glDeleteVertexArrays(circleVao);
+        glDeleteBuffers(polygonVbo);
+        glDeleteVertexArrays(polygonVao);
     }
 } 

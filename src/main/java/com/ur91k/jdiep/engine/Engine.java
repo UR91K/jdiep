@@ -7,6 +7,10 @@ import com.ur91k.jdiep.engine.core.Time;
 import com.ur91k.jdiep.engine.core.Logger;
 import com.ur91k.jdiep.engine.graphics.RenderSystem;
 import com.ur91k.jdiep.engine.graphics.RenderingConstants;
+import com.ur91k.jdiep.engine.ecs.*;
+import org.joml.Vector2f;
+import org.joml.Vector4f;
+
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -15,7 +19,9 @@ public class Engine {
     private Window window;
     private Input input;
     private RenderSystem renderSystem;
+    private EntityRenderSystem entityRenderSystem;
     private DebugOverlay debugOverlay;
+    private World world;
     private boolean running;
     
     public Engine(String title, int width, int height) {
@@ -34,7 +40,10 @@ public class Engine {
         input.init(window.getHandle());
         Time.init();
         renderSystem = new RenderSystem(window.getWidth(), window.getHeight());
+        entityRenderSystem = new EntityRenderSystem(renderSystem);
         debugOverlay = new DebugOverlay(window.getWidth(), window.getHeight());
+        world = new World();
+        world.addSystem(entityRenderSystem);
         running = true;
         
         glClearColor(
@@ -43,6 +52,19 @@ public class Engine {
             RenderingConstants.BACKGROUND_COLOR.z,
             RenderingConstants.BACKGROUND_COLOR.w
         );
+
+        // Create test entity
+        Entity testEntity = world.createEntity();
+        testEntity.addComponent(new TransformComponent(
+            new Vector2f(window.getWidth() / 2, window.getHeight() / 2),  // Center of screen
+            new Vector2f(1, 1),  // Normal scale
+            0.0f  // No rotation
+        ));
+        testEntity.addComponent(new ShapeComponent(30.0f));  // Circle with radius 30
+        ColorComponent color = new ColorComponent(new Vector4f(0.2f, 0.6f, 1.0f, 1.0f));  // Blue color
+        color.setOutline(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f), 3.0f);  // Black outline, 3px thick
+        testEntity.addComponent(color);
+        
         logger.info("Engine initialized successfully");
     }
     
@@ -77,6 +99,8 @@ public class Engine {
                 RenderingConstants.GRID_COLOR
             );
             
+            world.update();
+            
             // Enable proper blending for text rendering
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -95,6 +119,7 @@ public class Engine {
     
     private void cleanup() {
         logger.info("Cleaning up engine resources...");
+        entityRenderSystem.cleanup();
         debugOverlay.cleanup();
         renderSystem.cleanup();
         window.cleanup();

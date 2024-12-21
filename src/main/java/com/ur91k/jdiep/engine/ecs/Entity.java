@@ -4,28 +4,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Entity {
-    private final Map<Class<? extends Component>, Component> components = new HashMap<>();
-    private boolean active = true;
-    
-    public <T extends Component> T addComponent(T component) {
-        component.setOwner(this);
-        components.put(component.getClass(), component);
-        return component;
+    private final long id;
+    private final Map<Class<? extends Component>, Component> components;
+
+    public Entity() {
+        this(0); // For legacy support
     }
-    
+
+    public Entity(long id) {
+        this.id = id;
+        this.components = new HashMap<>();
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public <T extends Component> void addComponent(T component) {
+        components.put(component.getClass(), component);
+    }
+
     public <T extends Component> T getComponent(Class<T> componentClass) {
         return componentClass.cast(components.get(componentClass));
     }
-    
-    public boolean hasComponent(Class<? extends Component> componentClass) {
+
+    public <T extends Component> boolean hasComponent(Class<T> componentClass) {
         return components.containsKey(componentClass);
     }
-    
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-    
-    public boolean isActive() {
-        return active;
+
+    public <T extends Component> void removeComponent(Class<T> componentClass) {
+        components.remove(componentClass);
     }
 }

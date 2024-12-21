@@ -78,8 +78,12 @@ public class RenderSystem {
         }
     }
     
-    // Future methods for rendering entities will go here
-    // public void renderEntity(TransformComponent transform, RenderComponent render) { ... }
+    public void setTransformAndColor(Matrix4f transform, Vector4f color) {
+        gameShader.use();
+        gameShader.setMatrix4f("projection", projection);
+        gameShader.setMatrix4f("model", transform);
+        gameShader.setVector4f("color", color);
+    }
     
     public void cleanup() {
         gameShader.cleanup();

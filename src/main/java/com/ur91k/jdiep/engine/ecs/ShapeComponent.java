@@ -31,4 +31,20 @@ public class ShapeComponent extends Component {
         this.type = ShapeType.POLYGON;
         this.vertices = vertices;
     }
+
+    public ShapeType getType() {
+        return type;
+    }
+
+    public float getRadius() {
+        return radius;
+    }
+
+    public int getSides() {
+        return sides;
+    }
+
+    public float[] getVertices() {
+        return vertices;
+    }
 }

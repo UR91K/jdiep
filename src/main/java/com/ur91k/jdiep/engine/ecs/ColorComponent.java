@@ -15,4 +15,16 @@ public class ColorComponent extends Component {
         this.outlineColor.set(color);
         this.outlineThickness = thickness;
     }
+
+    public Vector4f getFillColor() {
+        return new Vector4f(fillColor);
+    }
+
+    public Vector4f getOutlineColor() {
+        return new Vector4f(outlineColor);
+    }
+
+    public float getOutlineThickness() {
+        return outlineThickness;
+    }
 }

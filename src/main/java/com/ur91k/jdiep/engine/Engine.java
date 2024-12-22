@@ -20,8 +20,10 @@ public class Engine {
     private Input input;
     private RenderSystem renderSystem;
     private EntityRenderSystem entityRenderSystem;
+    private ParentSystem parentSystem;
     private DebugOverlay debugOverlay;
     private World world;
+    private EntityFactory entityFactory;
     private boolean running;
     
     public Engine(String title, int width, int height) {
@@ -41,9 +43,12 @@ public class Engine {
         Time.init();
         renderSystem = new RenderSystem(window.getWidth(), window.getHeight());
         entityRenderSystem = new EntityRenderSystem(renderSystem);
+        parentSystem = new ParentSystem();
         debugOverlay = new DebugOverlay(window.getWidth(), window.getHeight());
         world = new World();
-        world.addSystem(entityRenderSystem);
+        world.addSystem(parentSystem);     // Update parent-child relationships first
+        world.addSystem(entityRenderSystem);  // Then render
+        entityFactory = new EntityFactory(world);
         running = true;
         
         glClearColor(
@@ -59,45 +64,11 @@ public class Engine {
     }
 
     private void createTestEntities() {
-        float spacing = 100.0f;  // Space between test entities
-        float centerX = window.getWidth() / 2;
-        float centerY = window.getHeight() / 2;
-
-        // Create circle test entity
-        Entity circleEntity = world.createEntity();
-        circleEntity.addComponent(new TransformComponent(
-            new Vector2f(centerX - spacing, centerY),  // Left of center
-            new Vector2f(1, 1),
-            0.0f
+        // Create a test tank in the center of the screen
+        entityFactory.createTank(new Vector2f(
+            window.getWidth() / 2,
+            window.getHeight() / 2
         ));
-        circleEntity.addComponent(new ShapeComponent(30.0f));  // Circle with radius 30
-        ColorComponent circleColor = new ColorComponent(new Vector4f(0.2f, 0.6f, 1.0f, 1.0f));
-        circleColor.setOutline(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f), 3.0f);
-        circleEntity.addComponent(circleColor);
-
-        // Create triangle test entity
-        Entity triangleEntity = world.createEntity();
-        triangleEntity.addComponent(new TransformComponent(
-            new Vector2f(centerX, centerY),  // Center
-            new Vector2f(1, 1),
-            0.0f
-        ));
-        triangleEntity.addComponent(new ShapeComponent(ShapeComponent.ShapeType.TRIANGLE, 30.0f, 3));
-        ColorComponent triangleColor = new ColorComponent(new Vector4f(1.0f, 0.4f, 0.4f, 1.0f));  // Light red
-        triangleColor.setOutline(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f), 3.0f);
-        triangleEntity.addComponent(triangleColor);
-
-        // Create pentagon test entity
-        Entity pentagonEntity = world.createEntity();
-        pentagonEntity.addComponent(new TransformComponent(
-            new Vector2f(centerX + spacing, centerY),  // Right of center
-            new Vector2f(1, 1),
-            0.0f
-        ));
-        pentagonEntity.addComponent(new ShapeComponent(ShapeComponent.ShapeType.POLYGON, 30.0f, 5));
-        ColorComponent pentagonColor = new ColorComponent(new Vector4f(0.4f, 0.4f, 1.0f, 1.0f));  // Light blue
-        pentagonColor.setOutline(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f), 3.0f);
-        pentagonEntity.addComponent(pentagonColor);
     }
     
     private void gameLoop() {

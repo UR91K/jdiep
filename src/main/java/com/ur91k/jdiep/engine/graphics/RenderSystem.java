@@ -13,6 +13,7 @@ import static org.lwjgl.opengl.GL30.*;
 public class RenderSystem {
     private final ShaderProgram gameShader;
     private final Matrix4f projection;
+    private static final float GRID_LINE_WIDTH = 0.5f;
     
     // Grid rendering resources
     private final int gridVao;
@@ -54,6 +55,9 @@ public class RenderSystem {
         
         glBindVertexArray(gridVao);
         glBindBuffer(GL_ARRAY_BUFFER, gridVbo);
+        
+        // Set thin line width for grid
+        glLineWidth(GRID_LINE_WIDTH);
         
         FloatBuffer lineBuffer = BufferUtils.createFloatBuffer(4);
         

@@ -21,7 +21,7 @@ public class EntityRenderSystem extends System {
     private final int rectangleVbo;
     private static final int CIRCLE_SEGMENTS = 32;
     private static final int MAX_POLYGON_VERTICES = 8;  // Support up to octagons
-    private boolean reverseRenderOrder = false;  // Control render order
+    private boolean reverseRenderOrder = true;  // Control render order
 
     public EntityRenderSystem(RenderSystem renderSystem) {
         this.renderSystem = renderSystem;

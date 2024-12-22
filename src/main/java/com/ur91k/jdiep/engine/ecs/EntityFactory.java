@@ -1,9 +1,11 @@
 package com.ur91k.jdiep.engine.ecs;
 
 import com.ur91k.jdiep.engine.graphics.RenderingConstants;
+import com.ur91k.jdiep.engine.core.Logger;
 import org.joml.Vector2f;
 
 public class EntityFactory {
+    private static final Logger logger = Logger.getLogger(EntityFactory.class);
     private final World world;
 
     public EntityFactory(World world) {
@@ -11,8 +13,21 @@ public class EntityFactory {
     }
 
     protected float calculateTurretOffset(float radius, float width) {
+        // Prevent invalid math if turret width is greater than diameter
+        if (width > 2 * radius) {
+            logger.warn("Turret width ({}) is greater than tank diameter ({})", width, 2*radius);
+            width = 2 * radius;
+        }
+
         // Use Pythagorean theorem to calculate offset where turret meets circle
-        return radius - (float)Math.sqrt(radius * radius - (width/2) * (width/2));
+        float offset = radius - (float)Math.sqrt(radius * radius - (width/2)*(width/2));
+
+        // Debug output
+        logger.debug("Tank radius: {}", radius);
+        logger.debug("Turret width: {}", width);
+        logger.debug("Calculated offset: {}", offset);
+
+        return offset;
     }
 
     public Entity createTank(Vector2f position) {
@@ -47,12 +62,16 @@ public class EntityFactory {
         // Calculate optimal turret offset
         float turretOffset = calculateTurretOffset(tankRadius, turretWidth);
         
-        // Calculate initial turret position (this will be updated by ParentSystem)
-        Vector2f turretPosition = new Vector2f(position).add(turretLength/2 - turretOffset, 0);
+        // Calculate turret starting position (where it meets the circle)
+        float startX = tankRadius - turretOffset;
+        // Turret extends outward from the starting position
+        float endX = startX + turretLength;
+        // Center position is halfway between start and end
+        float centerOffset = (startX + endX) / 2;
         
         // Add transform for the turret
         turret.addComponent(new TransformComponent(
-            turretPosition,  // Start at offset position
+            position,  // Initial position doesn't matter, will be updated by ParentSystem
             new Vector2f(turretLength/tankRadius, turretWidth/tankRadius),  // Scale relative to tank radius
             0.0f
         ));
@@ -72,12 +91,16 @@ public class EntityFactory {
         // Add render layer for turret (behind body)
         turret.addComponent(new RenderLayer(RenderLayer.TURRET));
 
-        // Add parent component to link turret to body with offset
+        // Add parent component to link turret to body
         turret.addComponent(new ParentComponent(
             tankBody,
-            new Vector2f(turretLength/2 - turretOffset, 0.0f),  // Offset from tank center
+            new Vector2f(centerOffset, 0.0f),  // Position turret center at the calculated offset
             0.0f  // No initial rotation relative to parent
         ));
+
+        // Debug output
+        logger.debug("Turret dimensions - Start X: {}, End X: {}, Center offset: {}", 
+                    startX, endX, centerOffset);
 
         return tankBody;  // Return the body entity (parent)
     }

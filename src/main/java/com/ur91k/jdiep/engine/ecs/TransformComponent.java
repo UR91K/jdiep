@@ -6,6 +6,7 @@ public class TransformComponent extends Component {
     private Vector2f position;
     private Vector2f scale;
     private float rotation; // In radians
+    private Entity entity;  // Reference to owning entity
 
     public TransformComponent() {
         this(new Vector2f(), new Vector2f(1.0f, 1.0f), 0.0f);
@@ -15,6 +16,14 @@ public class TransformComponent extends Component {
         this.position = new Vector2f(position);
         this.scale = new Vector2f(scale);
         this.rotation = rotation;
+    }
+
+    public void setEntity(Entity entity) {
+        this.entity = entity;
+    }
+
+    public Entity getEntity() {
+        return entity;
     }
 
     public Vector2f getPosition() {

@@ -21,6 +21,7 @@ public class Engine {
     private RenderSystem renderSystem;
     private EntityRenderSystem entityRenderSystem;
     private ParentSystem parentSystem;
+    private MouseAimSystem mouseAimSystem;
     private DebugOverlay debugOverlay;
     private World world;
     private EntityFactory entityFactory;
@@ -44,9 +45,11 @@ public class Engine {
         renderSystem = new RenderSystem(window.getWidth(), window.getHeight());
         entityRenderSystem = new EntityRenderSystem(renderSystem);
         parentSystem = new ParentSystem();
+        mouseAimSystem = new MouseAimSystem(input, window.getHeight());
         debugOverlay = new DebugOverlay(window.getWidth(), window.getHeight());
         world = new World();
         world.addSystem(parentSystem);     // Update parent-child relationships first
+        world.addSystem(mouseAimSystem);   // Then update aiming
         world.addSystem(entityRenderSystem);  // Then render
         entityFactory = new EntityFactory(world);
         running = true;

@@ -1,7 +1,12 @@
 package com.ur91k.jdiep.engine.core;
 
-import static org.lwjgl.glfw.GLFW.*;
+import org.joml.Vector2f;
+import org.lwjgl.BufferUtils;
+
+import java.nio.DoubleBuffer;
 import java.util.Arrays;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 public class Input {
     private static final Logger logger = Logger.getLogger(Input.class);
@@ -15,9 +20,14 @@ public class Input {
     private boolean[] mouseButtonsJustPressed = new boolean[MAX_BUTTONS];
     private double mouseX, mouseY;
     private double scrollX, scrollY;
+    private long windowHandle;
+    private final DoubleBuffer mouseXBuffer = BufferUtils.createDoubleBuffer(1);
+    private final DoubleBuffer mouseYBuffer = BufferUtils.createDoubleBuffer(1);
     
     public void init(long windowHandle) {
         logger.info("Initializing input system...");
+        
+        this.windowHandle = windowHandle;
         
         // Key callback
         glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
@@ -79,6 +89,8 @@ public class Input {
             mouseButtonsJustPressed[i] = false;
         }
         scrollX = scrollY = 0;
+        
+        glfwGetCursorPos(windowHandle, mouseXBuffer, mouseYBuffer);
     }
     
     public boolean isKeyPressed(int key) {
@@ -117,4 +129,11 @@ public class Input {
     public double getMouseY() { return mouseY; }
     public double getScrollX() { return scrollX; }
     public double getScrollY() { return scrollY; }
+    
+    public Vector2f getMousePosition() {
+        return new Vector2f(
+            (float)mouseXBuffer.get(0),
+            (float)mouseYBuffer.get(0)
+        );
+    }
 }

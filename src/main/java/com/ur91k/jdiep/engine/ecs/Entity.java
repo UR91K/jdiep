@@ -22,6 +22,9 @@ public class Entity {
 
     public <T extends Component> void addComponent(T component) {
         components.put(component.getClass(), component);
+        if (component instanceof TransformComponent) {
+            ((TransformComponent) component).setEntity(this);
+        }
     }
 
     public <T extends Component> T getComponent(Class<T> componentClass) {

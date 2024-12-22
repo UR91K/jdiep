@@ -5,6 +5,7 @@ import org.joml.Matrix4f;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import org.joml.Vector2f;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -146,12 +147,29 @@ public class EntityRenderSystem extends System {
     }
 
     private void renderRectangle(TransformComponent transform, ShapeComponent shape, ColorComponent color) {
-        Matrix4f model = new Matrix4f()
-            .translate(transform.getPosition().x, transform.getPosition().y, 0)
-            .rotate(transform.getRotation(), 0, 0, 1)
-            .scale(shape.getRadius() * 2 * transform.getScale().x,  // Multiply by 2 since vertices are in [-0.5, 0.5]
-                  shape.getRadius() * 2 * transform.getScale().y, 
-                  1);
+        Matrix4f model = new Matrix4f();
+        
+        // If this entity has a parent, rotate around the parent's center
+        ParentComponent parentComp = world.getEntity(transform.getEntity().getId()).getComponent(ParentComponent.class);
+        if (parentComp != null) {
+            Entity parent = parentComp.getParent();
+            TransformComponent parentTransform = parent.getComponent(TransformComponent.class);
+            Vector2f parentPos = parentTransform.getPosition();
+            Vector2f localOffset = parentComp.getLocalOffset();
+            
+            model.translate(parentPos.x, parentPos.y, 0)  // Move to parent's position
+                .rotate(parentTransform.getRotation() + parentComp.getLocalRotation(), 0, 0, 1)  // Apply total rotation
+                .translate(localOffset.x, localOffset.y, 0)  // Apply offset
+                .scale(shape.getRadius() * 2 * transform.getScale().x,  // Multiply by 2 since vertices are in [-0.5, 0.5]
+                      shape.getRadius() * 2 * transform.getScale().y, 
+                      1);
+        } else {
+            model.translate(transform.getPosition().x, transform.getPosition().y, 0)
+                .rotate(transform.getRotation(), 0, 0, 1)
+                .scale(shape.getRadius() * 2 * transform.getScale().x,
+                      shape.getRadius() * 2 * transform.getScale().y, 
+                      1);
+        }
 
         glBindVertexArray(rectangleVao);
         
@@ -172,11 +190,9 @@ public class EntityRenderSystem extends System {
         int vertexCount;
 
         if (shape.getType() == ShapeComponent.ShapeType.POLYGON && shape.getVertices() != null) {
-            // Use custom vertices if provided
             vertices = shape.getVertices();
             vertexCount = vertices.length / 2;
         } else {
-            // Generate regular polygon vertices
             vertexCount = shape.getSides();
             vertices = new float[vertexCount * 2];
             
@@ -193,12 +209,29 @@ public class EntityRenderSystem extends System {
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
 
         // Create transformation matrix
-        Matrix4f model = new Matrix4f()
-            .translate(transform.getPosition().x, transform.getPosition().y, 0)
-            .rotate(transform.getRotation(), 0, 0, 1)
-            .scale(shape.getRadius() * transform.getScale().x, 
-                  shape.getRadius() * transform.getScale().y, 
-                  1);
+        Matrix4f model = new Matrix4f();
+        
+        // If this entity has a parent, rotate around the parent's center
+        ParentComponent parentComp = world.getEntity(transform.getEntity().getId()).getComponent(ParentComponent.class);
+        if (parentComp != null) {
+            Entity parent = parentComp.getParent();
+            TransformComponent parentTransform = parent.getComponent(TransformComponent.class);
+            Vector2f parentPos = parentTransform.getPosition();
+            Vector2f localOffset = parentComp.getLocalOffset();
+            
+            model.translate(parentPos.x, parentPos.y, 0)  // Move to parent's position
+                .rotate(parentTransform.getRotation() + parentComp.getLocalRotation(), 0, 0, 1)  // Apply total rotation
+                .translate(localOffset.x, localOffset.y, 0)  // Apply offset AFTER rotation
+                .scale(shape.getRadius() * transform.getScale().x, 
+                      shape.getRadius() * transform.getScale().y, 
+                      1);
+        } else {
+            model.translate(transform.getPosition().x, transform.getPosition().y, 0)
+                .rotate(transform.getRotation(), 0, 0, 1)
+                .scale(shape.getRadius() * transform.getScale().x, 
+                      shape.getRadius() * transform.getScale().y, 
+                      1);
+        }
 
         // Draw filled polygon
         renderSystem.setTransformAndColor(model, color.getFillColor());

@@ -98,6 +98,9 @@ public class EntityFactory {
             0.0f  // No initial rotation relative to parent
         ));
 
+        // Add mouse aim component to tank body, targeting the turret
+        tankBody.addComponent(new MouseAimComponent(turret));
+
         // Debug output
         logger.debug("Turret dimensions - Start X: {}, End X: {}, Center offset: {}", 
                     startX, endX, centerOffset);

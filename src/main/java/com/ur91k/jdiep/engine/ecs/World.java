@@ -2,6 +2,10 @@ package com.ur91k.jdiep.engine.ecs;
 
 import java.util.*;
 
+import com.ur91k.jdiep.engine.ecs.components.Component;
+import com.ur91k.jdiep.engine.ecs.entities.Entity;
+import com.ur91k.jdiep.engine.ecs.systems.System;
+
 public class World {
     private final Map<Long, Entity> entities;
     private final List<System> systems;

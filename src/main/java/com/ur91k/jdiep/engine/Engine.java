@@ -5,9 +5,18 @@ import com.ur91k.jdiep.engine.core.Input;
 import com.ur91k.jdiep.engine.debug.DebugOverlay;
 import com.ur91k.jdiep.engine.core.Time;
 import com.ur91k.jdiep.engine.core.Logger;
-import com.ur91k.jdiep.engine.graphics.RenderSystem;
 import com.ur91k.jdiep.engine.graphics.RenderingConstants;
 import com.ur91k.jdiep.engine.ecs.*;
+import com.ur91k.jdiep.engine.ecs.entities.Entity;
+import com.ur91k.jdiep.engine.ecs.entities.EntityFactory;
+import com.ur91k.jdiep.engine.ecs.systems.EntityRenderSystem;
+import com.ur91k.jdiep.engine.ecs.systems.MouseAimSystem;
+import com.ur91k.jdiep.engine.ecs.systems.ParentSystem;
+import com.ur91k.jdiep.engine.ecs.systems.RenderSystem;
+import com.ur91k.jdiep.engine.ecs.systems.CameraSystem;
+import com.ur91k.jdiep.engine.ecs.components.CameraComponent;
+import com.ur91k.jdiep.engine.ecs.systems.MovementSystem;
+
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
@@ -22,16 +31,24 @@ public class Engine {
     private EntityRenderSystem entityRenderSystem;
     private ParentSystem parentSystem;
     private MouseAimSystem mouseAimSystem;
+    private CameraSystem cameraSystem;
     private DebugOverlay debugOverlay;
     private World world;
     private EntityFactory entityFactory;
     private boolean running;
-    
-    public Engine(String title, int width, int height) {
+    private int frameCount;
+    private boolean debugMode;
+    private int maxDebugFrames;
+    private MovementSystem movementSystem;
+
+    public Engine(String title, int width, int height, boolean debugMode, int maxDebugFrames, Logger.Level logLevel) {
         // Configure logging first
-        Logger.setGlobalMinimumLevel(Logger.Level.ERROR);  // Set to ERROR level globally
-        Logger.useColors(true);  // Enable colored output
-        Logger.showTimestamp(true);  // Show timestamps in logs
+        Logger.setGlobalMinimumLevel(logLevel);
+        Logger.useColors(true);
+        Logger.showTimestamp(true);
+        
+        this.debugMode = debugMode;
+        this.maxDebugFrames = maxDebugFrames;
         
         window = new Window(title, width, height);
         input = new Input();
@@ -42,14 +59,18 @@ public class Engine {
         window.init();
         input.init(window.getHandle());
         Time.init();
-        renderSystem = new RenderSystem(window.getWidth(), window.getHeight());
+        world = new World();  // Create World first
+        renderSystem = new RenderSystem(world, window.getWidth(), window.getHeight(), input);
         entityRenderSystem = new EntityRenderSystem(renderSystem);
         parentSystem = new ParentSystem();
-        mouseAimSystem = new MouseAimSystem(input, window.getHeight());
+        mouseAimSystem = new MouseAimSystem(input);
+        cameraSystem = new CameraSystem(input);
+        movementSystem = new MovementSystem(input);
         debugOverlay = new DebugOverlay(window.getWidth(), window.getHeight());
-        world = new World();
         world.addSystem(parentSystem);     // Update parent-child relationships first
+        world.addSystem(movementSystem);   // Then update movement
         world.addSystem(mouseAimSystem);   // Then update aiming
+        world.addSystem(cameraSystem);     // Then update camera
         world.addSystem(entityRenderSystem);  // Then render
         entityFactory = new EntityFactory(world);
         running = true;
@@ -67,24 +88,27 @@ public class Engine {
     }
 
     private void createTestEntities() {
-        // Create a test tank in the center of the screen
-        entityFactory.createTank(new Vector2f(
-            window.getWidth() / 2,
-            window.getHeight() / 2
-        ));
+        // Create a test tank at world origin (0,0)
+        Entity tank = entityFactory.createTank(new Vector2f(0, 0));
+        
+        // Set tank as the player for movement system
+        movementSystem.setPlayer(tank);
+
+        // Create and set up camera at world origin (0,0)
+        Entity camera = entityFactory.createCamera(new Vector2f(0, 0));
+        cameraSystem.setTarget(tank);  // Make camera follow the tank
+
+        // Update debug overlay with camera info
+        if (debugOverlay.isVisible()) {
+            debugOverlay.updateCameraDebug(camera);
+        }
     }
     
     private void gameLoop() {
         while (running && !window.shouldClose()) {
             Time.update();
-            input.update();
             
-            // Debug: Check for any key press
-            for (int key = 0; key < 348; key++) {
-                if (input.isKeyJustPressed(key)) {
-                    logger.debug("Key pressed: {}", key);
-                }
-            }
+            input.update();
             
             if (input.isKeyJustPressed(GLFW_KEY_F3)) {
                 logger.debug("F3 key pressed");
@@ -92,16 +116,21 @@ public class Engine {
             }
             
             if (debugOverlay.isVisible()) {
-                debugOverlay.setInfo("F3 State", String.valueOf(input.isKeyPressed(GLFW_KEY_F3)));
                 debugOverlay.setInfo("FPS", String.valueOf(Time.getFPS()));
                 debugOverlay.updateInputDebug(input);
+
+                // Update camera debug info
+                var cameras = world.getEntitiesWith(CameraComponent.class);
+                if (!cameras.isEmpty()) {
+                    debugOverlay.updateCameraDebug(cameras.iterator().next());
+                }
             }
             
             renderSystem.beginFrame();
             renderSystem.renderGrid(
-                window.getWidth(),
-                window.getHeight(),
-                RenderingConstants.GRID_SIZE,
+                1024,           // World width
+                1024,           // World height
+                32,             // Grid size
                 RenderingConstants.GRID_COLOR
             );
             
@@ -114,6 +143,15 @@ public class Engine {
             glDisable(GL_BLEND);
             
             window.update();
+            frameCount++;
+            
+            if (debugMode) {
+                logger.debug("Debug mode frame count: {}", frameCount);
+                if (frameCount >= maxDebugFrames) {
+                    logger.debug("Debug frames complete. Stopping game loop");
+                    running = false;
+                }
+            }
         }
     }
     

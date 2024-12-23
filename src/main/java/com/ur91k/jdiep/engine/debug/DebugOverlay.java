@@ -3,6 +3,10 @@ package com.ur91k.jdiep.engine.debug;
 import com.ur91k.jdiep.engine.graphics.TextRenderer;
 import com.ur91k.jdiep.engine.core.Input;
 import com.ur91k.jdiep.engine.core.Logger;
+import com.ur91k.jdiep.engine.graphics.RenderingConstants;
+import com.ur91k.jdiep.engine.ecs.components.CameraComponent;
+import com.ur91k.jdiep.engine.ecs.entities.Entity;
+import org.joml.Vector2f;
 import org.joml.Vector4f;
 
 import java.util.ArrayList;
@@ -16,7 +20,7 @@ public class DebugOverlay {
     private boolean visible = false;
     private final Map<String, String> debugInfo = new LinkedHashMap<>();
     private final TextRenderer textRenderer;
-    private final Vector4f textColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    private final Vector4f textColor = RenderingConstants.rgb(0x5b5b5b);
     private static final float LINE_HEIGHT = 16.0f;
     private static final float PADDING = 8.0f;
 
@@ -37,6 +41,21 @@ public class DebugOverlay {
     public void setInfo(String key, String value) {
         debugInfo.put(key, value);
         logger.trace("Debug info updated - {}: {}", key, value);
+    }
+
+    public void updateCameraDebug(Entity cameraEntity) {
+        if (!visible || cameraEntity == null) return;
+
+        CameraComponent camera = cameraEntity.getComponent(CameraComponent.class);
+        if (camera == null) return;
+
+        Vector2f pos = camera.getPosition();
+        Vector2f vel = camera.getVelocity();
+        
+        setInfo("Camera Position", String.format("%.1f, %.1f", pos.x, pos.y));
+        setInfo("Camera Velocity", String.format("%.1f, %.1f", vel.x, vel.y));
+        setInfo("Camera Mode", camera.getMode().toString());
+        setInfo("Camera Zoom", String.format("%.2fx", camera.getZoom()));
     }
 
     public void render() {

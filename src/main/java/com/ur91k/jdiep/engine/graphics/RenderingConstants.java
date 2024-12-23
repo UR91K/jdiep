@@ -43,7 +43,8 @@ public final class RenderingConstants {
     }
     
     @SuppressWarnings("unused")
-    private static Vector4f rgb(int hex) {
+    public
+    static Vector4f rgb(int hex) {
         return rgb((hex >> 16) & 0xFF, (hex >> 8) & 0xFF, hex & 0xFF);
     }
 } 

@@ -1,6 +1,8 @@
 package com.ur91k.jdiep.engine.core;
 
 import org.joml.Vector2f;
+import org.joml.Vector4f;
+import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.DoubleBuffer;
@@ -13,21 +15,41 @@ public class Input {
     private static final int MAX_KEYS = 348;
     private static final int MAX_BUTTONS = 8;
     
+    private int windowWidth;
+    private int windowHeight;
     private boolean[] keys = new boolean[MAX_KEYS];
     private boolean[] keysJustPressed = new boolean[MAX_KEYS];
     private boolean[] keysPendingPress = new boolean[MAX_KEYS];
     private boolean[] mouseButtons = new boolean[MAX_BUTTONS];
     private boolean[] mouseButtonsJustPressed = new boolean[MAX_BUTTONS];
     private double mouseX, mouseY;
-    private double scrollX, scrollY;
+    private float scrollX, scrollY;
     private long windowHandle;
     private final DoubleBuffer mouseXBuffer = BufferUtils.createDoubleBuffer(1);
     private final DoubleBuffer mouseYBuffer = BufferUtils.createDoubleBuffer(1);
     
+    private Matrix4f viewMatrix = new Matrix4f();
+    private Matrix4f projectionMatrix = new Matrix4f();
+    private boolean matricesNeedUpdate = true;
+
     public void init(long windowHandle) {
         logger.info("Initializing input system...");
         
         this.windowHandle = windowHandle;
+        
+        // Get initial window dimensions
+        int[] width = new int[1];
+        int[] height = new int[1];
+        glfwGetWindowSize(windowHandle, width, height);
+        this.windowWidth = width[0];
+        this.windowHeight = height[0];
+        
+        // Add window size callback
+        glfwSetWindowSizeCallback(windowHandle, (window, newWidth, newHeight) -> {
+            windowWidth = newWidth;
+            windowHeight = newHeight;
+            logger.debug("Window resized to {}x{}", newWidth, newHeight);
+        });
         
         // Key callback
         glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
@@ -65,8 +87,8 @@ public class Input {
         // Scroll callback
         glfwSetScrollCallback(windowHandle, (window, xoffset, yoffset) -> {
             logger.trace("Scroll event: x={}, y={}", xoffset, yoffset);
-            scrollX = xoffset;
-            scrollY = yoffset;
+            scrollX = (float)xoffset;
+            scrollY = (float)yoffset;
         });
         
         logger.debug("Input system initialized successfully");
@@ -127,13 +149,59 @@ public class Input {
     
     public double getMouseX() { return mouseX; }
     public double getMouseY() { return mouseY; }
-    public double getScrollX() { return scrollX; }
-    public double getScrollY() { return scrollY; }
+    public float getScrollX() { return scrollX; }
+    public float getScrollY() { return scrollY; }
     
     public Vector2f getMousePosition() {
         return new Vector2f(
             (float)mouseXBuffer.get(0),
             (float)mouseYBuffer.get(0)
         );
+    }
+
+    public void setViewMatrix(Matrix4f view) {
+        this.viewMatrix.set(view);
+        matricesNeedUpdate = true;
+    }
+
+    public void setProjectionMatrix(Matrix4f projection) {
+        this.projectionMatrix.set(projection);
+        matricesNeedUpdate = true;
+    }
+
+    public Vector2f getMouseWorldPosition() {
+        Vector2f screenPos = getMousePosition();
+        logger.debug("Screen position: {}", screenPos);
+        
+        // Convert screen coordinates to centered coordinates
+        float centeredX = screenPos.x - windowWidth / 2.0f;
+        float centeredY = windowHeight / 2.0f - screenPos.y;  // Flip Y and center
+        
+        logger.debug("Centered coordinates: ({}, {})", centeredX, centeredY);
+
+        // Apply view matrix transformations (zoom and camera position)
+        Vector2f worldPos = new Vector2f(centeredX, centeredY);
+        
+        // Check if view matrix is not identity (has some transformation)
+        boolean isIdentity = viewMatrix.m00() == 1.0f && 
+                           viewMatrix.m11() == 1.0f && 
+                           viewMatrix.m22() == 1.0f && 
+                           viewMatrix.m33() == 1.0f &&
+                           viewMatrix.m30() == 0.0f && 
+                           viewMatrix.m31() == 0.0f;
+        
+        if (!isIdentity) {
+            // Extract scale (zoom) from view matrix
+            float zoom = viewMatrix.m00();  // Assuming uniform scale
+            worldPos.mul(1.0f / zoom);  // Apply inverse zoom
+            
+            // Extract translation from view matrix
+            float cameraX = -viewMatrix.m30();  // Camera position is negative of translation
+            float cameraY = -viewMatrix.m31();
+            worldPos.add(cameraX, cameraY);  // Add camera position to get world position
+        }
+        
+        logger.debug("World position (after transform): {}", worldPos);
+        return worldPos;
     }
 }

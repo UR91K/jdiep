@@ -16,6 +16,8 @@ import com.ur91k.jdiep.engine.ecs.systems.RenderSystem;
 import com.ur91k.jdiep.engine.ecs.systems.CameraSystem;
 import com.ur91k.jdiep.engine.ecs.components.CameraComponent;
 import com.ur91k.jdiep.engine.ecs.systems.MovementSystem;
+import com.ur91k.jdiep.engine.ecs.components.PlayerControlledComponent;
+import com.ur91k.jdiep.engine.ecs.components.CameraTargetComponent;
 
 import org.joml.Vector2f;
 import org.joml.Vector4f;
@@ -90,18 +92,11 @@ public class Engine {
     private void createTestEntities() {
         // Create a test tank at world origin (0,0)
         Entity tank = entityFactory.createTank(new Vector2f(0, 0));
+        tank.addComponent(new PlayerControlledComponent());
+        tank.addComponent(new CameraTargetComponent());
         
-        // Set tank as the player for movement system
-        movementSystem.setPlayer(tank);
-
-        // Create and set up camera at world origin (0,0)
+        // Create camera at world origin (0,0)
         Entity camera = entityFactory.createCamera(new Vector2f(0, 0));
-        cameraSystem.setTarget(tank);  // Make camera follow the tank
-
-        // Update debug overlay with camera info
-        if (debugOverlay.isVisible()) {
-            debugOverlay.updateCameraDebug(camera);
-        }
     }
     
     private void gameLoop() {

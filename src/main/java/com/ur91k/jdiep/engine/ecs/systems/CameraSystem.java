@@ -1,7 +1,6 @@
 package com.ur91k.jdiep.engine.ecs.systems;
 
-import com.ur91k.jdiep.engine.ecs.components.CameraComponent;
-import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
+import com.ur91k.jdiep.engine.ecs.components.*;
 import com.ur91k.jdiep.engine.ecs.entities.Entity;
 import com.ur91k.jdiep.engine.core.Time;
 import com.ur91k.jdiep.engine.core.Logger;
@@ -13,16 +12,10 @@ import static org.lwjgl.glfw.GLFW.*;
 public class CameraSystem extends System {
     private static final Logger logger = Logger.getLogger(CameraSystem.class);
     private static final float FREE_ROAM_SPEED = 500.0f; // pixels per second
-    private Entity target;
     private final Input input;
 
     public CameraSystem(Input input) {
         this.input = input;
-    }
-
-    public void setTarget(Entity target) {
-        this.target = target;
-        logger.debug("Camera target set to entity: {}", target.getId());
     }
 
     @Override
@@ -52,11 +45,12 @@ public class CameraSystem extends System {
     }
 
     private void updateFollowMode(CameraComponent camera, double deltaTime) {
-        if (target == null) return;
+        var targets = world.getEntitiesWith(CameraTargetComponent.class, TransformComponent.class);
+        if (targets.isEmpty()) return;
 
+        // Follow the first target found
+        Entity target = targets.iterator().next();
         TransformComponent targetTransform = target.getComponent(TransformComponent.class);
-        if (targetTransform == null) return;
-
         Vector2f targetPos = targetTransform.getPosition();
         Vector2f cameraPos = camera.getPosition();
         Vector2f velocity = camera.getVelocity();

@@ -7,6 +7,7 @@ import com.ur91k.jdiep.engine.ecs.components.MovementComponent;
 import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
 import com.ur91k.jdiep.engine.ecs.components.PlayerControlledComponent;
 import com.ur91k.jdiep.engine.ecs.entities.Entity;
+import com.ur91k.jdiep.engine.ecs.components.PlayerComponent;
 
 import org.joml.Vector2f;
 import static org.lwjgl.glfw.GLFW.*;
@@ -21,9 +22,17 @@ public class MovementSystem extends System {
 
     @Override
     public void update() {
-        var players = world.getEntitiesWith(PlayerControlledComponent.class, MovementComponent.class, TransformComponent.class);
+        var players = world.getEntitiesWith(
+            PlayerComponent.class,
+            MovementComponent.class,
+            TransformComponent.class
+        );
         
         for (Entity player : players) {
+            PlayerComponent playerComp = player.getComponent(PlayerComponent.class);
+            // Only process input for local player
+            if (!playerComp.isLocalPlayer()) continue;
+            
             MovementComponent movement = player.getComponent(MovementComponent.class);
             TransformComponent transform = player.getComponent(TransformComponent.class);
 

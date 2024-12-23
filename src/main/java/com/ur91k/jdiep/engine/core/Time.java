@@ -37,7 +37,7 @@ public class Time {
         return fps;
     }
     
-    private static double getCurrentTime() {
+    public static double getCurrentTime() {
         return glfwGetTime();
     }
 } 

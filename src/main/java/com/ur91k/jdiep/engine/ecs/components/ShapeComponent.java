@@ -14,6 +14,8 @@ public class ShapeComponent extends Component {
     private float[] vertices;  // For custom polygons
     private float radius;      // For circles
     private int sides;         // For regular polygons
+    private float width;       // For rectangles
+    private float height;      // For rectangles
     
     // Circle constructor
     public ShapeComponent(float radius) {
@@ -33,9 +35,20 @@ public class ShapeComponent extends Component {
         this.type = ShapeType.POLYGON;
         this.vertices = vertices;
     }
+    
+    // Rectangle constructor
+    public ShapeComponent(float width, float height) {
+        this.type = ShapeType.RECTANGLE;
+        this.width = width;
+        this.height = height;
+    }
 
     public ShapeType getType() {
         return type;
+    }
+    
+    public void setType(ShapeType type) {
+        this.type = type;
     }
 
     public float getRadius() {
@@ -48,5 +61,21 @@ public class ShapeComponent extends Component {
 
     public float[] getVertices() {
         return vertices;
+    }
+    
+    public float getWidth() {
+        return width;
+    }
+    
+    public void setWidth(float width) {
+        this.width = width;
+    }
+    
+    public float getHeight() {
+        return height;
+    }
+    
+    public void setHeight(float height) {
+        this.height = height;
     }
 }

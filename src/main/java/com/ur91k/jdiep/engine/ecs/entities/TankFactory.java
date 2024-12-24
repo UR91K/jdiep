@@ -44,6 +44,7 @@ public class TankFactory {
     private Entity createTurret(Entity tankBody, float widthRatio, float lengthRatio, 
                               Vector2f offset, float rotation, TurretPhase phase) {
         Entity turret = world.createEntity();
+        logger.debug("Creating turret entity {}", turret.getId());
         
         // Add turret component
         TurretComponent turretComp = new TurretComponent(
@@ -62,11 +63,23 @@ public class TankFactory {
         turret.addComponent(parentComp);
         
         // Add rendering components
-        turret.addComponent(new ShapeComponent(30.0f * widthRatio)); // Scale with tank size
+        float turretWidth = 30.0f * widthRatio;
+        float turretLength = 30.0f * lengthRatio;
+        ShapeComponent shape = new ShapeComponent(turretWidth, turretLength);
+        turret.addComponent(shape);
+        
         turret.addComponent(new RenderLayer(RenderLayer.TURRET));
         ColorComponent turretColor = new ColorComponent(RenderingConstants.TURRET_FILL_COLOR);
         turretColor.setOutline(RenderingConstants.TURRET_OUTLINE_COLOR, 2.0f);
         turret.addComponent(turretColor);
+        
+        logger.debug("Turret components: Shape={}, Color={}, RenderLayer={}, Transform={}, Parent={}",
+            turret.hasComponent(ShapeComponent.class),
+            turret.hasComponent(ColorComponent.class),
+            turret.hasComponent(RenderLayer.class),
+            turret.hasComponent(TransformComponent.class),
+            turret.hasComponent(ParentComponent.class)
+        );
         
         return turret;
     }

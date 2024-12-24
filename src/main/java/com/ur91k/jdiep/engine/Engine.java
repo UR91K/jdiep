@@ -15,10 +15,9 @@ import com.ur91k.jdiep.engine.ecs.systems.MouseAimSystem;
 import com.ur91k.jdiep.engine.ecs.systems.ParentSystem;
 import com.ur91k.jdiep.engine.ecs.systems.RenderSystem;
 import com.ur91k.jdiep.engine.ecs.systems.CameraSystem;
-import com.ur91k.jdiep.engine.ecs.components.CameraComponent;
+import com.ur91k.jdiep.engine.ecs.components.*;
 import com.ur91k.jdiep.engine.ecs.systems.MovementSystem;
-import com.ur91k.jdiep.engine.ecs.components.PlayerControlledComponent;
-import com.ur91k.jdiep.engine.ecs.components.CameraTargetComponent;
+import com.ur91k.jdiep.engine.graphics.RenderLayer;
 
 import org.joml.Vector2f;
 import org.joml.Vector4f;
@@ -64,6 +63,8 @@ public class Engine {
         input.init(window.getHandle());
         Time.init();
         world = new World();  // Create World first
+        
+        // Initialize all systems
         renderSystem = new RenderSystem(world, window.getWidth(), window.getHeight(), input);
         entityRenderSystem = new EntityRenderSystem(renderSystem);
         parentSystem = new ParentSystem();
@@ -71,11 +72,15 @@ public class Engine {
         cameraSystem = new CameraSystem(input);
         movementSystem = new MovementSystem(input);
         debugOverlay = new DebugOverlay(window.getWidth(), window.getHeight());
-        world.addSystem(parentSystem);     // Update parent-child relationships first
-        world.addSystem(movementSystem);   // Then update movement
-        world.addSystem(mouseAimSystem);   // Then update aiming
-        world.addSystem(cameraSystem);     // Then update camera
-        world.addSystem(entityRenderSystem);  // Then render
+        
+        // Add systems in correct update order
+        world.addSystem(movementSystem);   // 1. Update positions
+        world.addSystem(mouseAimSystem);   // 2. Update rotations
+        world.addSystem(parentSystem);     // 3. Update child positions/rotations
+        world.addSystem(cameraSystem);     // 4. Update camera
+        world.addSystem(entityRenderSystem);  // 5. Render everything
+        
+        // Initialize factories
         tankFactory = new TankFactory(world);
         cameraFactory = new CameraFactory(world);
         running = true;
@@ -105,7 +110,6 @@ public class Engine {
     private void gameLoop() {
         while (running && !window.shouldClose()) {
             Time.update();
-            
             input.update();
             
             if (input.isKeyJustPressed(GLFW_KEY_F3)) {
@@ -121,6 +125,30 @@ public class Engine {
                 var cameras = world.getEntitiesWith(CameraComponent.class);
                 if (!cameras.isEmpty()) {
                     debugOverlay.updateCameraDebug(cameras.iterator().next());
+                }
+            }
+            
+            // Debug entity state before rendering
+            if (debugMode) {
+                var renderables = world.getEntitiesWith(
+                    TransformComponent.class,
+                    ShapeComponent.class,
+                    ColorComponent.class,
+                    RenderLayer.class
+                );
+                
+                logger.debug("Found {} renderable entities", renderables.size());
+                for (Entity entity : renderables) {
+                    ShapeComponent shape = entity.getComponent(ShapeComponent.class);
+                    RenderLayer layer = entity.getComponent(RenderLayer.class);
+                    TransformComponent transform = entity.getComponent(TransformComponent.class);
+                    logger.debug("Entity {}: shape={}, layer={}, pos={}, rot={}",
+                        entity.getId(),
+                        shape.getType(),
+                        layer.getLayer(),
+                        transform.getPosition(),
+                        transform.getRotation()
+                    );
                 }
             }
             

@@ -1,44 +1,61 @@
 package com.ur91k.jdiep.engine.ecs.systems;
 
-import org.joml.Vector2f;
-
+import com.ur91k.jdiep.engine.ecs.systems.base.System;
 import com.ur91k.jdiep.engine.ecs.components.ParentComponent;
 import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
 import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
-import com.ur91k.jdiep.engine.ecs.systems.base.System;
+import com.ur91k.jdiep.engine.core.Logger;
+import org.joml.Vector2f;
 
 public class ParentSystem extends System {
+    private static final Logger logger = Logger.getLogger(ParentSystem.class);
+
     @Override
     public void update() {
-        // Get all entities with both transform and parent components
         var children = world.getEntitiesWith(
-            TransformComponent.class,
-            ParentComponent.class
+            ParentComponent.class,
+            TransformComponent.class
         );
 
         for (Entity child : children) {
             ParentComponent parentComp = child.getComponent(ParentComponent.class);
             TransformComponent childTransform = child.getComponent(TransformComponent.class);
-            TransformComponent parentTransform = parentComp.getParent().getComponent(TransformComponent.class);
-
-            // Calculate world position based on parent's transform and local offset
-            Vector2f localOffset = parentComp.getLocalOffset();
-            float parentRotation = parentTransform.getRotation();
+            Entity parent = parentComp.getParent();
             
-            // Rotate offset by parent's rotation
-            float rotatedX = (float) (localOffset.x * Math.cos(parentRotation) - 
-                                    localOffset.y * Math.sin(parentRotation));
-            float rotatedY = (float) (localOffset.x * Math.sin(parentRotation) + 
-                                    localOffset.y * Math.cos(parentRotation));
+            if (parent == null) {
+                logger.warn("Child entity {} has null parent", child.getId());
+                continue;
+            }
+            
+            TransformComponent parentTransform = parent.getComponent(TransformComponent.class);
+            if (parentTransform == null) {
+                logger.warn("Parent entity {} has no transform component", parent.getId());
+                continue;
+            }
 
-            // Set position relative to parent
-            childTransform.setPosition(new Vector2f(
-                parentTransform.getPosition().x + rotatedX,
-                parentTransform.getPosition().y + rotatedY
-            ));
-
-            // Set rotation relative to parent
-            childTransform.setRotation(parentRotation + parentComp.getLocalRotation());
+            // Get parent's world position and rotation
+            Vector2f parentPos = parentTransform.getPosition();
+            float parentRot = parentTransform.getRotation();
+            
+            // Get local offset and rotation
+            Vector2f localOffset = parentComp.getLocalOffset();
+            float localRot = parentComp.getLocalRotation();
+            
+            // Calculate rotated offset
+            float cos = (float)Math.cos(parentRot);
+            float sin = (float)Math.sin(parentRot);
+            Vector2f rotatedOffset = new Vector2f(
+                localOffset.x * cos - localOffset.y * sin,
+                localOffset.x * sin + localOffset.y * cos
+            );
+            
+            // Update child transform
+            Vector2f worldPos = new Vector2f(parentPos).add(rotatedOffset);
+            childTransform.setPosition(worldPos);
+            childTransform.setRotation(parentRot + localRot);
+            
+            logger.trace("Updated child {} transform - pos: {}, rot: {}", 
+                child.getId(), worldPos, parentRot + localRot);
         }
     }
 } 

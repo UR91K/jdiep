@@ -167,18 +167,20 @@ public class EntityRenderSystem extends System {
             model.translate(parentPos.x, parentPos.y, 0)  // Move to parent's position
                 .rotate(parentTransform.getRotation() + parentComp.getLocalRotation(), 0, 0, 1)  // Apply total rotation
                 .translate(localOffset.x, localOffset.y, 0)  // Apply offset
-                .scale(shape.getRadius() * 2 * transform.getScale().x,  // Multiply by 2 since vertices are in [-0.5, 0.5]
-                      shape.getRadius() * 2 * transform.getScale().y, 
+                .scale(shape.getWidth() * transform.getScale().x,  // Use width and height directly
+                      shape.getHeight() * transform.getScale().y, 
                       1);
         } else {
             model.translate(transform.getPosition().x, transform.getPosition().y, 0)
                 .rotate(transform.getRotation(), 0, 0, 1)
-                .scale(shape.getRadius() * 2 * transform.getScale().x,
-                      shape.getRadius() * 2 * transform.getScale().y, 
+                .scale(shape.getWidth() * transform.getScale().x,
+                      shape.getHeight() * transform.getScale().y, 
                       1);
         }
 
+        // Ensure proper VAO binding
         glBindVertexArray(rectangleVao);
+        glBindBuffer(GL_ARRAY_BUFFER, rectangleVbo);
         
         // Draw filled rectangle
         renderSystem.setTransformAndColor(model, color.getFillColor());
@@ -190,6 +192,10 @@ public class EntityRenderSystem extends System {
         glLineWidth(color.getOutlineThickness());
         glDrawArrays(GL_LINE_LOOP, 0, 4);
         endOutlineRender();
+
+        // Reset state
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
     }
 
     private void renderPolygon(TransformComponent transform, ShapeComponent shape, ColorComponent color) {

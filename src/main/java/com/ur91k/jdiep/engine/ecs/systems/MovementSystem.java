@@ -79,7 +79,7 @@ public class MovementSystem extends System {
         transform.translate(new Vector2f(velocity).mul(deltaTime));
 
         // Debug logging for significant velocity changes
-        if (velocity.length() > 100) {
+        if (velocity.length() > 500) {
             logger.debug("High velocity detected: {}", velocity.length());
         }
     }

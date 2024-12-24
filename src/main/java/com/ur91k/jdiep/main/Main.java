@@ -8,7 +8,8 @@ public class Main {
         // Default values
         boolean debugMode = false;
         int maxDebugFrames = 1;
-        Logger.Level logLevel = Logger.Level.INFO;
+        Logger.Level logLevel = Logger.Level.DEBUG;
+    
         
         // Parse command line arguments
         for (int i = 0; i < args.length; i++) {
@@ -40,7 +41,7 @@ public class Main {
             }
         }
 
-        Engine engine = new Engine("jdiep", 800, 600, debugMode, maxDebugFrames, logLevel);
+        Engine engine = new Engine("jdiep", 1280, 960, debugMode, maxDebugFrames, logLevel);
         engine.start();
     }
 

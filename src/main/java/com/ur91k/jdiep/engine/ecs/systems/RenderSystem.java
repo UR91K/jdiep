@@ -96,10 +96,10 @@ public class RenderSystem {
             .scale(camera.getZoom())  // Apply zoom
             .translate(-camera.getPosition().x, -camera.getPosition().y, 0);  // Center on camera
 
-        logger.debug("Updated view matrix - Camera position: {}, Zoom: {}", 
+        logger.trace("Updated view matrix - Camera position: {}, Zoom: {}", 
             camera.getPosition(), camera.getZoom());
-        logger.debug("View matrix: {}", view);
-        logger.debug("Projection matrix: {}", projection);
+        logger.trace("View matrix: {}", view);
+        logger.trace("Projection matrix: {}", projection);
 
         // Update Input system with current matrices
         input.setViewMatrix(view);
@@ -107,7 +107,7 @@ public class RenderSystem {
     }
     
     public void renderGrid(float worldWidth, float worldHeight, float gridSize, Vector4f gridColor) {
-        logger.debug("Rendering grid: {}x{}, size={}, color={}", worldWidth, worldHeight, gridSize, gridColor);
+        logger.trace("Rendering grid: {}x{}, size={}, color={}", worldWidth, worldHeight, gridSize, gridColor);
         
         // Verify shader program is valid
         gameShader.use();

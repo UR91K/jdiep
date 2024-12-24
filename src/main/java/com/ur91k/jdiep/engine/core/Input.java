@@ -171,13 +171,13 @@ public class Input {
 
     public Vector2f getMouseWorldPosition() {
         Vector2f screenPos = getMousePosition();
-        logger.debug("Screen position: {}", screenPos);
+        logger.trace("Screen position: {}", screenPos);
         
         // Convert screen coordinates to centered coordinates
         float centeredX = screenPos.x - windowWidth / 2.0f;
         float centeredY = windowHeight / 2.0f - screenPos.y;  // Flip Y and center
         
-        logger.debug("Centered coordinates: ({}, {})", centeredX, centeredY);
+        logger.trace("Centered coordinates: ({}, {})", centeredX, centeredY);
 
         // Apply view matrix transformations (zoom and camera position)
         Vector2f worldPos = new Vector2f(centeredX, centeredY);
@@ -201,7 +201,7 @@ public class Input {
             worldPos.add(cameraX, cameraY);  // Add camera position to get world position
         }
         
-        logger.debug("World position (after transform): {}", worldPos);
+        logger.trace("World position (after transform): {}", worldPos);
         return worldPos;
     }
 }

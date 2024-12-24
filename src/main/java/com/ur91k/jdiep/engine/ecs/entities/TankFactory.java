@@ -44,7 +44,7 @@ public class TankFactory {
     private Entity createTurret(Entity tankBody, float widthRatio, float lengthRatio, 
                               Vector2f offset, float rotation, TurretPhase phase) {
         Entity turret = world.createEntity();
-        logger.debug("Creating turret entity {}", turret.getId());
+        logger.debug("Creating turret entity {} for tank {}", turret.getId(), tankBody.getId());
         
         // Add turret component
         TurretComponent turretComp = new TurretComponent(
@@ -54,7 +54,10 @@ public class TankFactory {
         turret.addComponent(turretComp);
         
         // Add transform (will be updated by parent system)
-        turret.addComponent(new TransformComponent());
+        TransformComponent transform = new TransformComponent();
+        transform.setPosition(tankBody.getComponent(TransformComponent.class).getPosition());
+        transform.setRotation((float)Math.PI / 2); // Add 90-degree rotation to make length point right
+        turret.addComponent(transform);
         
         // Add parent relationship
         ParentComponent parentComp = new ParentComponent(tankBody);
@@ -63,23 +66,27 @@ public class TankFactory {
         turret.addComponent(parentComp);
         
         // Add rendering components
-        float turretWidth = 30.0f * widthRatio;
-        float turretLength = 30.0f * lengthRatio;
-        ShapeComponent shape = new ShapeComponent(turretWidth, turretLength);
+        float tankRadius = tankBody.getComponent(TankBodyComponent.class).getRadius();
+        // Swap width and length for correct orientation
+        float turretWidth = tankRadius * 2 * lengthRatio;  // Use length for width
+        float turretHeight = tankRadius * 2 * widthRatio;  // Use width for height
+        ShapeComponent shape = new ShapeComponent(turretWidth, turretHeight);
         turret.addComponent(shape);
         
         turret.addComponent(new RenderLayer(RenderLayer.TURRET));
         ColorComponent turretColor = new ColorComponent(RenderingConstants.TURRET_FILL_COLOR);
-        turretColor.setOutline(RenderingConstants.TURRET_OUTLINE_COLOR, 2.0f);
+        turretColor.setOutline(RenderingConstants.TURRET_OUTLINE_COLOR, 3.0f);
         turret.addComponent(turretColor);
         
-        logger.debug("Turret components: Shape={}, Color={}, RenderLayer={}, Transform={}, Parent={}",
-            turret.hasComponent(ShapeComponent.class),
-            turret.hasComponent(ColorComponent.class),
-            turret.hasComponent(RenderLayer.class),
-            turret.hasComponent(TransformComponent.class),
-            turret.hasComponent(ParentComponent.class)
-        );
+        logger.debug("Turret {} components:", turret.getId());
+        logger.debug("- Shape: type={}, width={}, height={}", 
+            shape.getType(), shape.getWidth(), shape.getHeight());
+        logger.debug("- Transform: pos={}, rot={}", 
+            transform.getPosition(), transform.getRotation());
+        logger.debug("- Parent: offset={}, rot={}", 
+            parentComp.getLocalOffset(), parentComp.getLocalRotation());
+        logger.debug("- Color: fill={}, outline={}", 
+            turretColor.getFillColor(), turretColor.getOutlineColor());
         
         return turret;
     }
@@ -108,20 +115,21 @@ public class TankFactory {
         Entity tankBody = createTankBody(120, 2, 1.2f, position);
         TankBodyComponent body = tankBody.getComponent(TankBodyComponent.class);
         PhaseConfig phaseConfig = body.getPhaseConfig();
+        float tankRadius = body.getRadius();
         
-        // Create twin turrets
+        // Create twin turrets with offsets relative to tank radius
         createTurret(
             tankBody,
-            0.3f, 0.7f,
-            new Vector2f(-0.2f, 0),
+            0.074f, 0.14f,
+            new Vector2f(0.2f * tankRadius, 15.0f),  // Right turret
             0.0f,
-            new TurretPhase(phaseConfig, 1)
+            new TurretPhase(phaseConfig, 2)
         );
-        
+
         createTurret(
             tankBody,
-            0.3f, 0.7f,
-            new Vector2f(0.2f, 0),
+            0.074f, 0.14f,
+            new Vector2f(0.2f * tankRadius, -15.0f),  // Right turret
             0.0f,
             new TurretPhase(phaseConfig, 2)
         );

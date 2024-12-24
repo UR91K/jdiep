@@ -10,6 +10,12 @@ public class ParentComponent extends Component {
     private Vector2f localOffset;  // Offset from parent's position
     private float localRotation;   // Rotation relative to parent
 
+    public ParentComponent(Entity parent) {
+        this.parent = parent;
+        this.localOffset = new Vector2f(0, 0);
+        this.localRotation = 0.0f;
+    }
+
     public ParentComponent(Entity parent, Vector2f localOffset, float localRotation) {
         this.parent = parent;
         this.localOffset = new Vector2f(localOffset);
@@ -22,6 +28,10 @@ public class ParentComponent extends Component {
 
     public Vector2f getLocalOffset() {
         return new Vector2f(localOffset);
+    }
+
+    public void setLocalOffset(Vector2f offset) {
+        this.localOffset.set(offset);
     }
 
     public float getLocalRotation() {

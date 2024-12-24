@@ -9,6 +9,7 @@ import com.ur91k.jdiep.engine.ecs.components.MouseAimComponent;
 import com.ur91k.jdiep.engine.ecs.components.ParentComponent;
 import com.ur91k.jdiep.engine.ecs.components.ShapeComponent;
 import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
+import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
 import com.ur91k.jdiep.engine.ecs.components.CameraComponent;
 import com.ur91k.jdiep.engine.ecs.components.MovementComponent;
 

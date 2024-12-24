@@ -5,7 +5,8 @@ import com.ur91k.jdiep.engine.core.Input;
 import com.ur91k.jdiep.engine.core.Logger;
 import com.ur91k.jdiep.engine.graphics.RenderingConstants;
 import com.ur91k.jdiep.engine.ecs.components.CameraComponent;
-import com.ur91k.jdiep.engine.ecs.entities.Entity;
+import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
+
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 

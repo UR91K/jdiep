@@ -7,8 +7,9 @@ import com.ur91k.jdiep.engine.core.Time;
 import com.ur91k.jdiep.engine.core.Logger;
 import com.ur91k.jdiep.engine.graphics.RenderingConstants;
 import com.ur91k.jdiep.engine.ecs.*;
-import com.ur91k.jdiep.engine.ecs.entities.Entity;
-import com.ur91k.jdiep.engine.ecs.entities.EntityFactory;
+import com.ur91k.jdiep.engine.ecs.entities.TankFactory;
+import com.ur91k.jdiep.engine.ecs.entities.CameraFactory;
+import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
 import com.ur91k.jdiep.engine.ecs.systems.EntityRenderSystem;
 import com.ur91k.jdiep.engine.ecs.systems.MouseAimSystem;
 import com.ur91k.jdiep.engine.ecs.systems.ParentSystem;
@@ -36,7 +37,8 @@ public class Engine {
     private CameraSystem cameraSystem;
     private DebugOverlay debugOverlay;
     private World world;
-    private EntityFactory entityFactory;
+    private TankFactory tankFactory;
+    private CameraFactory cameraFactory;
     private boolean running;
     private int frameCount;
     private boolean debugMode;
@@ -74,7 +76,8 @@ public class Engine {
         world.addSystem(mouseAimSystem);   // Then update aiming
         world.addSystem(cameraSystem);     // Then update camera
         world.addSystem(entityRenderSystem);  // Then render
-        entityFactory = new EntityFactory(world);
+        tankFactory = new TankFactory(world);
+        cameraFactory = new CameraFactory(world);
         running = true;
         
         glClearColor(
@@ -90,13 +93,13 @@ public class Engine {
     }
 
     private void createTestEntities() {
-        // Create a test tank at world origin (0,0)
-        Entity tank = entityFactory.createTank(new Vector2f(0, 0));
-        tank.addComponent(new PlayerControlledComponent());
-        tank.addComponent(new CameraTargetComponent());
+        // Create a player-controlled twin tank at world origin
+        Entity playerTank = tankFactory.makePlayerControlled(
+            tankFactory.createTwinTank(new Vector2f(0, 0))
+        );
         
-        // Create camera at world origin (0,0)
-        Entity camera = entityFactory.createCamera(new Vector2f(0, 0));
+        // Create camera at world origin
+        Entity camera = cameraFactory.createCamera(new Vector2f(0, 0));
     }
     
     private void gameLoop() {

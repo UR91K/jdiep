@@ -2,6 +2,8 @@ package com.ur91k.jdiep.engine.ecs.components;
 
 import org.joml.Vector4f;
 
+import com.ur91k.jdiep.engine.ecs.components.base.Component;
+
 public class ColorComponent extends Component {
     private Vector4f fillColor = new Vector4f(1.0f);
     private Vector4f outlineColor = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f);

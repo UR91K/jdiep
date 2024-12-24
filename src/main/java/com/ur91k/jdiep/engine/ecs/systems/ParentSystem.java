@@ -4,7 +4,8 @@ import org.joml.Vector2f;
 
 import com.ur91k.jdiep.engine.ecs.components.ParentComponent;
 import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
-import com.ur91k.jdiep.engine.ecs.entities.Entity;
+import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
+import com.ur91k.jdiep.engine.ecs.systems.base.System;
 
 public class ParentSystem extends System {
     @Override

@@ -1,6 +1,6 @@
-package com.ur91k.jdiep.engine.ecs.components;
+package com.ur91k.jdiep.engine.ecs.components.base;
 
-import com.ur91k.jdiep.engine.ecs.entities.Entity;
+import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
 
 public abstract class Component {
     protected Entity owner;

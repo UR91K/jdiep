@@ -2,7 +2,9 @@ package com.ur91k.jdiep.engine.ecs.systems;
 
 import com.ur91k.jdiep.engine.core.Time;
 import com.ur91k.jdiep.engine.ecs.components.*;
-import com.ur91k.jdiep.engine.ecs.entities.Entity;
+import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
+import com.ur91k.jdiep.engine.ecs.systems.base.System;
+
 import org.joml.Vector2f;
 
 public class NetworkSystem extends System {

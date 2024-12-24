@@ -1,5 +1,6 @@
 package com.ur91k.jdiep.engine.ecs.components;
 
+import com.ur91k.jdiep.engine.ecs.components.base.Component;
 import com.ur91k.jdiep.engine.ecs.firing.TurretPhase;
 import org.joml.Vector2f;
 

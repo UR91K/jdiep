@@ -4,8 +4,9 @@ import com.ur91k.jdiep.engine.core.Input;
 import com.ur91k.jdiep.engine.core.Logger;
 import com.ur91k.jdiep.engine.ecs.components.MouseAimComponent;
 import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
+import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
+import com.ur91k.jdiep.engine.ecs.systems.base.System;
 import com.ur91k.jdiep.engine.ecs.components.ParentComponent;
-import com.ur91k.jdiep.engine.ecs.entities.Entity;
 
 import org.joml.Vector2f;
 

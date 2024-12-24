@@ -1,10 +1,11 @@
-package com.ur91k.jdiep.engine.ecs.entities;
+package com.ur91k.jdiep.engine.ecs.entities.base;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ur91k.jdiep.engine.ecs.components.Component;
 import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
+import com.ur91k.jdiep.engine.ecs.components.base.Component;
 
 public class Entity {
     private final long id;
@@ -40,5 +41,9 @@ public class Entity {
 
     public <T extends Component> void removeComponent(Class<T> componentClass) {
         components.remove(componentClass);
+    }
+
+    public Collection<Component> getComponents() {
+        return components.values();
     }
 }

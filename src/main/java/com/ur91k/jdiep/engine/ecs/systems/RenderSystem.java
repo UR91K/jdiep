@@ -6,7 +6,7 @@ import org.lwjgl.BufferUtils;
 
 import com.ur91k.jdiep.engine.graphics.ShaderProgram;
 import com.ur91k.jdiep.engine.ecs.components.CameraComponent;
-import com.ur91k.jdiep.engine.ecs.entities.Entity;
+import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
 import com.ur91k.jdiep.engine.ecs.World;
 import com.ur91k.jdiep.engine.core.Logger;
 import com.ur91k.jdiep.engine.core.Input;

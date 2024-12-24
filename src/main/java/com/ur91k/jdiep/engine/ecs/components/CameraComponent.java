@@ -2,6 +2,8 @@ package com.ur91k.jdiep.engine.ecs.components;
 
 import org.joml.Vector2f;
 
+import com.ur91k.jdiep.engine.ecs.components.base.Component;
+
 public class CameraComponent extends Component {
     public enum Mode {
         FOLLOW,     // Spring-based following

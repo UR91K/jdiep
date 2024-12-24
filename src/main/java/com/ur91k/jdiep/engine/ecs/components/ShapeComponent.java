@@ -1,5 +1,7 @@
 package com.ur91k.jdiep.engine.ecs.components;
 
+import com.ur91k.jdiep.engine.ecs.components.base.Component;
+
 public class ShapeComponent extends Component {
     public enum ShapeType {
         CIRCLE,

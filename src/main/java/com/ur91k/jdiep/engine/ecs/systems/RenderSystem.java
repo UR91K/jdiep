@@ -106,8 +106,8 @@ public class RenderSystem {
         input.setProjectionMatrix(projection);
     }
     
-    public void renderGrid(float worldWidth, float worldHeight, float gridSize, Vector4f gridColor) {
-        logger.trace("Rendering grid: {}x{}, size={}, color={}", worldWidth, worldHeight, gridSize, gridColor);
+    public void renderGrid(float numLinesX, float numLinesY, float gridSize, Vector4f gridColor) {
+        logger.trace("Rendering grid: {}x{} lines, size={}, color={}", numLinesX, numLinesY, gridSize, gridColor);
         
         // Verify shader program is valid
         gameShader.use();
@@ -147,11 +147,15 @@ public class RenderSystem {
         
         FloatBuffer lineBuffer = BufferUtils.createFloatBuffer(4);
         
+        // Calculate total world dimensions based on number of lines and grid size
+        float worldWidth = (numLinesX - 1) * gridSize;
+        float worldHeight = (numLinesY - 1) * gridSize;
         float halfWidth = worldWidth / 2;
         float halfHeight = worldHeight / 2;
         
         // Draw vertical lines
-        for (float x = -halfWidth; x <= halfWidth; x += gridSize) {
+        for (int i = 0; i < numLinesX; i++) {
+            float x = -halfWidth + (i * gridSize);
             lineBuffer.clear();
             float[] vertices = new float[] { x, -halfHeight, x, halfHeight };
             lineBuffer.put(vertices);
@@ -168,7 +172,8 @@ public class RenderSystem {
         }
         
         // Draw horizontal lines
-        for (float y = -halfHeight; y <= halfHeight; y += gridSize) {
+        for (int i = 0; i < numLinesY; i++) {
+            float y = -halfHeight + (i * gridSize);
             lineBuffer.clear();
             float[] vertices = new float[] { -halfWidth, y, halfWidth, y };
             lineBuffer.put(vertices);

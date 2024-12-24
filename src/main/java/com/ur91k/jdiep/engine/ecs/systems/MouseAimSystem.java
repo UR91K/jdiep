@@ -15,7 +15,8 @@ public class MouseAimSystem extends System {
     public MouseAimSystem(Input input) {
         this.input = input;
     }
-
+    
+    @SuppressWarnings("unused")
     @Override
     public void update() {
         // Update player-controlled tanks

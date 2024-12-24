@@ -154,9 +154,9 @@ public class Engine {
             
             renderSystem.beginFrame();
             renderSystem.renderGrid(
-                1024,           // World width
-                1024,           // World height
-                32,             // Grid size
+                1024,           // Number of vertical lines
+                1024,           // Number of horizontal lines
+                25,             // Grid size
                 RenderingConstants.GRID_COLOR
             );
             

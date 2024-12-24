@@ -10,24 +10,73 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.lwjgl.BufferUtils;
 
+/**
+ * A class for loading and managing BDF (Bitmap Distribution Format) fonts.
+ * This implementation supports ASCII characters from 32 to 126 and creates
+ * a texture atlas for efficient rendering.
+ */
 public class BDFFont {
+    /** Maps ASCII characters to their corresponding glyph data */
     private final Map<Character, Glyph> glyphs = new HashMap<>();
+    
+    /** The texture atlas containing all glyph bitmaps */
     private final ByteBuffer bitmap;
+    
+    /** Width of the texture atlas in pixels */
     private final int textureWidth;
+    
+    /** Height of the texture atlas in pixels */
     private final int textureHeight;
+    
+    /** Width of the font's bounding box */
     private int fontBoundingBoxWidth;
+    
+    /** Height of the font's bounding box */
     private int fontBoundingBoxHeight;
+    
+    /** Baseline offset for proper glyph positioning */
     private int baseline;
     
+    /**
+     * Represents a single character glyph in the font.
+     * Contains both geometric and texture coordinate information.
+     */
     public static class Glyph {
+        /** Width of the glyph in pixels */
         public final int width;
+        
+        /** Height of the glyph in pixels */
         public final int height;
+        
+        /** Horizontal offset from the cursor position */
         public final int xOffset;
+        
+        /** Vertical offset from the baseline */
         public final int yOffset;
+        
+        /** Horizontal advance after rendering this glyph */
         public final int xAdvance;
-        public final float s0, t0, s1, t1; // Texture coordinates
+        
+        /** Texture coordinates for the glyph in the atlas */
+        public final float s0, t0, s1, t1;
+        
+        /** Binary bitmap data for the glyph */
         public final boolean[] bitmap;
         
+        /**
+         * Creates a new Glyph with the specified parameters.
+         *
+         * @param width    Width of the glyph
+         * @param height   Height of the glyph
+         * @param xOffset  Horizontal offset
+         * @param yOffset  Vertical offset
+         * @param xAdvance Horizontal advance
+         * @param s0       Left texture coordinate
+         * @param t0       Top texture coordinate
+         * @param s1       Right texture coordinate
+         * @param t1       Bottom texture coordinate
+         * @param bitmap   Binary bitmap data
+         */
         public Glyph(int width, int height, int xOffset, int yOffset, int xAdvance,
                     float s0, float t0, float s1, float t1, boolean[] bitmap) {
             this.width = width;
@@ -43,6 +92,13 @@ public class BDFFont {
         }
     }
     
+    /**
+     * Creates a new BDFFont from the specified input stream.
+     * Parses the BDF file format and creates a texture atlas containing all glyphs.
+     *
+     * @param inputStream The input stream containing the BDF font data
+     * @throws RuntimeException if the font cannot be loaded
+     */
     @SuppressWarnings("unused")
     public BDFFont(InputStream inputStream) {
         try {
@@ -168,24 +224,52 @@ public class BDFFont {
         }
     }
     
+    /**
+     * Returns the next power of two greater than or equal to the input value.
+     * Used for calculating texture dimensions.
+     *
+     * @param n The input value
+     * @return The next power of two
+     */
     private int nextPowerOfTwo(int n) {
         int value = 1;
         while (value < n) value <<= 1;
         return value;
     }
     
+    /**
+     * Retrieves the glyph data for a specific character.
+     *
+     * @param c The character to look up
+     * @return The Glyph object containing the character's rendering data, or null if not found
+     */
     public Glyph getGlyph(char c) {
         return glyphs.get(c);
     }
     
+    /**
+     * Returns the texture atlas containing all glyph bitmaps.
+     *
+     * @return ByteBuffer containing the texture atlas data
+     */
     public ByteBuffer getBitmap() {
         return bitmap;
     }
     
+    /**
+     * Returns the width of the texture atlas.
+     *
+     * @return Width in pixels
+     */
     public int getTextureWidth() {
         return textureWidth;
     }
     
+    /**
+     * Returns the height of the texture atlas.
+     *
+     * @return Height in pixels
+     */
     public int getTextureHeight() {
         return textureHeight;
     }

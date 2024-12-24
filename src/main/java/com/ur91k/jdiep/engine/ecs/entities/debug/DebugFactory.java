@@ -34,6 +34,7 @@ public class DebugFactory {
     /**
      * Creates a debug label that follows an entity.
      */
+    @SuppressWarnings("unused")
     public Entity createEntityLabel(Entity target, String text) {
         Entity label = world.createEntity();
         

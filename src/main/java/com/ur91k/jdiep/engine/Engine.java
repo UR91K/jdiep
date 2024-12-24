@@ -21,7 +21,6 @@ import com.ur91k.jdiep.engine.ecs.systems.CameraSystem;
 import com.ur91k.jdiep.engine.ecs.systems.debug.*;
 import com.ur91k.jdiep.engine.ecs.systems.movement.*;
 import org.joml.Vector2f;
-import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -42,12 +41,12 @@ public class Engine {
     private DebugFactory debugFactory;
     private boolean running;
     private boolean debugMode;
-    private int maxDebugFrames;
 
     // Debug systems
     private DebugDrawSystem debugDrawSystem;
     private DebugGraphSystem debugGraphSystem;
     private LabelSystem labelSystem;
+    @SuppressWarnings("unused")
     private Entity fpsMonitor;
     private Entity frameTimeGraph;
     private Entity velocityGraph;
@@ -59,7 +58,6 @@ public class Engine {
         Logger.showTimestamp(true);
         
         this.debugMode = debugMode;
-        this.maxDebugFrames = maxDebugFrames;
         
         window = new Window(title, width, height);
         input = new Input();
@@ -157,6 +155,7 @@ public class Engine {
         );
     }
 
+    @SuppressWarnings("unused")
     private void createTestEntities() {
         // Create a player-controlled twin tank at world origin
         playerTank = tankFactory.makePlayerControlled(

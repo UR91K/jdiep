@@ -15,14 +15,23 @@ public class Window {
     private int width, height;
     private String title;
     private boolean resized;
-    
+    private ResizeCallback resizeCallback;
+
+    public interface ResizeCallback {
+        void onResize(int width, int height);
+    }
+
     public Window(String title, int width, int height) {
         this.title = title;
         this.width = width;
         this.height = height;
         this.resized = false;
     }
-    
+
+    public void setResizeCallback(ResizeCallback callback) {
+        this.resizeCallback = callback;
+    }
+
     public void init() {
         GLFWErrorCallback.createPrint(System.err).set();
         
@@ -44,6 +53,9 @@ public class Window {
             width = w;
             height = h;
             resized = true;
+            if (resizeCallback != null) {
+                resizeCallback.onResize(w, h);
+            }
         });
         
         // Center window on screen

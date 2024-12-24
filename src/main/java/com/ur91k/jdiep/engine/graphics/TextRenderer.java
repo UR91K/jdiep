@@ -2,6 +2,7 @@ package com.ur91k.jdiep.engine.graphics;
 
 import com.ur91k.jdiep.engine.core.Logger;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
@@ -186,6 +187,71 @@ public class TextRenderer {
         glDisable(GL_BLEND);
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    
+    public void renderText(String text, Vector2f position, Vector4f color, float scale) {
+        if (text == null || text.isEmpty()) return;
+        
+        shader.use();
+        shader.setMatrix4f("projection", projection);
+        shader.setVector4f("color", color);
+        shader.setInt("text", 0);
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        float xpos = position.x;
+        float ypos = position.y;
+        
+        FloatBuffer vertices = BufferUtils.createFloatBuffer(16);
+        
+        for (char c : text.toCharArray()) {
+            BDFFont.Glyph glyph = font.getGlyph(c);
+            if (glyph == null) continue;
+            
+            float x0 = xpos + glyph.xOffset * scale;
+            float y0 = ypos + glyph.yOffset * scale;
+            float x1 = x0 + glyph.width * scale;
+            float y1 = y0 + glyph.height * scale;
+            
+            vertices.clear();
+            vertices.put(new float[] {
+                x0, y0, glyph.s0, glyph.t0,
+                x1, y0, glyph.s1, glyph.t0,
+                x1, y1, glyph.s1, glyph.t1,
+                x0, y1, glyph.s0, glyph.t1
+            });
+            vertices.flip();
+            
+            glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
+            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+            
+            xpos += glyph.xAdvance * scale;
+        }
+        
+        glDisable(GL_BLEND);
+        glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    public void renderScreenText(String text, Vector2f position, Vector4f color, float scale) {
+        // Screen space coordinates are already in the correct space
+        renderText(text, position, color, scale);
+    }
+    
+    public void handleResize(int width, int height) {
+        // Update projection matrix for new window dimensions
+        projection.identity().ortho(
+            0, width,
+            height, 0,  // Flip Y coordinates for screen space
+            -1, 1
+        );
     }
     
     public void cleanup() {

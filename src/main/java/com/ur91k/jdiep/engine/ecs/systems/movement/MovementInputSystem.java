@@ -36,7 +36,8 @@ public class MovementInputSystem extends InputSystem {
             inputDir.mul(movement.getMoveSpeed());
         }
         
-        movement.setVelocity(inputDir);
+        // Set acceleration instead of velocity directly
+        movement.setAcceleration(inputDir);
     }
     
     private Vector2f getInputDirection() {

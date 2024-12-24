@@ -6,6 +6,7 @@ import com.ur91k.jdiep.engine.ecs.components.base.Component;
 
 public class MovementComponent extends Component {
     private Vector2f velocity;
+    private Vector2f acceleration;
     private float moveSpeed;
     private float friction;
 
@@ -15,6 +16,7 @@ public class MovementComponent extends Component {
 
     public MovementComponent(float moveSpeed, float friction) {
         this.velocity = new Vector2f();
+        this.acceleration = new Vector2f();
         this.moveSpeed = moveSpeed;
         this.friction = friction;
     }
@@ -27,19 +29,38 @@ public class MovementComponent extends Component {
         this.velocity.set(velocity);  // Copy the values
     }
     
+    public Vector2f getAcceleration() {
+        return new Vector2f(acceleration);
+    }
+    
+    public void setAcceleration(Vector2f acceleration) {
+        this.acceleration.set(acceleration);
+    }
+    
     public float getMoveSpeed() { return moveSpeed; }
     public float getFriction() { return friction; }
     
     public void setMoveSpeed(float moveSpeed) { this.moveSpeed = moveSpeed; }
     public void setFriction(float friction) { this.friction = friction; }
     
-    // Helper method to apply friction
+    // Apply acceleration to velocity
+    public void applyAcceleration(float deltaTime) {
+        velocity.add(new Vector2f(acceleration).mul(deltaTime));
+    }
+    
+    // Apply friction to current velocity
     public void applyFriction(float deltaTime) {
-        if (velocity.length() > 0) {
-            velocity.mul(1.0f - (friction * deltaTime));
+        if (velocity.lengthSquared() > 0) {
+            float speed = velocity.length();
+            float drop = speed * friction * deltaTime;
+            float newSpeed = Math.max(0, speed - drop);
+            
+            if (newSpeed != speed) {
+                velocity.mul(newSpeed / speed);
+            }
             
             // Stop completely if velocity is very small
-            if (velocity.length() < 0.01f) {
+            if (velocity.lengthSquared() < 0.01f) {
                 velocity.zero();
             }
         }

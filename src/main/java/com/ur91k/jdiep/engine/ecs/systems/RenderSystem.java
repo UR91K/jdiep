@@ -2,6 +2,7 @@ package com.ur91k.jdiep.engine.ecs.systems;
 
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
 import com.ur91k.jdiep.engine.graphics.ShaderProgram;
@@ -23,10 +24,13 @@ public class RenderSystem {
     private static final Logger logger = Logger.getLogger(RenderSystem.class);
     private final ShaderProgram gameShader;
     private final Matrix4f projection;
+    private final Matrix4f screenProjection;  // For UI/debug elements
     private final Matrix4f view;
     private static final float GRID_LINE_WIDTH = 1.0f;
     private final World world;
     private final Input input;
+    private int windowWidth;
+    private int windowHeight;
     
     // Grid rendering resources
     private final int gridVao;
@@ -35,8 +39,24 @@ public class RenderSystem {
     public RenderSystem(World world, int windowWidth, int windowHeight, Input input) {
         this.world = world;
         this.input = input;
+        this.windowWidth = windowWidth;
+        this.windowHeight = windowHeight;
         this.view = new Matrix4f();
         
+        // World space projection (center origin)
+        projection = new Matrix4f().ortho(
+            -windowWidth/2.0f, windowWidth/2.0f,
+            -windowHeight/2.0f, windowHeight/2.0f,
+            -1, 1
+        );
+        
+        // Screen space projection (top-left origin)
+        screenProjection = new Matrix4f().ortho(
+            0, windowWidth,
+            windowHeight, 0,  // Flip Y coordinates
+            -1, 1
+        );
+
         // Initialize shader
         ClassLoader classLoader = getClass().getClassLoader();
         gameShader = new ShaderProgram(
@@ -54,12 +74,6 @@ public class RenderSystem {
         logger.debug("Shader uniform locations - projection: {}, view: {}, model: {}, color: {}", 
             projLoc, viewLoc, modelLoc, colorLoc);
         
-        projection = new Matrix4f().ortho(
-            -windowWidth/2.0f, windowWidth/2.0f,
-            -windowHeight/2.0f, windowHeight/2.0f,
-            -1, 1
-        );
-
         // Create grid VAO/VBO
         gridVao = glGenVertexArrays();
         gridVbo = glGenBuffers();
@@ -207,5 +221,189 @@ public class RenderSystem {
         gameShader.cleanup();
         glDeleteBuffers(gridVbo);
         glDeleteVertexArrays(gridVao);
+    }
+
+    public void drawLine(Vector2f start, Vector2f end, Vector4f color, float thickness) {
+        gameShader.use();
+        glLineWidth(thickness);
+        
+        // Enable blending for lines
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        // Set uniforms
+        gameShader.setMatrix4f("projection", projection);
+        gameShader.setMatrix4f("view", view);
+        gameShader.setMatrix4f("model", new Matrix4f());
+        gameShader.setVector4f("color", color);
+        
+        // Draw line
+        FloatBuffer lineBuffer = BufferUtils.createFloatBuffer(4);
+        float[] vertices = new float[] { 
+            start.x, start.y,
+            end.x, end.y 
+        };
+        lineBuffer.put(vertices).flip();
+        
+        glBindVertexArray(gridVao);
+        glBindBuffer(GL_ARRAY_BUFFER, gridVbo);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, lineBuffer);
+        glDrawArrays(GL_LINES, 0, 2);
+        
+        // Cleanup state
+        glDisable(GL_BLEND);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
+    
+    public void drawScreenLine(Vector2f start, Vector2f end, Vector4f color, float thickness) {
+        Matrix4f oldView = new Matrix4f(view);
+        Matrix4f oldProj = new Matrix4f(projection);
+        
+        // Switch to screen space
+        view.identity();
+        gameShader.setMatrix4f("projection", screenProjection);
+        
+        // Disable line smoothing for crisp debug shapes
+        glDisable(GL_LINE_SMOOTH);
+        
+        drawLine(start, end, color, thickness);
+        
+        // Restore previous state
+        view.set(oldView);
+        gameShader.setMatrix4f("projection", oldProj);
+        glEnable(GL_LINE_SMOOTH);
+    }
+    
+    public void drawCircle(Vector2f center, float radius, Vector4f color, float thickness) {
+        gameShader.use();
+        glLineWidth(thickness);
+        
+        // Enable blending
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        // Set uniforms
+        gameShader.setMatrix4f("projection", projection);
+        gameShader.setMatrix4f("view", view);
+        gameShader.setMatrix4f("model", new Matrix4f().translate(center.x, center.y, 0));
+        gameShader.setVector4f("color", color);
+        
+        // Generate circle vertices
+        int segments = 32;
+        FloatBuffer circleBuffer = BufferUtils.createFloatBuffer(segments * 2);
+        for (int i = 0; i < segments; i++) {
+            float angle = (float) (2.0f * Math.PI * i / segments);
+            circleBuffer.put((float) Math.cos(angle) * radius);
+            circleBuffer.put((float) Math.sin(angle) * radius);
+        }
+        circleBuffer.flip();
+        
+        // Draw circle
+        glBindVertexArray(gridVao);
+        glBindBuffer(GL_ARRAY_BUFFER, gridVbo);
+        glBufferData(GL_ARRAY_BUFFER, circleBuffer, GL_DYNAMIC_DRAW);
+        glDrawArrays(GL_LINE_LOOP, 0, segments);
+        
+        // Cleanup state
+        glDisable(GL_BLEND);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
+    
+    public void drawScreenCircle(Vector2f center, float radius, Vector4f color, float thickness) {
+        Matrix4f oldView = new Matrix4f(view);
+        Matrix4f oldProj = new Matrix4f(projection);
+        
+        // Switch to screen space
+        view.identity();
+        gameShader.setMatrix4f("projection", screenProjection);
+        
+        // Disable line smoothing for crisp debug shapes
+        glDisable(GL_LINE_SMOOTH);
+        
+        drawCircle(center, radius, color, thickness);
+        
+        // Restore previous state
+        view.set(oldView);
+        gameShader.setMatrix4f("projection", oldProj);
+        glEnable(GL_LINE_SMOOTH);
+    }
+
+    public void drawRect(Vector2f position, float width, float height, Vector4f color, float thickness) {
+        gameShader.use();
+        glLineWidth(thickness);
+        
+        // Enable blending
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        // Set uniforms
+        gameShader.setMatrix4f("projection", projection);
+        gameShader.setMatrix4f("view", view);
+        gameShader.setMatrix4f("model", new Matrix4f());
+        gameShader.setVector4f("color", color);
+        
+        // Draw rectangle outline
+        FloatBuffer vertices = BufferUtils.createFloatBuffer(10);  // 5 vertices * 2 coordinates
+        float[] rectVertices = new float[] {
+            position.x, position.y,                    // Bottom left
+            position.x + width, position.y,            // Bottom right
+            position.x + width, position.y + height,   // Top right
+            position.x, position.y + height,           // Top left
+            position.x, position.y                     // Back to start
+        };
+        vertices.put(rectVertices).flip();
+        
+        glBindVertexArray(gridVao);
+        glBindBuffer(GL_ARRAY_BUFFER, gridVbo);
+        glBufferData(GL_ARRAY_BUFFER, vertices, GL_DYNAMIC_DRAW);
+        glDrawArrays(GL_LINE_STRIP, 0, 5);
+        
+        // Cleanup state
+        glDisable(GL_BLEND);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
+    
+    public void drawScreenRect(Vector2f position, float width, float height, Vector4f color, float thickness) {
+        Matrix4f oldView = new Matrix4f(view);
+        Matrix4f oldProj = new Matrix4f(projection);
+        
+        // Switch to screen space
+        view.identity();
+        gameShader.setMatrix4f("projection", screenProjection);
+        
+        // Disable line smoothing for crisp debug shapes
+        glDisable(GL_LINE_SMOOTH);
+        
+        drawRect(position, width, height, color, thickness);
+        
+        // Restore previous state
+        view.set(oldView);
+        gameShader.setMatrix4f("projection", oldProj);
+        glEnable(GL_LINE_SMOOTH);
+    }
+
+    public void handleResize(int newWidth, int newHeight) {
+        this.windowWidth = newWidth;
+        this.windowHeight = newHeight;
+        
+        // Update world space projection (center origin)
+        projection.identity().ortho(
+            -windowWidth/2.0f, windowWidth/2.0f,
+            -windowHeight/2.0f, windowHeight/2.0f,
+            -1, 1
+        );
+        
+        // Update screen space projection (top-left origin)
+        screenProjection.identity().ortho(
+            0, windowWidth,
+            windowHeight, 0,  // Flip Y coordinates
+            -1, 1
+        );
+        
+        // Update viewport
+        glViewport(0, 0, windowWidth, windowHeight);
     }
 } 

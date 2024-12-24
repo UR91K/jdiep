@@ -1,0 +1,13 @@
+package com.ur91k.jdiep.engine.ecs.systems.base;
+
+import com.ur91k.jdiep.engine.ecs.World;
+import com.ur91k.jdiep.engine.core.Input;
+
+public abstract class InputSystem extends GameSystem {
+    protected Input input;
+    
+    public InputSystem(World world, Input input) {
+        super(world, true);  // Input systems are client-only
+        this.input = input;
+    }
+} 

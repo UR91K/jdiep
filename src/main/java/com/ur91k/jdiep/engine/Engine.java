@@ -16,7 +16,9 @@ import com.ur91k.jdiep.engine.ecs.systems.ParentSystem;
 import com.ur91k.jdiep.engine.ecs.systems.RenderSystem;
 import com.ur91k.jdiep.engine.ecs.systems.CameraSystem;
 import com.ur91k.jdiep.engine.ecs.components.*;
-import com.ur91k.jdiep.engine.ecs.systems.MovementSystem;
+import com.ur91k.jdiep.engine.ecs.systems.movement.MovementInputSystem;
+import com.ur91k.jdiep.engine.ecs.systems.movement.MovementStateSystem;
+import com.ur91k.jdiep.engine.debug.DebugSystem;
 import com.ur91k.jdiep.engine.graphics.RenderLayer;
 
 import org.joml.Vector2f;
@@ -41,7 +43,6 @@ public class Engine {
     private int frameCount;
     private boolean debugMode;
     private int maxDebugFrames;
-    private MovementSystem movementSystem;
 
     public Engine(String title, int width, int height, boolean debugMode, int maxDebugFrames, Logger.Level logLevel) {
         // Configure logging first
@@ -69,15 +70,21 @@ public class Engine {
         parentSystem = new ParentSystem();
         mouseAimSystem = new MouseAimSystem(input);
         cameraSystem = new CameraSystem(input);
-        movementSystem = new MovementSystem(input);
         debugOverlay = new DebugOverlay(window.getWidth(), window.getHeight());
         
+        // Replace old movement system with new ones
+        MovementInputSystem movementInputSystem = new MovementInputSystem(world, input);
+        MovementStateSystem movementStateSystem = new MovementStateSystem(world, true);
+        DebugSystem debugSystem = new DebugSystem(world, debugOverlay);
+        
         // Add systems in correct update order
-        world.addSystem(movementSystem);   // 1. Update positions
-        world.addSystem(mouseAimSystem);   // 2. Update rotations
-        world.addSystem(parentSystem);     // 3. Update child positions/rotations
-        world.addSystem(cameraSystem);     // 4. Update camera
-        world.addSystem(entityRenderSystem);  // 5. Render everything
+        world.addSystem(movementInputSystem);   // 1. Handle input
+        world.addSystem(movementStateSystem);   // 2. Update movement state
+        world.addSystem(mouseAimSystem);        // 3. Update rotations
+        world.addSystem(parentSystem);          // 4. Update child positions/rotations
+        world.addSystem(cameraSystem);          // 5. Update camera
+        world.addSystem(debugSystem);           // 6. Update debug info
+        world.addSystem(entityRenderSystem);    // 7. Render everything
         
         // Initialize factories
         tankFactory = new TankFactory(world);

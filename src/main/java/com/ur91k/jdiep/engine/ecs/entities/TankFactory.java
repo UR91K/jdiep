@@ -8,6 +8,7 @@ import com.ur91k.jdiep.engine.core.Logger;
 import com.ur91k.jdiep.engine.graphics.RenderLayer;
 import com.ur91k.jdiep.engine.graphics.RenderingConstants;
 import org.joml.Vector2f;
+import com.ur91k.jdiep.engine.ecs.components.debug.DebugStateComponent;
 
 public class TankFactory {
     private static final Logger logger = Logger.getLogger(TankFactory.class);
@@ -189,5 +190,26 @@ public class TankFactory {
         logger.debug("Calculated offset: {}", offset);
 
         return offset;
+    }
+
+    public Entity createTank(Vector2f position) {
+        Entity tank = world.createEntity();
+        
+        // Add existing components
+        TransformComponent transform = new TransformComponent();
+        transform.setPosition(position);
+        tank.addComponent(transform);
+        
+        MovementComponent movement = new MovementComponent();
+        tank.addComponent(movement);
+        
+        // Add debug component
+        DebugStateComponent debug = new DebugStateComponent();
+        debug.setValue("type", "Tank");
+        debug.setValue("created_at", System.currentTimeMillis());
+        tank.addComponent(debug);
+        
+        // ... rest of existing tank setup ...
+        return tank;
     }
 } 

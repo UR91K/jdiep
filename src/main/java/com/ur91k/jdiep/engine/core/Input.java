@@ -174,15 +174,22 @@ public class Input {
         Vector2f screenPos = getMousePosition();
         logger.trace("Screen position: {}", screenPos);
         
-        // Convert screen coordinates to centered coordinates
-        float centeredX = screenPos.x - windowWidth / 2.0f;
-        float centeredY = windowHeight / 2.0f - screenPos.y;  // Flip Y and center
+        // Convert screen coordinates to normalized device coordinates (-1 to 1)
+        float ndcX = (2.0f * screenPos.x) / windowWidth - 1.0f;
+        float ndcY = 1.0f - (2.0f * screenPos.y) / windowHeight;
         
-        logger.trace("Centered coordinates: ({}, {})", centeredX, centeredY);
-
+        // Calculate view dimensions based on aspect ratio
+        float aspectRatio = (float)windowWidth / windowHeight;
+        float viewWidth = GameConstants.BASE_VIEW_HEIGHT * aspectRatio;
+        float viewHeight = GameConstants.BASE_VIEW_HEIGHT;
+        
+        // Convert to world coordinates
+        Vector2f worldPos = new Vector2f(
+            ndcX * (viewWidth / 2.0f),
+            ndcY * (viewHeight / 2.0f)
+        );
+        
         // Apply view matrix transformations (zoom and camera position)
-        Vector2f worldPos = new Vector2f(centeredX, centeredY);
-        
         // Check if view matrix is not identity (has some transformation)
         boolean isIdentity = viewMatrix.m00() == 1.0f && 
                            viewMatrix.m11() == 1.0f && 

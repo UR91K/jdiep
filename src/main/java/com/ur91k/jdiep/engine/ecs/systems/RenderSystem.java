@@ -11,6 +11,7 @@ import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
 import com.ur91k.jdiep.engine.ecs.World;
 import com.ur91k.jdiep.engine.core.Logger;
 import com.ur91k.jdiep.engine.core.Input;
+import com.ur91k.jdiep.engine.core.GameConstants;
 
 import java.nio.FloatBuffer;
 import java.util.Collection;
@@ -31,6 +32,8 @@ public class RenderSystem {
     private final Input input;
     private int windowWidth;
     private int windowHeight;
+    private float aspectRatio;
+    private static final float BASE_VIEW_HEIGHT = GameConstants.BASE_VIEW_HEIGHT;
     
     // Grid rendering resources
     private final int gridVao;
@@ -41,12 +44,14 @@ public class RenderSystem {
         this.input = input;
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
+        this.aspectRatio = (float)windowWidth / windowHeight;
         this.view = new Matrix4f();
         
         // World space projection (center origin)
+        float viewWidth = BASE_VIEW_HEIGHT * aspectRatio;
         projection = new Matrix4f().ortho(
-            -windowWidth/2.0f, windowWidth/2.0f,
-            -windowHeight/2.0f, windowHeight/2.0f,
+            -viewWidth/2.0f, viewWidth/2.0f,
+            -BASE_VIEW_HEIGHT/2.0f, BASE_VIEW_HEIGHT/2.0f,
             -1, 1
         );
         
@@ -388,11 +393,13 @@ public class RenderSystem {
     public void handleResize(int newWidth, int newHeight) {
         this.windowWidth = newWidth;
         this.windowHeight = newHeight;
+        this.aspectRatio = (float)newWidth / newHeight;
         
         // Update world space projection (center origin)
+        float viewWidth = BASE_VIEW_HEIGHT * aspectRatio;
         projection.identity().ortho(
-            -windowWidth/2.0f, windowWidth/2.0f,
-            -windowHeight/2.0f, windowHeight/2.0f,
+            -viewWidth/2.0f, viewWidth/2.0f,
+            -BASE_VIEW_HEIGHT/2.0f, BASE_VIEW_HEIGHT/2.0f,
             -1, 1
         );
         

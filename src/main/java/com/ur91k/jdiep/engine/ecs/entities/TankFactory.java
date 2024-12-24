@@ -8,7 +8,6 @@ import com.ur91k.jdiep.engine.core.Logger;
 import com.ur91k.jdiep.engine.graphics.RenderLayer;
 import com.ur91k.jdiep.engine.graphics.RenderingConstants;
 import org.joml.Vector2f;
-import org.joml.Vector4f;
 
 public class TankFactory {
     private static final Logger logger = Logger.getLogger(TankFactory.class);
@@ -31,7 +30,7 @@ public class TankFactory {
         tank.addComponent(new ShapeComponent(30.0f)); // Base tank radius
         tank.addComponent(new RenderLayer(RenderLayer.BODY));
         ColorComponent bodyColor = new ColorComponent(RenderingConstants.RED_FILL_COLOR);
-        bodyColor.setOutline(RenderingConstants.RED_OUTLINE_COLOR, 3.0f);
+        bodyColor.setOutline(RenderingConstants.RED_OUTLINE_COLOR, 4.0f);
         tank.addComponent(bodyColor);
         
         // Set position
@@ -75,7 +74,7 @@ public class TankFactory {
         
         turret.addComponent(new RenderLayer(RenderLayer.TURRET));
         ColorComponent turretColor = new ColorComponent(RenderingConstants.TURRET_FILL_COLOR);
-        turretColor.setOutline(RenderingConstants.TURRET_OUTLINE_COLOR, 3.0f);
+        turretColor.setOutline(RenderingConstants.TURRET_OUTLINE_COLOR, 4.0f);
         turret.addComponent(turretColor);
         
         logger.debug("Turret {} components:", turret.getId());
@@ -120,7 +119,7 @@ public class TankFactory {
         // Create twin turrets with offsets relative to tank radius
         createTurret(
             tankBody,
-            0.074f, 0.14f,
+            0.067f, 0.14f,
             new Vector2f(0.2f * tankRadius, 15.0f),  // Right turret
             0.0f,
             new TurretPhase(phaseConfig, 2)
@@ -128,7 +127,7 @@ public class TankFactory {
 
         createTurret(
             tankBody,
-            0.074f, 0.14f,
+            0.067f, 0.14f,
             new Vector2f(0.2f * tankRadius, -15.0f),  // Right turret
             0.0f,
             new TurretPhase(phaseConfig, 2)

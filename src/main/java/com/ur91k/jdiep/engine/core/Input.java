@@ -1,7 +1,6 @@
 package com.ur91k.jdiep.engine.core;
 
 import org.joml.Vector2f;
-import org.joml.Vector4f;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
@@ -30,6 +29,8 @@ public class Input {
     
     private Matrix4f viewMatrix = new Matrix4f();
     private Matrix4f projectionMatrix = new Matrix4f();
+
+    @SuppressWarnings("unused")
     private boolean matricesNeedUpdate = true;
 
     public void init(long windowHandle) {

@@ -7,6 +7,7 @@ import com.ur91k.jdiep.engine.ecs.systems.base.System;
 
 import org.joml.Vector2f;
 
+@SuppressWarnings("unused")
 public class NetworkSystem extends System {
     private static final float NETWORK_SEND_RATE = 1.0f / 20.0f; // 20Hz update rate
     private float timeSinceLastUpdate = 0;

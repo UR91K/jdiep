@@ -20,7 +20,6 @@ import com.ur91k.jdiep.engine.ecs.systems.MovementSystem;
 import com.ur91k.jdiep.engine.graphics.RenderLayer;
 
 import org.joml.Vector2f;
-import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -97,6 +96,7 @@ public class Engine {
         logger.info("Engine initialized successfully");
     }
 
+    @SuppressWarnings("unused")
     private void createTestEntities() {
         // Create a player-controlled twin tank at world origin
         Entity playerTank = tankFactory.makePlayerControlled(

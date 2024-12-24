@@ -9,7 +9,7 @@ import com.ur91k.jdiep.engine.core.Input;
 import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.*;
-
+@SuppressWarnings("unused")
 public class CameraSystem extends System {
     private static final Logger logger = Logger.getLogger(CameraSystem.class);
     private static final float FREE_ROAM_SPEED = 500.0f; // pixels per second

@@ -1,6 +1,6 @@
 package com.ur91k.jdiep.engine.ecs.components;
 
-import com.ur91k.jdiep.engine.ecs.components.base.Component;
+import com.ur91k.jdiep.engine.ecs.core.Component;
 
 public class PlayerComponent extends Component {
     private final String playerId;  // Unique network ID

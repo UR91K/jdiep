@@ -4,8 +4,8 @@ import com.ur91k.jdiep.engine.ecs.components.ColorComponent;
 import com.ur91k.jdiep.engine.ecs.components.ParentComponent;
 import com.ur91k.jdiep.engine.ecs.components.ShapeComponent;
 import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
-import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
-import com.ur91k.jdiep.engine.ecs.systems.base.System;
+import com.ur91k.jdiep.engine.ecs.core.Entity;
+import com.ur91k.jdiep.engine.ecs.core.System;
 import com.ur91k.jdiep.engine.graphics.RenderLayer;
 
 import org.joml.Matrix4f;

@@ -1,11 +1,11 @@
 package com.ur91k.jdiep.engine.ecs.systems.movement;
 
 import com.ur91k.jdiep.engine.core.window.Input;
-import com.ur91k.jdiep.engine.ecs.World;
 import com.ur91k.jdiep.engine.ecs.systems.base.InputSystem;
-import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
 import com.ur91k.jdiep.engine.ecs.components.MovementComponent;
 import com.ur91k.jdiep.engine.ecs.components.PlayerControlledComponent;
+import com.ur91k.jdiep.engine.ecs.core.Entity;
+import com.ur91k.jdiep.engine.ecs.core.World;
 
 import org.joml.Vector2f;
 

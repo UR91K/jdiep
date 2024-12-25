@@ -5,8 +5,8 @@ import com.ur91k.jdiep.engine.core.time.Time;
 import com.ur91k.jdiep.engine.core.window.Input;
 import com.ur91k.jdiep.engine.ecs.components.MovementComponent;
 import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
-import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
-import com.ur91k.jdiep.engine.ecs.systems.base.System;
+import com.ur91k.jdiep.engine.ecs.core.Entity;
+import com.ur91k.jdiep.engine.ecs.core.System;
 import com.ur91k.jdiep.engine.ecs.components.PlayerComponent;
 
 import org.joml.Vector2f;

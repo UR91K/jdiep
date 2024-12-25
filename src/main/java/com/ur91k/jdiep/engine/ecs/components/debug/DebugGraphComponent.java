@@ -1,8 +1,9 @@
 package com.ur91k.jdiep.engine.ecs.components.debug;
 
-import com.ur91k.jdiep.engine.ecs.components.base.Component;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
+
+import com.ur91k.jdiep.engine.ecs.core.Component;
 
 /**
  * Component for rendering real-time data graphs.

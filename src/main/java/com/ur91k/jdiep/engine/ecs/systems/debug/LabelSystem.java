@@ -1,11 +1,11 @@
 package com.ur91k.jdiep.engine.ecs.systems.debug;
 
 import com.ur91k.jdiep.engine.core.logging.Logger;
-import com.ur91k.jdiep.engine.ecs.World;
 import com.ur91k.jdiep.engine.ecs.components.debug.LabelComponent;
+import com.ur91k.jdiep.engine.ecs.core.Entity;
+import com.ur91k.jdiep.engine.ecs.core.System;
+import com.ur91k.jdiep.engine.ecs.core.World;
 import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
-import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
-import com.ur91k.jdiep.engine.ecs.systems.base.System;
 import com.ur91k.jdiep.engine.graphics.TextRenderer;
 
 import org.joml.Vector2f;

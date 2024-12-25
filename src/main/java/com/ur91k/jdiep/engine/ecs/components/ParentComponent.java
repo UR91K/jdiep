@@ -2,8 +2,8 @@ package com.ur91k.jdiep.engine.ecs.components;
 
 import org.joml.Vector2f;
 
-import com.ur91k.jdiep.engine.ecs.components.base.Component;
-import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
+import com.ur91k.jdiep.engine.ecs.core.Component;
+import com.ur91k.jdiep.engine.ecs.core.Entity;
 
 public class ParentComponent extends Component {
     private Entity parent;

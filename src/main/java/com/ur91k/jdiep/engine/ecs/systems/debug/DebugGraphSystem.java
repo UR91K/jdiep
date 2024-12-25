@@ -1,9 +1,9 @@
 package com.ur91k.jdiep.engine.ecs.systems.debug;
 
-import com.ur91k.jdiep.engine.ecs.World;
 import com.ur91k.jdiep.engine.ecs.components.debug.DebugGraphComponent;
-import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
-import com.ur91k.jdiep.engine.ecs.systems.base.System;
+import com.ur91k.jdiep.engine.ecs.core.Entity;
+import com.ur91k.jdiep.engine.ecs.core.System;
+import com.ur91k.jdiep.engine.ecs.core.World;
 import com.ur91k.jdiep.engine.ecs.systems.RenderSystem;
 import org.joml.Vector2f;
 import org.joml.Vector4f;

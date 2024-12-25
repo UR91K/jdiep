@@ -1,6 +1,6 @@
 package com.ur91k.jdiep.engine.graphics;
 
-import com.ur91k.jdiep.engine.ecs.components.base.Component;
+import com.ur91k.jdiep.engine.ecs.core.Component;
 
 public class RenderLayer extends Component {
     public static final int BACKGROUND = 0;

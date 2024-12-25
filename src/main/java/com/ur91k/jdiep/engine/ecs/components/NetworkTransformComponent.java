@@ -2,7 +2,7 @@ package com.ur91k.jdiep.engine.ecs.components;
 
 import org.joml.Vector2f;
 
-import com.ur91k.jdiep.engine.ecs.components.base.Component;
+import com.ur91k.jdiep.engine.ecs.core.Component;
 
 public class NetworkTransformComponent extends Component {
     private Vector2f lastReceivedPosition;

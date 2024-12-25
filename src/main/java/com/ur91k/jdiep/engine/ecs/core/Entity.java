@@ -1,11 +1,10 @@
-package com.ur91k.jdiep.engine.ecs.entities.base;
+package com.ur91k.jdiep.engine.ecs.core;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
-import com.ur91k.jdiep.engine.ecs.components.base.Component;
 
 public class Entity {
     private final long id;

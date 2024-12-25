@@ -1,8 +1,9 @@
 package com.ur91k.jdiep.engine.ecs.components.debug;
 
-import com.ur91k.jdiep.engine.ecs.components.base.Component;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.ur91k.jdiep.engine.ecs.core.Component;
 
 public class DebugStateComponent extends Component {
     private Map<String, Object> debugValues = new HashMap<>();

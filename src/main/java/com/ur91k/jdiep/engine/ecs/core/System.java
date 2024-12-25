@@ -1,6 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.systems.base;
-
-import com.ur91k.jdiep.engine.ecs.World;
+package com.ur91k.jdiep.engine.ecs.core;
 
 public abstract class System {
     protected World world;

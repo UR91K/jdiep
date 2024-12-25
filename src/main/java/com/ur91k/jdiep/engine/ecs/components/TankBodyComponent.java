@@ -1,7 +1,7 @@
 package com.ur91k.jdiep.engine.ecs.components;
 
 import com.ur91k.jdiep.engine.ecs.scaling.TankScaling;
-import com.ur91k.jdiep.engine.ecs.components.base.Component;
+import com.ur91k.jdiep.engine.ecs.core.Component;
 import com.ur91k.jdiep.engine.ecs.firing.PhaseConfig;
 
 public class TankBodyComponent extends Component {

@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.systems;
+package com.ur91k.jdiep.engine.ecs.systems.movement;
 
 import com.ur91k.jdiep.engine.core.logging.Logger;
 import com.ur91k.jdiep.engine.core.window.Input;

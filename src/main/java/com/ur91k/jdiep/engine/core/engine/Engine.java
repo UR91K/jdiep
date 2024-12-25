@@ -17,8 +17,6 @@ import com.ur91k.jdiep.engine.ecs.components.movement.MovementComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.World;
 import com.ur91k.jdiep.engine.ecs.systems.EntityRenderSystem;
-import com.ur91k.jdiep.engine.ecs.systems.MouseAimSystem;
-import com.ur91k.jdiep.engine.ecs.systems.ParentSystem;
 import com.ur91k.jdiep.engine.ecs.systems.RenderSystem;
 import com.ur91k.jdiep.engine.ecs.systems.CameraSystem;
 import com.ur91k.jdiep.engine.ecs.systems.movement.*;

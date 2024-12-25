@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.main;
+package com.ur91k.jdiep;
 
 import com.ur91k.jdiep.core.engine.Engine;
 import com.ur91k.jdiep.core.logging.Logger;

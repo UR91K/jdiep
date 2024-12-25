@@ -23,7 +23,6 @@ import com.ur91k.jdiep.ecs.systems.render.EntityRenderSystem;
 import com.ur91k.jdiep.ecs.systems.render.RenderSystem;
 import com.ur91k.jdiep.graphics.config.RenderingConstants;
 import com.ur91k.jdiep.graphics.text.TextRenderer;
-import com.ur91k.jdiep.engine.ecs.systems.movement.*;
 
 import org.joml.Vector2f;
 

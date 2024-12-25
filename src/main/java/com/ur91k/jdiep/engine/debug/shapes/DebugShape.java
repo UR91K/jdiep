@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.components.debug.shapes;
+package com.ur91k.jdiep.engine.debug.shapes;
 
 import org.joml.Vector4f;
 

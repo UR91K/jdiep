@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.entities.debug;
+package com.ur91k.jdiep.engine.ecs.factories;
 
 import com.ur91k.jdiep.engine.ecs.components.debug.DebugDrawComponent;
 import com.ur91k.jdiep.engine.ecs.components.debug.LabelComponent;

@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.entities;
+package com.ur91k.jdiep.engine.ecs.factories;
 
 import com.ur91k.jdiep.engine.ecs.components.*;
 import com.ur91k.jdiep.engine.ecs.firing.*;

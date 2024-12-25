@@ -1,9 +1,9 @@
 package com.ur91k.jdiep.engine.ecs.systems;
 
-import com.ur91k.jdiep.engine.ecs.components.ColorComponent;
-import com.ur91k.jdiep.engine.ecs.components.ParentComponent;
-import com.ur91k.jdiep.engine.ecs.components.ShapeComponent;
-import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
+import com.ur91k.jdiep.engine.ecs.components.rendering.ColorComponent;
+import com.ur91k.jdiep.engine.ecs.components.rendering.ShapeComponent;
+import com.ur91k.jdiep.engine.ecs.components.transform.ParentComponent;
+import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.System;
 import com.ur91k.jdiep.engine.graphics.RenderLayer;

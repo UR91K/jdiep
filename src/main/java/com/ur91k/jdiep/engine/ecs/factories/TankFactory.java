@@ -1,6 +1,16 @@
 package com.ur91k.jdiep.engine.ecs.factories;
 
 import com.ur91k.jdiep.engine.ecs.components.*;
+import com.ur91k.jdiep.engine.ecs.components.camera.CameraTargetComponent;
+import com.ur91k.jdiep.engine.ecs.components.gameplay.PlayerComponent;
+import com.ur91k.jdiep.engine.ecs.components.gameplay.PlayerControlledComponent;
+import com.ur91k.jdiep.engine.ecs.components.gameplay.TankBodyComponent;
+import com.ur91k.jdiep.engine.ecs.components.gameplay.TurretComponent;
+import com.ur91k.jdiep.engine.ecs.components.movement.MovementComponent;
+import com.ur91k.jdiep.engine.ecs.components.rendering.ColorComponent;
+import com.ur91k.jdiep.engine.ecs.components.rendering.ShapeComponent;
+import com.ur91k.jdiep.engine.ecs.components.transform.ParentComponent;
+import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.engine.core.logging.Logger;
 import com.ur91k.jdiep.engine.debug.components.DebugStateComponent;
 import com.ur91k.jdiep.engine.graphics.RenderLayer;

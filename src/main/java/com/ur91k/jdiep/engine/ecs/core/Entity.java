@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
+import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;
 
 public class Entity {
     private final long id;

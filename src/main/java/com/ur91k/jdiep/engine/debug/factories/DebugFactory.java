@@ -2,11 +2,12 @@ package com.ur91k.jdiep.engine.debug.factories;
 
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.World;
-import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
 import com.ur91k.jdiep.engine.debug.components.DebugDrawComponent;
 import com.ur91k.jdiep.engine.debug.components.DebugGraphComponent;
 import com.ur91k.jdiep.engine.debug.components.LabelComponent;
-import com.ur91k.jdiep.engine.ecs.components.MovementComponent;
+import com.ur91k.jdiep.engine.ecs.components.movement.MovementComponent;
+import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;
+
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 

@@ -1,6 +1,6 @@
 package com.ur91k.jdiep.engine.ecs.systems.movement;
 
-import com.ur91k.jdiep.engine.core.logging.Logger;
+import com.ur91k.jdiep.core.logging.Logger;
 import com.ur91k.jdiep.engine.ecs.components.transform.ParentComponent;
 import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;

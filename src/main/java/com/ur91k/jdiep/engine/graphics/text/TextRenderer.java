@@ -5,7 +5,7 @@ import org.joml.Vector2f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
-import com.ur91k.jdiep.engine.core.logging.Logger;
+import com.ur91k.jdiep.core.logging.Logger;
 import com.ur91k.jdiep.engine.graphics.core.ShaderProgram;
 
 import java.nio.ByteBuffer;

@@ -1,7 +1,7 @@
 package com.ur91k.jdiep.main;
 
-import com.ur91k.jdiep.engine.core.engine.Engine;
-import com.ur91k.jdiep.engine.core.logging.Logger;
+import com.ur91k.jdiep.core.engine.Engine;
+import com.ur91k.jdiep.core.logging.Logger;
 
 public class Main {
     public static void main(String[] args) {

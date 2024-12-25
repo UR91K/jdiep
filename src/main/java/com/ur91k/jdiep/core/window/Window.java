@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.core.window;
+package com.ur91k.jdiep.core.window;
 
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;

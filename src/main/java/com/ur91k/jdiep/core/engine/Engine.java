@@ -1,14 +1,14 @@
-package com.ur91k.jdiep.engine.core.engine;
+package com.ur91k.jdiep.core.engine;
 
-import com.ur91k.jdiep.engine.core.window.Input;
-import com.ur91k.jdiep.engine.core.window.Window;
 import com.ur91k.jdiep.engine.debug.components.DebugGraphComponent;
 import com.ur91k.jdiep.engine.debug.factories.DebugFactory;
 import com.ur91k.jdiep.engine.debug.systems.DebugDrawSystem;
 import com.ur91k.jdiep.engine.debug.systems.DebugGraphSystem;
 import com.ur91k.jdiep.engine.debug.systems.LabelSystem;
-import com.ur91k.jdiep.engine.core.logging.Logger;
-import com.ur91k.jdiep.engine.core.time.Time;
+import com.ur91k.jdiep.core.logging.Logger;
+import com.ur91k.jdiep.core.time.Time;
+import com.ur91k.jdiep.core.window.Input;
+import com.ur91k.jdiep.core.window.Window;
 import com.ur91k.jdiep.engine.graphics.config.RenderingConstants;
 import com.ur91k.jdiep.engine.graphics.text.TextRenderer;
 import com.ur91k.jdiep.engine.ecs.factories.CameraFactory;

@@ -1,6 +1,6 @@
 package com.ur91k.jdiep.engine.debug.systems;
 
-import com.ur91k.jdiep.engine.core.logging.Logger;
+import com.ur91k.jdiep.core.logging.Logger;
 import com.ur91k.jdiep.engine.debug.components.LabelComponent;
 import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;

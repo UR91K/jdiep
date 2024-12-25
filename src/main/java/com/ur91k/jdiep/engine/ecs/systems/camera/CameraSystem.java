@@ -6,9 +6,9 @@ import com.ur91k.jdiep.engine.ecs.components.camera.CameraTargetComponent;
 import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.System;
-import com.ur91k.jdiep.engine.core.window.Input;
-import com.ur91k.jdiep.engine.core.logging.Logger;
-import com.ur91k.jdiep.engine.core.time.Time;
+import com.ur91k.jdiep.core.logging.Logger;
+import com.ur91k.jdiep.core.time.Time;
+import com.ur91k.jdiep.core.window.Input;
 
 import org.joml.Vector2f;
 

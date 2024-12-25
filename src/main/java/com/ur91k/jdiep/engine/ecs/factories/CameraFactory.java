@@ -1,8 +1,8 @@
 package com.ur91k.jdiep.engine.ecs.factories;
 
-import com.ur91k.jdiep.engine.core.logging.Logger;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.World;
+import com.ur91k.jdiep.core.logging.Logger;
 import com.ur91k.jdiep.engine.ecs.components.camera.CameraComponent;
 import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;
 

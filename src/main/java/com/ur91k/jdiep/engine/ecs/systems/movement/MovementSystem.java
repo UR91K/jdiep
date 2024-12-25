@@ -1,8 +1,8 @@
 package com.ur91k.jdiep.engine.ecs.systems.movement;
 
-import com.ur91k.jdiep.engine.core.logging.Logger;
-import com.ur91k.jdiep.engine.core.time.Time;
-import com.ur91k.jdiep.engine.core.window.Input;
+import com.ur91k.jdiep.core.logging.Logger;
+import com.ur91k.jdiep.core.time.Time;
+import com.ur91k.jdiep.core.window.Input;
 import com.ur91k.jdiep.engine.ecs.components.gameplay.PlayerComponent;
 import com.ur91k.jdiep.engine.ecs.components.movement.MovementComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;

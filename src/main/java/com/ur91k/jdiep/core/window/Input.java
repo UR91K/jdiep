@@ -1,10 +1,10 @@
-package com.ur91k.jdiep.engine.core.window;
+package com.ur91k.jdiep.core.window;
 
 import org.joml.Vector2f;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
-import com.ur91k.jdiep.engine.core.logging.Logger;
+import com.ur91k.jdiep.core.logging.Logger;
 import com.ur91k.jdiep.game.config.GameConstants;
 
 import java.nio.DoubleBuffer;

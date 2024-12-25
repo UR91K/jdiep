@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.components.debug;
+package com.ur91k.jdiep.engine.debug.components;
 
 import java.util.HashMap;
 import java.util.Map;

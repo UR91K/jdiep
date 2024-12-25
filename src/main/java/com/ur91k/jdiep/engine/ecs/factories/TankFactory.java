@@ -3,10 +3,11 @@ package com.ur91k.jdiep.engine.ecs.factories;
 import com.ur91k.jdiep.engine.ecs.components.*;
 import com.ur91k.jdiep.engine.ecs.firing.*;
 import com.ur91k.jdiep.engine.core.logging.Logger;
+import com.ur91k.jdiep.engine.debug.components.DebugStateComponent;
 import com.ur91k.jdiep.engine.graphics.RenderLayer;
 import com.ur91k.jdiep.engine.graphics.RenderingConstants;
 import org.joml.Vector2f;
-import com.ur91k.jdiep.engine.ecs.components.debug.DebugStateComponent;
+
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.World;
 

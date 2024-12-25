@@ -1,6 +1,6 @@
 package com.ur91k.jdiep.engine.ecs.systems.debug;
 
-import com.ur91k.jdiep.engine.ecs.components.debug.DebugGraphComponent;
+import com.ur91k.jdiep.engine.debug.components.DebugGraphComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.System;
 import com.ur91k.jdiep.engine.ecs.core.World;

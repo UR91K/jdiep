@@ -1,9 +1,9 @@
 package com.ur91k.jdiep.engine.ecs.systems.debug;
 
+import com.ur91k.jdiep.engine.debug.components.DebugDrawComponent;
 import com.ur91k.jdiep.engine.debug.shapes.DebugCircle;
 import com.ur91k.jdiep.engine.debug.shapes.DebugLine;
 import com.ur91k.jdiep.engine.debug.shapes.DebugShape;
-import com.ur91k.jdiep.engine.ecs.components.debug.DebugDrawComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.System;
 import com.ur91k.jdiep.engine.ecs.core.World;

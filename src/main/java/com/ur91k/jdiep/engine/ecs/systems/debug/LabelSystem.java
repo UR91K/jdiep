@@ -1,7 +1,7 @@
 package com.ur91k.jdiep.engine.ecs.systems.debug;
 
 import com.ur91k.jdiep.engine.core.logging.Logger;
-import com.ur91k.jdiep.engine.ecs.components.debug.LabelComponent;
+import com.ur91k.jdiep.engine.debug.components.LabelComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.System;
 import com.ur91k.jdiep.engine.ecs.core.World;

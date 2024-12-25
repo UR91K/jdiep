@@ -2,6 +2,7 @@ package com.ur91k.jdiep.engine;
 
 import com.ur91k.jdiep.engine.core.window.Input;
 import com.ur91k.jdiep.engine.core.window.Window;
+import com.ur91k.jdiep.engine.debug.components.DebugGraphComponent;
 import com.ur91k.jdiep.engine.core.logging.Logger;
 import com.ur91k.jdiep.engine.core.time.Time;
 import com.ur91k.jdiep.engine.graphics.RenderingConstants;
@@ -10,7 +11,6 @@ import com.ur91k.jdiep.engine.ecs.factories.CameraFactory;
 import com.ur91k.jdiep.engine.ecs.factories.DebugFactory;
 import com.ur91k.jdiep.engine.ecs.factories.TankFactory;
 import com.ur91k.jdiep.engine.ecs.components.MovementComponent;
-import com.ur91k.jdiep.engine.ecs.components.debug.DebugGraphComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.World;
 import com.ur91k.jdiep.engine.ecs.systems.EntityRenderSystem;

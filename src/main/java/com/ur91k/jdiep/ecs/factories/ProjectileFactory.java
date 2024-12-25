@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.factories;
+package com.ur91k.jdiep.ecs.factories;
 
 import org.joml.Vector2f;
 

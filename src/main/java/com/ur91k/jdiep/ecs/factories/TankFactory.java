@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.factories;
+package com.ur91k.jdiep.ecs.factories;
 
 import com.ur91k.jdiep.core.logging.Logger;
 import com.ur91k.jdiep.debug.components.DebugStateComponent;

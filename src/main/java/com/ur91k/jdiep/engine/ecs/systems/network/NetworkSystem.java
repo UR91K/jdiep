@@ -1,10 +1,10 @@
 package com.ur91k.jdiep.engine.ecs.systems.network;
 
 import com.ur91k.jdiep.core.time.Time;
+import com.ur91k.jdiep.ecs.components.gameplay.PlayerComponent;
+import com.ur91k.jdiep.ecs.components.network.NetworkTransformComponent;
+import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.engine.ecs.components.*;
-import com.ur91k.jdiep.engine.ecs.components.gameplay.PlayerComponent;
-import com.ur91k.jdiep.engine.ecs.components.network.NetworkTransformComponent;
-import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.System;
 

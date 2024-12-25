@@ -3,11 +3,11 @@ package com.ur91k.jdiep.engine.ecs.systems.movement;
 import com.ur91k.jdiep.core.logging.Logger;
 import com.ur91k.jdiep.core.time.Time;
 import com.ur91k.jdiep.core.window.Input;
-import com.ur91k.jdiep.engine.ecs.components.gameplay.PlayerComponent;
-import com.ur91k.jdiep.engine.ecs.components.movement.MovementComponent;
+import com.ur91k.jdiep.ecs.components.gameplay.PlayerComponent;
+import com.ur91k.jdiep.ecs.components.movement.MovementComponent;
+import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.System;
-import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;
 
 import org.joml.Vector2f;
 import static org.lwjgl.glfw.GLFW.*;

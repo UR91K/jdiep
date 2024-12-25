@@ -5,8 +5,8 @@ import com.ur91k.jdiep.engine.ecs.core.World;
 import com.ur91k.jdiep.debug.components.DebugDrawComponent;
 import com.ur91k.jdiep.debug.components.DebugGraphComponent;
 import com.ur91k.jdiep.debug.components.LabelComponent;
-import com.ur91k.jdiep.engine.ecs.components.movement.MovementComponent;
-import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;
+import com.ur91k.jdiep.ecs.components.movement.MovementComponent;
+import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
 
 import org.joml.Vector2f;
 import org.joml.Vector4f;

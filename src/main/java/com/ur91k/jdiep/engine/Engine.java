@@ -21,7 +21,6 @@ import com.ur91k.jdiep.engine.ecs.systems.MouseAimSystem;
 import com.ur91k.jdiep.engine.ecs.systems.ParentSystem;
 import com.ur91k.jdiep.engine.ecs.systems.RenderSystem;
 import com.ur91k.jdiep.engine.ecs.systems.CameraSystem;
-import com.ur91k.jdiep.engine.ecs.systems.debug.*;
 import com.ur91k.jdiep.engine.ecs.systems.movement.*;
 import org.joml.Vector2f;
 

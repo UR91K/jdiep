@@ -5,8 +5,9 @@ import com.ur91k.jdiep.engine.ecs.systems.base.GameSystem;
 import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
 import com.ur91k.jdiep.engine.ecs.components.MovementComponent;
 import com.ur91k.jdiep.engine.ecs.components.TransformComponent;
-import com.ur91k.jdiep.engine.core.Time;
-import com.ur91k.jdiep.engine.core.Logger;
+import com.ur91k.jdiep.engine.core.logging.Logger;
+import com.ur91k.jdiep.engine.core.time.Time;
+
 import org.joml.Vector2f;
 
 public class MovementStateSystem extends GameSystem {

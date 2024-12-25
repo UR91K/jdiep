@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.core;
+package com.ur91k.jdiep.engine.core.logging;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

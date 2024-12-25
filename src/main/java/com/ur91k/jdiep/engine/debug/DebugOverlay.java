@@ -1,8 +1,8 @@
 package com.ur91k.jdiep.engine.debug;
 
 import com.ur91k.jdiep.engine.graphics.TextRenderer;
-import com.ur91k.jdiep.engine.core.Input;
-import com.ur91k.jdiep.engine.core.Logger;
+import com.ur91k.jdiep.engine.core.logging.Logger;
+import com.ur91k.jdiep.engine.core.window.Input;
 import com.ur91k.jdiep.engine.graphics.RenderingConstants;
 import com.ur91k.jdiep.engine.ecs.components.CameraComponent;
 import com.ur91k.jdiep.engine.ecs.entities.base.Entity;

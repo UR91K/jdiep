@@ -1,9 +1,9 @@
 package com.ur91k.jdiep.engine;
 
-import com.ur91k.jdiep.engine.core.Window;
-import com.ur91k.jdiep.engine.core.Input;
-import com.ur91k.jdiep.engine.core.Time;
-import com.ur91k.jdiep.engine.core.Logger;
+import com.ur91k.jdiep.engine.core.window.Input;
+import com.ur91k.jdiep.engine.core.window.Window;
+import com.ur91k.jdiep.engine.core.logging.Logger;
+import com.ur91k.jdiep.engine.core.time.Time;
 import com.ur91k.jdiep.engine.graphics.RenderingConstants;
 import com.ur91k.jdiep.engine.graphics.TextRenderer;
 import com.ur91k.jdiep.engine.ecs.*;

@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.core;
+package com.ur91k.jdiep.engine.core.time;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 

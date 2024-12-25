@@ -1,6 +1,6 @@
 package com.ur91k.jdiep.engine.ecs.systems;
 
-import com.ur91k.jdiep.engine.core.Time;
+import com.ur91k.jdiep.engine.core.time.Time;
 import com.ur91k.jdiep.engine.ecs.components.*;
 import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
 import com.ur91k.jdiep.engine.ecs.systems.base.System;

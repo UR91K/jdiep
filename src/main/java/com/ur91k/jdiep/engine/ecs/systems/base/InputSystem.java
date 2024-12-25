@@ -1,7 +1,7 @@
 package com.ur91k.jdiep.engine.ecs.systems.base;
 
+import com.ur91k.jdiep.engine.core.window.Input;
 import com.ur91k.jdiep.engine.ecs.World;
-import com.ur91k.jdiep.engine.core.Input;
 
 public abstract class InputSystem extends GameSystem {
     protected Input input;

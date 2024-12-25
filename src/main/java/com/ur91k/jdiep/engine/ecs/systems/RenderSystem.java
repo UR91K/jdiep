@@ -9,9 +9,9 @@ import com.ur91k.jdiep.engine.graphics.ShaderProgram;
 import com.ur91k.jdiep.engine.ecs.components.CameraComponent;
 import com.ur91k.jdiep.engine.ecs.entities.base.Entity;
 import com.ur91k.jdiep.engine.ecs.World;
-import com.ur91k.jdiep.engine.core.Logger;
-import com.ur91k.jdiep.engine.core.Input;
+import com.ur91k.jdiep.engine.core.window.Input;
 import com.ur91k.jdiep.engine.core.GameConstants;
+import com.ur91k.jdiep.engine.core.logging.Logger;
 
 import java.nio.FloatBuffer;
 import java.util.Collection;

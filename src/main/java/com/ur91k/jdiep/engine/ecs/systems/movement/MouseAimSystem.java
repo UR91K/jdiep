@@ -5,8 +5,8 @@ import com.ur91k.jdiep.core.window.Input;
 import com.ur91k.jdiep.ecs.components.gameplay.PlayerControlledComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.TankBodyComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
-import com.ur91k.jdiep.engine.ecs.core.Entity;
-import com.ur91k.jdiep.engine.ecs.core.System;
+import com.ur91k.jdiep.ecs.core.Entity;
+import com.ur91k.jdiep.ecs.core.System;
 
 import org.joml.Vector2f;
 

@@ -1,6 +1,6 @@
 package com.ur91k.jdiep.ecs.components.rendering;
 
-import com.ur91k.jdiep.engine.ecs.core.Component;
+import com.ur91k.jdiep.ecs.core.Component;
 
 public class ShapeComponent extends Component {
     public enum ShapeType {

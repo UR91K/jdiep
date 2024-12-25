@@ -1,9 +1,9 @@
 package com.ur91k.jdiep.engine.ecs.factories;
 
-import com.ur91k.jdiep.engine.ecs.core.Entity;
-import com.ur91k.jdiep.engine.ecs.core.World;
-
 import org.joml.Vector2f;
+
+import com.ur91k.jdiep.ecs.core.Entity;
+import com.ur91k.jdiep.ecs.core.World;
 
 public class DroneFactory implements EntityFactory {
     private final World world;

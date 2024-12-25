@@ -12,15 +12,14 @@ import com.ur91k.jdiep.ecs.components.rendering.ColorComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ShapeComponent;
 import com.ur91k.jdiep.ecs.components.transform.ParentComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
+import com.ur91k.jdiep.ecs.core.Entity;
+import com.ur91k.jdiep.ecs.core.World;
 import com.ur91k.jdiep.game.weapons.PhaseConfig;
 import com.ur91k.jdiep.game.weapons.TurretPhase;
 import com.ur91k.jdiep.graphics.config.RenderingConstants;
 import com.ur91k.jdiep.graphics.core.RenderLayer;
 
 import org.joml.Vector2f;
-
-import com.ur91k.jdiep.engine.ecs.core.Entity;
-import com.ur91k.jdiep.engine.ecs.core.World;
 
 public class TankFactory {
     private static final Logger logger = Logger.getLogger(TankFactory.class);

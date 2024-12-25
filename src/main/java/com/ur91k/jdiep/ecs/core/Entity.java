@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.core;
+package com.ur91k.jdiep.ecs.core;
 
 import java.util.Collection;
 import java.util.HashMap;

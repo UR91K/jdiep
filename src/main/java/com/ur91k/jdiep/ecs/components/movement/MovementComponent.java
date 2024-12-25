@@ -2,7 +2,7 @@ package com.ur91k.jdiep.ecs.components.movement;
 
 import org.joml.Vector2f;
 
-import com.ur91k.jdiep.engine.ecs.core.Component;
+import com.ur91k.jdiep.ecs.core.Component;
 
 public class MovementComponent extends Component {
     private Vector2f velocity;

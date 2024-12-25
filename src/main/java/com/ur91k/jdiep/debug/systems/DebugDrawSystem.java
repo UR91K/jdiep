@@ -4,9 +4,9 @@ import com.ur91k.jdiep.debug.components.DebugDrawComponent;
 import com.ur91k.jdiep.debug.shapes.DebugCircle;
 import com.ur91k.jdiep.debug.shapes.DebugLine;
 import com.ur91k.jdiep.debug.shapes.DebugShape;
-import com.ur91k.jdiep.engine.ecs.core.Entity;
-import com.ur91k.jdiep.engine.ecs.core.System;
-import com.ur91k.jdiep.engine.ecs.core.World;
+import com.ur91k.jdiep.ecs.core.Entity;
+import com.ur91k.jdiep.ecs.core.System;
+import com.ur91k.jdiep.ecs.core.World;
 import com.ur91k.jdiep.engine.ecs.systems.render.RenderSystem;
 
 import java.util.Collection;

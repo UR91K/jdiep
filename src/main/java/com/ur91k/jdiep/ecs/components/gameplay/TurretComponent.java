@@ -1,6 +1,6 @@
 package com.ur91k.jdiep.ecs.components.gameplay;
 
-import com.ur91k.jdiep.engine.ecs.core.Component;
+import com.ur91k.jdiep.ecs.core.Component;
 import com.ur91k.jdiep.game.weapons.TurretPhase;
 
 import org.joml.Vector2f;

@@ -3,7 +3,7 @@ package com.ur91k.jdiep.debug.components;
 import com.ur91k.jdiep.debug.shapes.DebugCircle;
 import com.ur91k.jdiep.debug.shapes.DebugLine;
 import com.ur91k.jdiep.debug.shapes.DebugShape;
-import com.ur91k.jdiep.engine.ecs.core.Component;
+import com.ur91k.jdiep.ecs.core.Component;
 
 import org.joml.Vector2f;
 import org.joml.Vector4f;

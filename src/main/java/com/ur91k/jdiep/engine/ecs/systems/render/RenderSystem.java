@@ -7,11 +7,11 @@ import org.lwjgl.BufferUtils;
 
 import com.ur91k.jdiep.game.config.GameConstants;
 import com.ur91k.jdiep.graphics.core.ShaderProgram;
-import com.ur91k.jdiep.engine.ecs.core.Entity;
-import com.ur91k.jdiep.engine.ecs.core.World;
 import com.ur91k.jdiep.core.logging.Logger;
 import com.ur91k.jdiep.core.window.Input;
 import com.ur91k.jdiep.ecs.components.camera.CameraComponent;
+import com.ur91k.jdiep.ecs.core.Entity;
+import com.ur91k.jdiep.ecs.core.World;
 
 import java.nio.FloatBuffer;
 import java.util.Collection;

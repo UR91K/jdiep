@@ -3,7 +3,7 @@ package com.ur91k.jdiep.debug.components;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ur91k.jdiep.engine.ecs.core.Component;
+import com.ur91k.jdiep.ecs.core.Component;
 
 public class DebugStateComponent extends Component {
     private Map<String, Object> debugValues = new HashMap<>();

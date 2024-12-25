@@ -1,7 +1,7 @@
 package com.ur91k.jdiep.engine.ecs.systems.core;
 
-import com.ur91k.jdiep.engine.ecs.core.System;
-import com.ur91k.jdiep.engine.ecs.core.World;
+import com.ur91k.jdiep.ecs.core.System;
+import com.ur91k.jdiep.ecs.core.World;
 
 public abstract class GameSystem extends System {
     protected World world;

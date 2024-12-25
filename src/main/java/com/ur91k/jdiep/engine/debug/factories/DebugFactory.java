@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.factories;
+package com.ur91k.jdiep.engine.debug.factories;
 
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.World;

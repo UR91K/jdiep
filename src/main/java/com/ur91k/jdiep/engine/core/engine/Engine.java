@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine;
+package com.ur91k.jdiep.engine.core.engine;
 
 import com.ur91k.jdiep.engine.core.window.Input;
 import com.ur91k.jdiep.engine.core.window.Window;

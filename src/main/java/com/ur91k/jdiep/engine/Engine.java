@@ -6,7 +6,6 @@ import com.ur91k.jdiep.engine.core.logging.Logger;
 import com.ur91k.jdiep.engine.core.time.Time;
 import com.ur91k.jdiep.engine.graphics.RenderingConstants;
 import com.ur91k.jdiep.engine.graphics.TextRenderer;
-import com.ur91k.jdiep.engine.ecs.*;
 import com.ur91k.jdiep.engine.ecs.factories.CameraFactory;
 import com.ur91k.jdiep.engine.ecs.factories.DebugFactory;
 import com.ur91k.jdiep.engine.ecs.factories.TankFactory;

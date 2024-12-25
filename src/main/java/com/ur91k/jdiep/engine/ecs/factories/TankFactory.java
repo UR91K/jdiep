@@ -1,6 +1,5 @@
 package com.ur91k.jdiep.engine.ecs.factories;
 
-import com.ur91k.jdiep.engine.ecs.components.*;
 import com.ur91k.jdiep.engine.ecs.components.camera.CameraTargetComponent;
 import com.ur91k.jdiep.engine.ecs.components.gameplay.PlayerComponent;
 import com.ur91k.jdiep.engine.ecs.components.gameplay.PlayerControlledComponent;

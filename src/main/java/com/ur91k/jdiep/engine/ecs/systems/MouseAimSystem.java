@@ -2,7 +2,6 @@ package com.ur91k.jdiep.engine.ecs.systems;
 
 import com.ur91k.jdiep.engine.core.logging.Logger;
 import com.ur91k.jdiep.engine.core.window.Input;
-import com.ur91k.jdiep.engine.ecs.components.*;
 import com.ur91k.jdiep.engine.ecs.components.gameplay.PlayerControlledComponent;
 import com.ur91k.jdiep.engine.ecs.components.gameplay.TankBodyComponent;
 import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;

@@ -6,7 +6,7 @@ import com.ur91k.jdiep.engine.ecs.components.transform.ParentComponent;
 import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.System;
-import com.ur91k.jdiep.engine.graphics.RenderLayer;
+import com.ur91k.jdiep.engine.graphics.core.RenderLayer;
 
 import org.joml.Matrix4f;
 import java.util.ArrayList;

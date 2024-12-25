@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.graphics;
+package com.ur91k.jdiep.engine.graphics.core;
 
 import org.joml.Matrix4f;
 import org.joml.Vector4f;

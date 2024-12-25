@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.graphics;
+package com.ur91k.jdiep.engine.graphics.core;
 
 import com.ur91k.jdiep.engine.ecs.core.Component;
 

@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.graphics;
+package com.ur91k.jdiep.engine.graphics.text;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -6,6 +6,7 @@ import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
 import com.ur91k.jdiep.engine.core.logging.Logger;
+import com.ur91k.jdiep.engine.graphics.core.ShaderProgram;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;

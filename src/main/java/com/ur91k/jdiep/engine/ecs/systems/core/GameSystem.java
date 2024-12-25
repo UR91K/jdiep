@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.systems.base;
+package com.ur91k.jdiep.engine.ecs.systems.core;
 
 import com.ur91k.jdiep.engine.ecs.core.System;
 import com.ur91k.jdiep.engine.ecs.core.World;

@@ -1,8 +1,8 @@
 package com.ur91k.jdiep.engine.ecs.components;
 
-import com.ur91k.jdiep.engine.ecs.scaling.TankScaling;
 import com.ur91k.jdiep.engine.ecs.core.Component;
-import com.ur91k.jdiep.engine.ecs.firing.PhaseConfig;
+import com.ur91k.jdiep.game.config.TankScaling;
+import com.ur91k.jdiep.game.weapons.PhaseConfig;
 
 public class TankBodyComponent extends Component {
     private float mass;

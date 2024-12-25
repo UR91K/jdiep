@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.firing;
+package com.ur91k.jdiep.game.weapons;
 
 public class TurretPhase {
     private final int phase;

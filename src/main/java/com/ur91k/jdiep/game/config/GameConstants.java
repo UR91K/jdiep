@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.core;
+package com.ur91k.jdiep.game.config;
 
 public final class GameConstants {
     private GameConstants() {} // Prevent instantiation

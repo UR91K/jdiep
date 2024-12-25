@@ -1,7 +1,8 @@
 package com.ur91k.jdiep.engine.ecs.components;
 
 import com.ur91k.jdiep.engine.ecs.core.Component;
-import com.ur91k.jdiep.engine.ecs.firing.TurretPhase;
+import com.ur91k.jdiep.game.weapons.TurretPhase;
+
 import org.joml.Vector2f;
 
 public class TurretComponent extends Component {

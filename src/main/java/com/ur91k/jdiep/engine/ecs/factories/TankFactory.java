@@ -1,11 +1,13 @@
 package com.ur91k.jdiep.engine.ecs.factories;
 
 import com.ur91k.jdiep.engine.ecs.components.*;
-import com.ur91k.jdiep.engine.ecs.firing.*;
 import com.ur91k.jdiep.engine.core.logging.Logger;
 import com.ur91k.jdiep.engine.debug.components.DebugStateComponent;
 import com.ur91k.jdiep.engine.graphics.RenderLayer;
 import com.ur91k.jdiep.engine.graphics.RenderingConstants;
+import com.ur91k.jdiep.game.weapons.PhaseConfig;
+import com.ur91k.jdiep.game.weapons.TurretPhase;
+
 import org.joml.Vector2f;
 
 import com.ur91k.jdiep.engine.ecs.core.Entity;

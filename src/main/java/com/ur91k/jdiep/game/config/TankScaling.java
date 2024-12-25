@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.scaling;
+package com.ur91k.jdiep.game.config;
 
 public class TankScaling {
     private static final float BASE_DIAMETER = 50.0f;  // Base diameter for mass = 1

@@ -7,7 +7,7 @@ import com.ur91k.jdiep.debug.shapes.DebugShape;
 import com.ur91k.jdiep.ecs.core.Entity;
 import com.ur91k.jdiep.ecs.core.System;
 import com.ur91k.jdiep.ecs.core.World;
-import com.ur91k.jdiep.engine.ecs.systems.render.RenderSystem;
+import com.ur91k.jdiep.ecs.systems.render.RenderSystem;
 
 import java.util.Collection;
 

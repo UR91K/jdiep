@@ -14,12 +14,16 @@ import com.ur91k.jdiep.ecs.core.Entity;
 import com.ur91k.jdiep.ecs.core.World;
 import com.ur91k.jdiep.ecs.factories.CameraFactory;
 import com.ur91k.jdiep.ecs.factories.TankFactory;
+import com.ur91k.jdiep.ecs.systems.camera.CameraSystem;
+import com.ur91k.jdiep.ecs.systems.movement.MouseAimSystem;
+import com.ur91k.jdiep.ecs.systems.movement.MovementInputSystem;
+import com.ur91k.jdiep.ecs.systems.movement.MovementStateSystem;
+import com.ur91k.jdiep.ecs.systems.movement.ParentSystem;
+import com.ur91k.jdiep.ecs.systems.render.EntityRenderSystem;
+import com.ur91k.jdiep.ecs.systems.render.RenderSystem;
 import com.ur91k.jdiep.graphics.config.RenderingConstants;
 import com.ur91k.jdiep.graphics.text.TextRenderer;
-import com.ur91k.jdiep.engine.ecs.systems.camera.CameraSystem;
 import com.ur91k.jdiep.engine.ecs.systems.movement.*;
-import com.ur91k.jdiep.engine.ecs.systems.render.EntityRenderSystem;
-import com.ur91k.jdiep.engine.ecs.systems.render.RenderSystem;
 
 import org.joml.Vector2f;
 

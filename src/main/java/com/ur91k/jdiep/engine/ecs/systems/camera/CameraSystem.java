@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.systems;
+package com.ur91k.jdiep.engine.ecs.systems.camera;
 
 import com.ur91k.jdiep.engine.ecs.components.*;
 import com.ur91k.jdiep.engine.ecs.components.camera.CameraComponent;

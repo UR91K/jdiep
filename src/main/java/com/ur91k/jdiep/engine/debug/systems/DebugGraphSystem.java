@@ -4,7 +4,8 @@ import com.ur91k.jdiep.engine.debug.components.DebugGraphComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.System;
 import com.ur91k.jdiep.engine.ecs.core.World;
-import com.ur91k.jdiep.engine.ecs.systems.RenderSystem;
+import com.ur91k.jdiep.engine.ecs.systems.render.RenderSystem;
+
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 

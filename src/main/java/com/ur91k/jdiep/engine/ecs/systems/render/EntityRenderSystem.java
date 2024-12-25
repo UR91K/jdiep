@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.systems;
+package com.ur91k.jdiep.engine.ecs.systems.render;
 
 import com.ur91k.jdiep.engine.ecs.components.rendering.ColorComponent;
 import com.ur91k.jdiep.engine.ecs.components.rendering.ShapeComponent;

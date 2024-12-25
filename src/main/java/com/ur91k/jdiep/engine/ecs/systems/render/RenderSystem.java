@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.systems;
+package com.ur91k.jdiep.engine.ecs.systems.render;
 
 import org.joml.Matrix4f;
 import org.joml.Vector4f;

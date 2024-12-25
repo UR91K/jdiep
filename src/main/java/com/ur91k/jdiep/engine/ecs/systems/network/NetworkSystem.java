@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.ecs.systems;
+package com.ur91k.jdiep.engine.ecs.systems.network;
 
 import com.ur91k.jdiep.engine.core.time.Time;
 import com.ur91k.jdiep.engine.ecs.components.*;

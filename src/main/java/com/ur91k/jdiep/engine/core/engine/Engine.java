@@ -16,10 +16,11 @@ import com.ur91k.jdiep.engine.ecs.factories.TankFactory;
 import com.ur91k.jdiep.engine.ecs.components.movement.MovementComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.World;
-import com.ur91k.jdiep.engine.ecs.systems.EntityRenderSystem;
-import com.ur91k.jdiep.engine.ecs.systems.RenderSystem;
-import com.ur91k.jdiep.engine.ecs.systems.CameraSystem;
+import com.ur91k.jdiep.engine.ecs.systems.camera.CameraSystem;
 import com.ur91k.jdiep.engine.ecs.systems.movement.*;
+import com.ur91k.jdiep.engine.ecs.systems.render.EntityRenderSystem;
+import com.ur91k.jdiep.engine.ecs.systems.render.RenderSystem;
+
 import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.*;

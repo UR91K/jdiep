@@ -6,7 +6,7 @@ import com.ur91k.jdiep.engine.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.engine.ecs.core.Entity;
 import com.ur91k.jdiep.engine.ecs.core.System;
 import com.ur91k.jdiep.engine.ecs.core.World;
-import com.ur91k.jdiep.engine.graphics.text.TextRenderer;
+import com.ur91k.jdiep.graphics.text.TextRenderer;
 
 import org.joml.Vector2f;
 

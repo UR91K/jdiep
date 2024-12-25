@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.graphics.text;
+package com.ur91k.jdiep.graphics.text;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

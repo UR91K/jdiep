@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.engine.graphics.config;
+package com.ur91k.jdiep.graphics.config;
 
 import org.joml.Vector4f;
 

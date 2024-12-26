@@ -1,7 +1,6 @@
 package com.ur91k.jdiep.debug.components.visualizers;
 
 import com.ur91k.jdiep.ecs.core.Component;
-import org.joml.Vector2f;
 import org.joml.Vector4f;
 
 public class SpawnerVisualizerComponent extends Component {

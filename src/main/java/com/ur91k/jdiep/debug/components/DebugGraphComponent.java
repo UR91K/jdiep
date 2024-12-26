@@ -19,8 +19,7 @@ public class DebugGraphComponent extends Component {
     private int currentIndex = 0;
     private int valueCount = 0;  // Track how many values we've added
     private float minValue = 0;
-    private float maxValue = 1;
-    private boolean autoScale = true;
+    private float maxValue = 100;  // Default to 0-100 range
     private Vector4f color = new Vector4f(0, 1, 0, 0.8f);
     private int width = DEFAULT_WIDTH;
     private int height = DEFAULT_HEIGHT;
@@ -36,7 +35,6 @@ public class DebugGraphComponent extends Component {
      */
     public DebugGraphComponent(String id, Vector2f screenPosition, int maxSamples) {
         this.id = id;
-        // Store position as offset from top-right corner
         this.screenPosition = new Vector2f(screenPosition);
         this.values = new float[maxSamples];
         // Initialize array with default value
@@ -55,30 +53,9 @@ public class DebugGraphComponent extends Component {
     }
 
     public void addValue(float value) {
-        // Store the value
         values[currentIndex] = value;
         currentIndex = (currentIndex + 1) % values.length;
         valueCount = Math.min(valueCount + 1, values.length);
-
-        if (autoScale && valueCount > 0) {
-            // Only scan values we've actually added
-            minValue = Float.MAX_VALUE;
-            maxValue = Float.MIN_VALUE;
-            int count = Math.min(valueCount, values.length);
-            
-            for (int i = 0; i < count; i++) {
-                float v = values[i];
-                minValue = Math.min(minValue, v);
-                maxValue = Math.max(maxValue, v);
-            }
-            
-            // Ensure we always have a valid range
-            if (minValue == maxValue) {
-                float currentValue = minValue;
-                minValue = currentValue - 0.5f;
-                maxValue = currentValue + 0.5f;
-            }
-        }
     }
 
     // Getters
@@ -89,7 +66,6 @@ public class DebugGraphComponent extends Component {
     public int getValueCount() { return valueCount; }
     public float getMinValue() { return minValue; }
     public float getMaxValue() { return maxValue; }
-    public boolean isAutoScale() { return autoScale; }
     public Vector4f getColor() { return new Vector4f(color); }
     public int getWidth() { return width; }
     public int getHeight() { return height; }
@@ -114,13 +90,8 @@ public class DebugGraphComponent extends Component {
         return this;
     }
 
-    public DebugGraphComponent setAutoScale(boolean autoScale) {
-        this.autoScale = autoScale;
-        return this;
-    }
-
     public DebugGraphComponent setRange(float min, float max) {
-        if (!autoScale && min < max) {
+        if (min < max) {
             this.minValue = min;
             this.maxValue = max;
         }
@@ -149,10 +120,6 @@ public class DebugGraphComponent extends Component {
         valueCount = 0;
         for (int i = 0; i < values.length; i++) {
             values[i] = defaultValue;
-        }
-        if (!autoScale) {
-            minValue = 0;
-            maxValue = 1;
         }
     }
 }

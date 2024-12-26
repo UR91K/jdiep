@@ -149,11 +149,17 @@ public class Engine {
             () -> String.valueOf(Time.getFPS())
         );
         
-        // Frame time graph
-        frameTimeGraph = debugFactory.createPerformanceGraph("Frame Time");
+        // Frame time graph (0-100ms range)
+        Entity frameTimeEntity = debugFactory.createPerformanceGraph("Frame Time");
+        frameTimeEntity.getComponent(DebugGraphComponent.class)
+            .setRange(0, 100);
+        frameTimeGraph = frameTimeEntity;
 
-        // Velocity graph
-        velocityGraph = debugFactory.createPerformanceGraph("Velocity");
+        // Velocity graph (0-500 units/s range)
+        Entity velocityEntity = debugFactory.createPerformanceGraph("Velocity");
+        velocityEntity.getComponent(DebugGraphComponent.class)
+            .setRange(0, 500);
+        velocityGraph = velocityEntity;
     }
 
     @SuppressWarnings("unused")

@@ -11,6 +11,8 @@ import org.joml.Vector4f;
 
 import java.util.Collection;
 
+import static org.lwjgl.opengl.GL11.*;
+
 public class DebugGraphSystem extends System {
     private final RenderSystem renderSystem;
     private boolean debugMode = false;
@@ -31,6 +33,12 @@ public class DebugGraphSystem extends System {
     public void update() {
         if (!debugMode) return;
 
+        // Store current line smooth state
+        boolean lineSmooth = glIsEnabled(GL_LINE_SMOOTH);
+        
+        // Disable line smoothing for crisp graph lines
+        glDisable(GL_LINE_SMOOTH);
+
         Collection<Entity> entities = world.getEntitiesWith(DebugGraphComponent.class);
         
         for (Entity entity : entities) {
@@ -38,6 +46,11 @@ public class DebugGraphSystem extends System {
             if (!graph.isVisible()) continue;
             
             renderGraph(graph);
+        }
+        
+        // Restore previous line smooth state
+        if (lineSmooth) {
+            glEnable(GL_LINE_SMOOTH);
         }
     }
 
@@ -80,18 +93,25 @@ public class DebugGraphSystem extends System {
         // Draw lines between points using fixed coordinates
         float xStep = width / (float)(values.length - 1);
         Vector2f prevPoint = null;
+        boolean prevPointValid = false;
         
         for (int i = 0; i < values.length; i++) {
             int idx = (currentIndex - values.length + i + values.length) % values.length;
             float value = values[idx];
-            float normalizedValue = (value - minValue) / valueRange;
             
+            // Skip points outside the range
+            if (value < minValue || value > maxValue) {
+                prevPointValid = false;
+                continue;
+            }
+            
+            float normalizedValue = (value - minValue) / valueRange;
             Vector2f point = new Vector2f(
                 pos.x + i * xStep,
                 pos.y + height - (normalizedValue * height)
             );
             
-            if (prevPoint != null) {
+            if (prevPointValid && prevPoint != null) {
                 renderSystem.drawFixedLine(
                     prevPoint,
                     point,
@@ -101,6 +121,7 @@ public class DebugGraphSystem extends System {
             }
             
             prevPoint = point;
+            prevPointValid = true;
         }
     }
 }

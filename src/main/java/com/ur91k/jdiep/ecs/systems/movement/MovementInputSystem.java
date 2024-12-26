@@ -6,12 +6,14 @@ import com.ur91k.jdiep.ecs.components.movement.MovementComponent;
 import com.ur91k.jdiep.ecs.core.Entity;
 import com.ur91k.jdiep.ecs.core.World;
 import com.ur91k.jdiep.ecs.systems.core.InputSystem;
+import com.ur91k.jdiep.core.logging.Logger;
 
 import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class MovementInputSystem extends InputSystem {
+    private static final Logger logger = Logger.getLogger(MovementInputSystem.class);
     
     public MovementInputSystem(World world, Input input) {
         super(world, input);
@@ -31,10 +33,14 @@ public class MovementInputSystem extends InputSystem {
         MovementComponent movement = entity.getComponent(MovementComponent.class);
         Vector2f inputDir = getInputDirection();
         
+        // Store raw input direction for visualization
+        movement.setInputDirection(new Vector2f(inputDir));
+        
         // Normalize if moving diagonally
         if (inputDir.length() > 0) {
             inputDir.normalize();
             inputDir.mul(movement.getMoveSpeed());
+            logger.trace("Input direction: {}, Acceleration: {}", movement.getInputDirection(), inputDir);
         }
         
         // Set acceleration instead of velocity directly

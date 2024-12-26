@@ -8,10 +8,12 @@ import com.ur91k.jdiep.ecs.core.Entity;
 import com.ur91k.jdiep.ecs.core.System;
 import com.ur91k.jdiep.ecs.core.World;
 import com.ur91k.jdiep.ecs.systems.render.RenderSystem;
+import com.ur91k.jdiep.core.logging.Logger;
 
 import java.util.Collection;
 
 public class DebugDrawSystem extends System {
+    private static final Logger logger = Logger.getLogger(DebugDrawSystem.class);
     private final RenderSystem renderSystem;
     private boolean debugMode = false;
 
@@ -22,6 +24,7 @@ public class DebugDrawSystem extends System {
 
     public void setDebugMode(boolean enabled) {
         this.debugMode = enabled;
+        logger.debug("Debug draw mode: {}", enabled);
     }
 
     @Override
@@ -29,17 +32,22 @@ public class DebugDrawSystem extends System {
         if (!debugMode) return;
 
         Collection<Entity> entities = world.getEntitiesWith(DebugDrawComponent.class);
+        logger.trace("Found {} entities with DebugDrawComponent", entities.size());
         
         for (Entity entity : entities) {
             DebugDrawComponent debugDraw = entity.getComponent(DebugDrawComponent.class);
             if (!debugDraw.isVisible()) continue;
 
             debugDraw.update(); // Update dynamic shapes
+            
+            logger.trace("Entity {} has {} debug shapes", entity.getId(), debugDraw.getShapes().size());
 
             for (DebugShape shape : debugDraw.getShapes()) {
                 if (shape instanceof DebugLine line) {
+                    logger.trace("Drawing line from {} to {}", line.getStart(), line.getEnd());
                     renderLine(line, debugDraw.isScreenSpace());
                 } else if (shape instanceof DebugCircle circle) {
+                    logger.trace("Drawing circle at {} with radius {}", circle.getCenter(), circle.getRadius());
                     renderCircle(circle, debugDraw.isScreenSpace());
                 }
             }

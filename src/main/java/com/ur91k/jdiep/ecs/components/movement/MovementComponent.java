@@ -7,6 +7,7 @@ import com.ur91k.jdiep.ecs.core.Component;
 public class MovementComponent extends Component {
     private Vector2f velocity;
     private Vector2f acceleration;
+    private Vector2f inputDirection;  // Current raw input direction
     private float moveSpeed;
     private float friction;
 
@@ -17,6 +18,7 @@ public class MovementComponent extends Component {
     public MovementComponent(float moveSpeed, float friction) {
         this.velocity = new Vector2f();
         this.acceleration = new Vector2f();
+        this.inputDirection = new Vector2f();
         this.moveSpeed = moveSpeed;
         this.friction = friction;
     }
@@ -35,6 +37,14 @@ public class MovementComponent extends Component {
     
     public void setAcceleration(Vector2f acceleration) {
         this.acceleration.set(acceleration);
+    }
+
+    public Vector2f getInputDirection() {
+        return new Vector2f(inputDirection);
+    }
+
+    public void setInputDirection(Vector2f inputDirection) {
+        this.inputDirection.set(inputDirection);
     }
     
     public float getMoveSpeed() { return moveSpeed; }

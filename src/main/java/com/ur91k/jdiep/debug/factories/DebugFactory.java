@@ -24,6 +24,7 @@ public class DebugFactory {
     private static final Vector4f 
         COLOR_DEBUG = new Vector4f(0.0f, 1.0f, 0.0f, 0.8f),    // Default debug color
         COLOR_VELOCITY = new Vector4f(1, 0, 0, 1),             // Red
+        COLOR_INPUT = new Vector4f(0, 0.8f, 1, 1),            // Light blue
         COLOR_HITBOX = new Vector4f(0, 1, 0, 0.5f),           // Semi-transparent green
         COLOR_DETECTION = new Vector4f(1, 1, 0, 0.3f),        // Semi-transparent yellow
         COLOR_SPAWN = new Vector4f(0, 0, 1, 0.3f),            // Semi-transparent blue
@@ -89,7 +90,7 @@ public class DebugFactory {
     }
     
     /**
-     * Creates velocity visualization for an entity.
+     * Creates velocity and input direction visualization for an entity.
      */
     public DebugDrawComponent createVelocityVisualizer(Entity entity) {
         MovementComponent movement = entity.getComponent(MovementComponent.class);
@@ -97,16 +98,30 @@ public class DebugFactory {
         
         DebugDrawComponent debugDraw = new DebugDrawComponent();
         
-        // Add velocity vector
+        // Add velocity vector - length represents actual velocity
         debugDraw.addDynamicLine(
             () -> transform.getPosition(),
             () -> {
                 Vector2f endPos = new Vector2f(transform.getPosition());
                 Vector2f velocity = movement.getVelocity();
-                endPos.add(new Vector2f(velocity).normalize().mul(velocity.length() * 50)); // Scale for visibility
+                endPos.add(new Vector2f(velocity).mul(0.5f)); // Scale for visibility
                 return endPos;
             },
             COLOR_VELOCITY
+        );
+        
+        // Add input direction vector - fixed length
+        debugDraw.addDynamicLine(
+            () -> transform.getPosition(),
+            () -> {
+                Vector2f endPos = new Vector2f(transform.getPosition());
+                Vector2f input = movement.getInputDirection();
+                if (input.length() > 0.01f) {  // Only show when there's input
+                    endPos.add(new Vector2f(input).normalize().mul(40.0f));
+                }
+                return endPos;
+            },
+            COLOR_INPUT
         );
         
         return debugDraw;
@@ -125,6 +140,51 @@ public class DebugFactory {
             () -> transform.getPosition(),
             () -> radius,
             COLOR_HITBOX
+        );
+        
+        return debugDraw;
+    }
+    
+    /**
+     * Creates combined debug visualization for an entity.
+     */
+    public DebugDrawComponent createDebugVisualizer(Entity entity, float hitboxRadius) {
+        MovementComponent movement = entity.getComponent(MovementComponent.class);
+        TransformComponent transform = entity.getComponent(TransformComponent.class);
+        
+        DebugDrawComponent debugDraw = new DebugDrawComponent();
+        
+        // Add hitbox circle
+        debugDraw.addDynamicCircle(
+            () -> transform.getPosition(),
+            () -> hitboxRadius,
+            COLOR_HITBOX
+        );
+        
+        // Add velocity vector - length represents actual velocity
+        debugDraw.addDynamicLine(
+            () -> transform.getPosition(),
+            () -> {
+                Vector2f endPos = new Vector2f(transform.getPosition());
+                Vector2f velocity = movement.getVelocity();
+                endPos.add(new Vector2f(velocity).mul(0.5f)); // Scale for visibility
+                return endPos;
+            },
+            COLOR_VELOCITY
+        );
+        
+        // Add input direction vector - fixed length
+        debugDraw.addDynamicLine(
+            () -> transform.getPosition(),
+            () -> {
+                Vector2f endPos = new Vector2f(transform.getPosition());
+                Vector2f input = movement.getInputDirection();
+                if (input.length() > 0.01f) {  // Only show when there's input
+                    endPos.add(new Vector2f(input).normalize().mul(40.0f));
+                }
+                return endPos;
+            },
+            COLOR_INPUT
         );
         
         return debugDraw;

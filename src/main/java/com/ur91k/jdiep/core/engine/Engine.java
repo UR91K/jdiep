@@ -169,9 +169,8 @@ public class Engine {
             tankFactory.createTwinTank(new Vector2f(0, 0))
         );
         
-        // Add debug visualizations
-        playerTank.addComponent(debugFactory.createVelocityVisualizer(playerTank));
-        playerTank.addComponent(debugFactory.createHitboxVisualizer(playerTank, 30.0f));
+        // Add debug visualizations (combined into one component)
+        playerTank.addComponent(debugFactory.createDebugVisualizer(playerTank, 30.0f));
         debugFactory.createEntityLabel(playerTank, String.format("Player Tank (ID: %d)", playerTank.getId()));
         
         // Create camera at world origin

@@ -44,6 +44,10 @@ public class MovementStateSystem extends GameSystem {
         // Get current state
         Vector2f currentPos = transform.getPosition();
         Vector2f velocity = movement.getVelocity();
+        // Debug logging for velocity
+        if (velocity.length() > 0.01f) {
+            logger.trace("Entity {} velocity: {}", entity.getId(), velocity);
+        }
         
         // Update position based on velocity
         Vector2f newPosition = new Vector2f(
@@ -52,10 +56,5 @@ public class MovementStateSystem extends GameSystem {
         );
         
         transform.setPosition(newPosition);
-        
-        // Debug logging for significant velocity changes
-        if (velocity.length() > 500) {
-            logger.debug("High velocity detected for entity {}: {}", entity.getId(), velocity.length());
-        }
     }
 } 

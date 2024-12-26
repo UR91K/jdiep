@@ -13,6 +13,7 @@ import org.joml.Vector2f;
 
 import java.util.Collection;
 
+@SuppressWarnings("unused")
 public class LabelSystem extends System {
     private static final Logger logger = Logger.getLogger(LabelSystem.class);
     private static final int CHAR_WIDTH = 8;  // BDF font character width in pixels

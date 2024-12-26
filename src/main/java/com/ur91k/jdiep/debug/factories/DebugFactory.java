@@ -19,6 +19,7 @@ import java.util.function.Supplier;
 /**
  * Factory for creating common debug visualizations.
  */
+@SuppressWarnings("unused")
 public class DebugFactory {
     // Debug colors
     private static final Vector4f 

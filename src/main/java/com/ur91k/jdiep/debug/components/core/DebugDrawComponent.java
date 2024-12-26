@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.debug.components;
+package com.ur91k.jdiep.debug.components.core;
 
 import com.ur91k.jdiep.debug.shapes.DebugCircle;
 import com.ur91k.jdiep.debug.shapes.DebugLine;

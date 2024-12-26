@@ -1,4 +1,4 @@
-package com.ur91k.jdiep.debug.components;
+package com.ur91k.jdiep.debug.components.core;
 
 import org.joml.Vector2f;
 import org.joml.Vector4f;

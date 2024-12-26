@@ -1,6 +1,7 @@
 package com.ur91k.jdiep.graphics.config;
 
 import org.joml.Vector4f;
+import static com.ur91k.jdiep.core.utils.ColorUtils.rgb;
 
 public final class RenderingConstants {
     private RenderingConstants() {} // Prevent instantiation
@@ -36,15 +37,4 @@ public final class RenderingConstants {
     //TURRET COLORS
     public static final Vector4f TURRET_FILL_COLOR = rgb(0x999999);
     public static final Vector4f TURRET_OUTLINE_COLOR = rgb(0x727272);
-
-    //HELPER FUNCTIONS
-    private static Vector4f rgb(int r, int g, int b) {
-        return new Vector4f(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
-    }
-    
-    @SuppressWarnings("unused")
-    public
-    static Vector4f rgb(int hex) {
-        return rgb((hex >> 16) & 0xFF, (hex >> 8) & 0xFF, hex & 0xFF);
-    }
 } 

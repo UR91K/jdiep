@@ -1,6 +1,6 @@
 package com.ur91k.jdiep.debug.systems;
 
-import com.ur91k.jdiep.debug.components.DebugDrawComponent;
+import com.ur91k.jdiep.debug.components.core.DebugDrawComponent;
 import com.ur91k.jdiep.debug.shapes.DebugCircle;
 import com.ur91k.jdiep.debug.shapes.DebugLine;
 import com.ur91k.jdiep.debug.shapes.DebugShape;

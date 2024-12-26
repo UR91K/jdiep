@@ -4,7 +4,7 @@ import com.ur91k.jdiep.core.logging.Logger;
 import com.ur91k.jdiep.core.time.Time;
 import com.ur91k.jdiep.core.window.Input;
 import com.ur91k.jdiep.core.window.Window;
-import com.ur91k.jdiep.debug.components.DebugGraphComponent;
+import com.ur91k.jdiep.debug.components.core.DebugGraphComponent;
 import com.ur91k.jdiep.debug.factories.DebugFactory;
 import com.ur91k.jdiep.debug.systems.DebugDrawSystem;
 import com.ur91k.jdiep.debug.systems.DebugGraphSystem;

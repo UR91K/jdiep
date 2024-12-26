@@ -1,9 +1,11 @@
 package com.ur91k.jdiep.debug.systems;
 
 import com.ur91k.jdiep.core.logging.Logger;
-import com.ur91k.jdiep.debug.components.HitboxVisualizerComponent;
-import com.ur91k.jdiep.debug.components.InputVisualizerComponent;
-import com.ur91k.jdiep.debug.components.VelocityVisualizerComponent;
+import com.ur91k.jdiep.debug.components.visualizers.HitboxVisualizerComponent;
+import com.ur91k.jdiep.debug.components.visualizers.InputVisualizerComponent;
+import com.ur91k.jdiep.debug.components.visualizers.SpawnerVisualizerComponent;
+import com.ur91k.jdiep.debug.components.visualizers.TurretVisualizerComponent;
+import com.ur91k.jdiep.debug.components.visualizers.VelocityVisualizerComponent;
 import com.ur91k.jdiep.ecs.components.movement.MovementComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.ecs.core.Entity;
@@ -34,6 +36,8 @@ public class VisualizerSystem extends System {
         renderVelocityVisualizers();
         renderInputVisualizers();
         renderHitboxVisualizers();
+        renderSpawnerVisualizers();
+        renderTurretVisualizers();
     }
 
     private void renderVelocityVisualizers() {
@@ -88,6 +92,52 @@ public class VisualizerSystem extends System {
                 visualizer.getColor(),
                 1.0f
             );
+        }
+    }
+
+    private void renderSpawnerVisualizers() {
+        for (Entity entity : world.getEntitiesWith(SpawnerVisualizerComponent.class, TransformComponent.class)) {
+            SpawnerVisualizerComponent visualizer = entity.getComponent(SpawnerVisualizerComponent.class);
+            if (!visualizer.isVisible()) continue;
+
+            TransformComponent transform = entity.getComponent(TransformComponent.class);
+            Vector2f position = transform.getPosition();
+
+            // Draw detection radius first (larger circle)
+            renderSystem.drawCircle(
+                position,
+                visualizer.getDetectionRadius(),
+                visualizer.getDetectionColor(),
+                1.0f
+            );
+
+            // Draw spawn radius on top (smaller circle)
+            renderSystem.drawCircle(
+                position,
+                visualizer.getSpawnRadius(),
+                visualizer.getSpawnColor(),
+                1.0f
+            );
+        }
+    }
+
+    private void renderTurretVisualizers() {
+        for (Entity entity : world.getEntitiesWith(TurretVisualizerComponent.class, TransformComponent.class)) {
+            TurretVisualizerComponent visualizer = entity.getComponent(TurretVisualizerComponent.class);
+            if (!visualizer.isVisible()) continue;
+
+            TransformComponent transform = entity.getComponent(TransformComponent.class);
+            Vector2f start = transform.getPosition();
+            float rotation = transform.getRotation();
+
+            Vector2f end = new Vector2f(start).add(
+                new Vector2f(
+                    (float)Math.cos(rotation),
+                    (float)Math.sin(rotation)
+                ).mul(visualizer.getLength())
+            );
+
+            renderSystem.drawLine(start, end, visualizer.getColor(), 1.0f);
         }
     }
 } 

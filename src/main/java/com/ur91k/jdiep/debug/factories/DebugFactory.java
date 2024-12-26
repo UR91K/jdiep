@@ -1,13 +1,22 @@
 package com.ur91k.jdiep.debug.factories;
 
 import com.ur91k.jdiep.debug.components.*;
+import com.ur91k.jdiep.debug.components.core.DebugGraphComponent;
+import com.ur91k.jdiep.debug.components.core.DebugLayoutComponent;
+import com.ur91k.jdiep.debug.components.core.LabelComponent;
+import com.ur91k.jdiep.debug.components.visualizers.HitboxVisualizerComponent;
+import com.ur91k.jdiep.debug.components.visualizers.InputVisualizerComponent;
+import com.ur91k.jdiep.debug.components.visualizers.SpawnerVisualizerComponent;
+import com.ur91k.jdiep.debug.components.visualizers.TurretVisualizerComponent;
+import com.ur91k.jdiep.debug.components.visualizers.VelocityVisualizerComponent;
 import com.ur91k.jdiep.ecs.components.movement.MovementComponent;
 import com.ur91k.jdiep.ecs.components.transform.ParentComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.ecs.core.Entity;
 import com.ur91k.jdiep.ecs.core.World;
 import com.ur91k.jdiep.core.window.Window;
-import static com.ur91k.jdiep.graphics.config.RenderingConstants.rgb;
+import static com.ur91k.jdiep.core.utils.ColorUtils.rgb;
+import static com.ur91k.jdiep.core.utils.ColorUtils.rgba;
 
 import org.joml.Vector2f;
 import org.joml.Vector4f;
@@ -23,10 +32,10 @@ public class DebugFactory {
         COLOR_DEBUG = rgb(0x0A9371),    // Default debug color
         COLOR_VELOCITY = rgb(0x910A2E),  // Red
         COLOR_INPUT = rgb(0x0A91E3),     // Light blue
-        COLOR_HITBOX = new Vector4f(rgb(0x0A910A)).mul(1, 1, 1, 0.5f),  // Semi-transparent green
-        COLOR_DETECTION = new Vector4f(rgb(0x919100)).mul(1, 1, 1, 0.3f),  // Semi-transparent yellow
-        COLOR_SPAWN = new Vector4f(rgb(0x0A0A91)).mul(1, 1, 1, 0.3f),  // Semi-transparent blue
-        COLOR_AIM = rgb(0x910A91);  // Magenta
+        COLOR_HITBOX = rgba(0x0A910A80),  // Semi-transparent green
+        COLOR_DETECTION = rgba(0x91910050),  // Semi-transparent yellow
+        COLOR_SPAWN = rgba(0x0A0A9150),   // Semi-transparent blue
+        COLOR_AIM = rgb(0x910A91);        // Magenta
     
     private final World world;
     private final Window window;
@@ -109,92 +118,17 @@ public class DebugFactory {
     }
     
     /**
-     * Creates combined debug visualization for an entity.
+     * Creates spawner visualization component.
      */
-    public DebugDrawComponent createDebugVisualizer(Entity entity, float hitboxRadius) {
-        MovementComponent movement = entity.getComponent(MovementComponent.class);
-        TransformComponent transform = entity.getComponent(TransformComponent.class);
-        
-        DebugDrawComponent debugDraw = new DebugDrawComponent();
-        
-        // Add hitbox circle
-        debugDraw.addDynamicCircle(
-            () -> transform.getPosition(),
-            () -> hitboxRadius,
-            COLOR_HITBOX
-        );
-        
-        // Add velocity vector - length represents actual velocity
-        debugDraw.addDynamicLine(
-            () -> transform.getPosition(),
-            () -> {
-                Vector2f endPos = new Vector2f(transform.getPosition());
-                Vector2f velocity = movement.getVelocity();
-                if (velocity.length() > 0.01f) { // Only show when moving
-                    endPos.add(new Vector2f(velocity).mul(0.5f)); // Scale for visibility
-                }
-                return endPos;
-            },
-            COLOR_VELOCITY
-        );
-        
-        // Add input direction vector - fixed length
-        debugDraw.addDynamicLine(
-            () -> transform.getPosition(),
-            () -> {
-                Vector2f endPos = new Vector2f(transform.getPosition());
-                Vector2f input = movement.getInputDirection();
-                if (input.length() > 0.01f) {  // Only show when there's input
-                    endPos.add(new Vector2f(input).normalize().mul(40.0f));
-                }
-                return endPos;
-            },
-            COLOR_INPUT
-        );
-        
-        return debugDraw;
+    public SpawnerVisualizerComponent createSpawnerVisualizer(float spawnRadius, float detectRadius) {
+        return new SpawnerVisualizerComponent(COLOR_SPAWN, COLOR_DETECTION, spawnRadius, detectRadius);
     }
     
     /**
-     * Creates spawner area visualization.
+     * Creates turret visualization component.
      */
-    public DebugDrawComponent createSpawnerVisualizer(Vector2f position, float spawnRadius, float detectRadius) {
-        DebugDrawComponent debugDraw = new DebugDrawComponent();
-        
-        // Spawn area
-        debugDraw.addCircle(position, spawnRadius, COLOR_SPAWN);
-        
-        // Detection area
-        debugDraw.addCircle(position, detectRadius, COLOR_DETECTION);
-        
-        return debugDraw;
-    }
-    
-    /**
-     * Creates weapon/turret visualization.
-     */
-    public DebugDrawComponent createTurretVisualizer(Entity turret) {
-        TransformComponent transform = turret.getComponent(TransformComponent.class);
-        
-        DebugDrawComponent debugDraw = new DebugDrawComponent();
-
-        debugDraw.addDynamicLine(
-            () -> transform.getPosition(),
-            () -> {
-                Vector2f endPos = new Vector2f(transform.getPosition());
-                float rotation = transform.getRotation();
-                endPos.add(
-                    new Vector2f(
-                        (float)Math.cos(rotation),
-                        (float)Math.sin(rotation)
-                    ).mul(50.0f)
-                );
-                return endPos;
-            },
-            COLOR_AIM
-        );
-        
-        return debugDraw;
+    public TurretVisualizerComponent createTurretVisualizer() {
+        return new TurretVisualizerComponent(COLOR_AIM, 50.0f);
     }
     
     /**

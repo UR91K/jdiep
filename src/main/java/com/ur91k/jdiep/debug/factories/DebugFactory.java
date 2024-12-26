@@ -252,14 +252,6 @@ public class DebugFactory {
     }
     
     /**
-     * @deprecated Use {@link #createPerformanceGraph(String)} instead
-     */
-    @Deprecated
-    public Entity createPerformanceGraph(String id, Vector2f position) {
-        return createPerformanceGraph(id);  // Ignore position parameter
-    }
-    
-    /**
      * Gets the debug layout component that manages UI positioning.
      */
     public DebugLayoutComponent getLayoutComponent() {

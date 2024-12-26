@@ -10,8 +10,11 @@ import com.ur91k.jdiep.ecs.core.Component;
  * Supports auto-scaling and circular buffer for continuous data.
  */
 public class DebugGraphComponent extends Component {
+    public static final int DEFAULT_WIDTH = 176;  // Fixed pixel width
+    public static final int DEFAULT_HEIGHT = 101; // Fixed pixel height
+    
     private final String id;
-    private final Vector2f screenPosition;
+    private final Vector2f screenPosition;  // Position relative to top-right corner
     private final float[] values;
     private int currentIndex = 0;
     private int valueCount = 0;  // Track how many values we've added
@@ -19,20 +22,35 @@ public class DebugGraphComponent extends Component {
     private float maxValue = 1;
     private boolean autoScale = true;
     private Vector4f color = new Vector4f(0, 1, 0, 0.8f);
-    private int width = 176;
-    private int height = 101;
+    private int width = DEFAULT_WIDTH;
+    private int height = DEFAULT_HEIGHT;
     private String label = "";
     private boolean visible = true;
     private float defaultValue = 0.0f;
 
+    /**
+     * Creates a new debug graph component.
+     * @param id Unique identifier for the graph
+     * @param screenPosition Position in pixels from the top-right corner of the screen
+     * @param maxSamples Maximum number of samples to store
+     */
     public DebugGraphComponent(String id, Vector2f screenPosition, int maxSamples) {
         this.id = id;
+        // Store position as offset from top-right corner
         this.screenPosition = new Vector2f(screenPosition);
         this.values = new float[maxSamples];
         // Initialize array with default value
         for (int i = 0; i < maxSamples; i++) {
             values[i] = defaultValue;
         }
+    }
+
+    /**
+     * Gets the fixed screen position in pixels from the top-right corner.
+     * @return Vector2f containing the x,y pixel coordinates from top-right
+     */
+    public Vector2f getFixedScreenPosition() {
+        return new Vector2f(screenPosition);
     }
 
     public void addValue(float value) {

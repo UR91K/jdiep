@@ -42,12 +42,12 @@ public class DebugGraphSystem extends System {
     }
 
     private void renderGraph(DebugGraphComponent graph) {
-        Vector2f pos = graph.getScreenPosition();
+        Vector2f pos = graph.getFixedScreenPosition();
         int width = graph.getWidth();
         int height = graph.getHeight();
         
-        // Draw background
-        renderSystem.drawScreenRect(
+        // Draw background using fixed coordinates
+        renderSystem.drawFixedRect(
             pos,
             width,
             height,
@@ -55,12 +55,12 @@ public class DebugGraphSystem extends System {
             GRAPH_LINE_THICKNESS
         );
         
-        // Draw grid lines
+        // Draw grid lines using fixed pixel spacing
         int gridLines = 4;
         float gridSpacing = height / (float)gridLines;
         for (int i = 1; i < gridLines; i++) {
             float y = pos.y + i * gridSpacing;
-            renderSystem.drawScreenLine(
+            renderSystem.drawFixedLine(
                 new Vector2f(pos.x, y),
                 new Vector2f(pos.x + width, y),
                 GRID_COLOR,
@@ -68,7 +68,7 @@ public class DebugGraphSystem extends System {
             );
         }
         
-        // Draw data points
+        // Draw data points using fixed pixel spacing
         float[] values = graph.getValues();
         int currentIndex = graph.getCurrentIndex();
         float minValue = graph.getMinValue();
@@ -77,7 +77,7 @@ public class DebugGraphSystem extends System {
         
         if (valueRange <= 0) return;  // Avoid division by zero
         
-        // Draw lines between points
+        // Draw lines between points using fixed coordinates
         float xStep = width / (float)(values.length - 1);
         Vector2f prevPoint = null;
         
@@ -92,7 +92,7 @@ public class DebugGraphSystem extends System {
             );
             
             if (prevPoint != null) {
-                renderSystem.drawScreenLine(
+                renderSystem.drawFixedLine(
                     prevPoint,
                     point,
                     graph.getColor(),

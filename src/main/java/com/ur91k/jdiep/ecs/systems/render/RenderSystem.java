@@ -413,4 +413,75 @@ public class RenderSystem {
         // Update viewport
         glViewport(0, 0, windowWidth, windowHeight);
     }
+
+    public void drawFixedRect(Vector2f pixelPos, float pixelWidth, float pixelHeight, Vector4f color, float thickness) {
+        gameShader.use();
+        glLineWidth(thickness);
+        
+        // Enable blending
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        // Set uniforms
+        Matrix4f fixedModel = new Matrix4f();  // Identity matrix - no scaling
+        gameShader.setMatrix4f("projection", screenProjection);
+        gameShader.setMatrix4f("view", new Matrix4f());  // Identity matrix - no view transform
+        gameShader.setMatrix4f("model", fixedModel);
+        gameShader.setVector4f("color", color);
+        
+        // Draw rectangle outline using absolute pixel coordinates
+        FloatBuffer vertices = BufferUtils.createFloatBuffer(10);  // 5 vertices * 2 coordinates
+        float[] rectVertices = new float[] {
+            pixelPos.x, pixelPos.y,                        // Top left
+            pixelPos.x + pixelWidth, pixelPos.y,          // Top right
+            pixelPos.x + pixelWidth, pixelPos.y + pixelHeight,  // Bottom right
+            pixelPos.x, pixelPos.y + pixelHeight,         // Bottom left
+            pixelPos.x, pixelPos.y                        // Back to start
+        };
+        vertices.put(rectVertices).flip();
+        
+        glBindVertexArray(gridVao);
+        glBindBuffer(GL_ARRAY_BUFFER, gridVbo);
+        glBufferData(GL_ARRAY_BUFFER, vertices, GL_DYNAMIC_DRAW);
+        glDrawArrays(GL_LINE_STRIP, 0, 5);
+        
+        // Cleanup state
+        glDisable(GL_BLEND);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
+    
+    public void drawFixedLine(Vector2f startPixel, Vector2f endPixel, Vector4f color, float thickness) {
+        gameShader.use();
+        glLineWidth(thickness);
+        
+        // Enable blending
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        // Set uniforms
+        Matrix4f fixedModel = new Matrix4f();  // Identity matrix - no scaling
+        gameShader.setMatrix4f("projection", screenProjection);
+        gameShader.setMatrix4f("view", new Matrix4f());  // Identity matrix - no view transform
+        gameShader.setMatrix4f("model", fixedModel);
+        gameShader.setVector4f("color", color);
+        
+        // Draw line using absolute pixel coordinates
+        FloatBuffer vertices = BufferUtils.createFloatBuffer(4);  // 2 vertices * 2 coordinates
+        float[] lineVertices = new float[] {
+            startPixel.x, startPixel.y,
+            endPixel.x, endPixel.y
+        };
+        vertices.put(lineVertices).flip();
+        
+        glBindVertexArray(gridVao);
+        glBindBuffer(GL_ARRAY_BUFFER, gridVbo);
+        glBufferData(GL_ARRAY_BUFFER, vertices, GL_DYNAMIC_DRAW);
+        glDrawArrays(GL_LINES, 0, 2);
+        
+        // Cleanup state
+        glDisable(GL_BLEND);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
 } 

@@ -159,7 +159,7 @@ public class DebugFactory {
         
         graph.addComponent(new DebugGraphComponent(id, position, 100)
             .setColor(COLOR_DEBUG)
-            .setDimensions(200, 100));
+            .setDimensions(DebugGraphComponent.DEFAULT_WIDTH, DebugGraphComponent.DEFAULT_HEIGHT));
             
         return graph;
     }

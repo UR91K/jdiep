@@ -31,13 +31,18 @@ A multiplayer-first implementation of diep.io using Java and LWJGL, built with a
 ### Multiplayer & Community
 - Community server support
 - Customizable server features
-- Advanced spectating system
+- Enhanced spectating system:
+  - Player follow mode
+  - Free camera mode
+  - Optional stats visualizations for mass and kills
+  - Zoom in/out for all spectator modes
 - Chat system with admin commands
 - Account system tracking:
   - Mass history
   - Kill statistics
   - Experience points
   - Lifetime achievements
+  - Other relevant statistics
 
 ### AI & Debug Features
 - Sophisticated AI bot system

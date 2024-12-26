@@ -1,9 +1,6 @@
 package com.ur91k.jdiep.debug.factories;
 
-import com.ur91k.jdiep.debug.components.DebugDrawComponent;
-import com.ur91k.jdiep.debug.components.DebugGraphComponent;
-import com.ur91k.jdiep.debug.components.DebugLayoutComponent;
-import com.ur91k.jdiep.debug.components.LabelComponent;
+import com.ur91k.jdiep.debug.components.*;
 import com.ur91k.jdiep.ecs.components.movement.MovementComponent;
 import com.ur91k.jdiep.ecs.components.transform.ParentComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
@@ -11,9 +8,9 @@ import com.ur91k.jdiep.ecs.core.Entity;
 import com.ur91k.jdiep.ecs.core.World;
 import com.ur91k.jdiep.core.window.Window;
 import static com.ur91k.jdiep.graphics.config.RenderingConstants.rgb;
+
 import org.joml.Vector2f;
 import org.joml.Vector4f;
-
 import java.util.function.Supplier;
 
 /**
@@ -24,12 +21,12 @@ public class DebugFactory {
     // Debug colors
     private static final Vector4f 
         COLOR_DEBUG = rgb(0x0A9371),    // Default debug color
-        COLOR_VELOCITY = rgb(0x910A2E),          // Red
-        COLOR_INPUT = new Vector4f(0, 0.8f, 1, 1),            // Light blue
-        COLOR_HITBOX = new Vector4f(0, 1, 0, 0.5f),           // Semi-transparent green
-        COLOR_DETECTION = new Vector4f(1, 1, 0, 0.3f),        // Semi-transparent yellow
-        COLOR_SPAWN = new Vector4f(0, 0, 1, 0.3f),            // Semi-transparent blue
-        COLOR_AIM = new Vector4f(1, 0, 1, 1);                 // Magenta
+        COLOR_VELOCITY = rgb(0x910A2E),  // Red
+        COLOR_INPUT = rgb(0x0A91E3),     // Light blue
+        COLOR_HITBOX = new Vector4f(rgb(0x0A910A)).mul(1, 1, 1, 0.5f),  // Semi-transparent green
+        COLOR_DETECTION = new Vector4f(rgb(0x919100)).mul(1, 1, 1, 0.3f),  // Semi-transparent yellow
+        COLOR_SPAWN = new Vector4f(rgb(0x0A0A91)).mul(1, 1, 1, 0.3f),  // Semi-transparent blue
+        COLOR_AIM = rgb(0x910A91);  // Magenta
     
     private final World world;
     private final Window window;
@@ -91,59 +88,24 @@ public class DebugFactory {
     }
     
     /**
-     * Creates velocity and input direction visualization for an entity.
+     * Creates velocity visualization component.
      */
-    public DebugDrawComponent createVelocityVisualizer(Entity entity) {
-        MovementComponent movement = entity.getComponent(MovementComponent.class);
-        TransformComponent transform = entity.getComponent(TransformComponent.class);
-        
-        DebugDrawComponent debugDraw = new DebugDrawComponent();
-        
-        // Add velocity vector - length represents actual velocity
-        debugDraw.addDynamicLine(
-            () -> transform.getPosition(),
-            () -> {
-                Vector2f endPos = new Vector2f(transform.getPosition());
-                Vector2f velocity = movement.getVelocity();
-                endPos.add(new Vector2f(velocity).mul(0.5f)); // Scale for visibility
-                return endPos;
-            },
-            COLOR_VELOCITY
-        );
-        
-        // Add input direction vector - fixed length
-        debugDraw.addDynamicLine(
-            () -> transform.getPosition(),
-            () -> {
-                Vector2f endPos = new Vector2f(transform.getPosition());
-                Vector2f input = movement.getInputDirection();
-                if (input.length() > 0.01f) {  // Only show when there's input
-                    endPos.add(new Vector2f(input).normalize().mul(40.0f));
-                }
-                return endPos;
-            },
-            COLOR_INPUT
-        );
-        
-        return debugDraw;
+    public VelocityVisualizerComponent createVelocityVisualizer() {
+        return new VelocityVisualizerComponent(COLOR_VELOCITY, 0.5f);
     }
     
     /**
-     * Creates hitbox visualization for an entity.
+     * Creates input direction visualization component.
      */
-    public DebugDrawComponent createHitboxVisualizer(Entity entity, float radius) {
-        TransformComponent transform = entity.getComponent(TransformComponent.class);
-        
-        DebugDrawComponent debugDraw = new DebugDrawComponent();
-        
-        // Add hitbox circle
-        debugDraw.addDynamicCircle(
-            () -> transform.getPosition(),
-            () -> radius,
-            COLOR_HITBOX
-        );
-        
-        return debugDraw;
+    public InputVisualizerComponent createInputVisualizer() {
+        return new InputVisualizerComponent(COLOR_INPUT, 40.0f);
+    }
+    
+    /**
+     * Creates hitbox visualization component.
+     */
+    public HitboxVisualizerComponent createHitboxVisualizer(float radius) {
+        return new HitboxVisualizerComponent(COLOR_HITBOX, radius);
     }
     
     /**
@@ -168,7 +130,9 @@ public class DebugFactory {
             () -> {
                 Vector2f endPos = new Vector2f(transform.getPosition());
                 Vector2f velocity = movement.getVelocity();
-                endPos.add(new Vector2f(velocity).mul(0.5f)); // Scale for visibility
+                if (velocity.length() > 0.01f) { // Only show when moving
+                    endPos.add(new Vector2f(velocity).mul(0.5f)); // Scale for visibility
+                }
                 return endPos;
             },
             COLOR_VELOCITY
@@ -213,8 +177,7 @@ public class DebugFactory {
         TransformComponent transform = turret.getComponent(TransformComponent.class);
         
         DebugDrawComponent debugDraw = new DebugDrawComponent();
-        
-        // Add aim line
+
         debugDraw.addDynamicLine(
             () -> transform.getPosition(),
             () -> {
@@ -244,7 +207,6 @@ public class DebugFactory {
             .setColor(COLOR_DEBUG)
             .setDimensions(DebugGraphComponent.DEFAULT_WIDTH, DebugGraphComponent.DEFAULT_HEIGHT));
             
-        // Add to layout
         layoutEntity.getComponent(DebugLayoutComponent.class)
             .addGraph(graph);
             

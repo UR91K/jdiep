@@ -9,6 +9,7 @@ import com.ur91k.jdiep.debug.factories.DebugFactory;
 import com.ur91k.jdiep.debug.systems.DebugDrawSystem;
 import com.ur91k.jdiep.debug.systems.DebugGraphSystem;
 import com.ur91k.jdiep.debug.systems.LabelSystem;
+import com.ur91k.jdiep.debug.systems.VisualizerSystem;
 import com.ur91k.jdiep.ecs.components.movement.MovementComponent;
 import com.ur91k.jdiep.ecs.core.Entity;
 import com.ur91k.jdiep.ecs.core.World;
@@ -50,6 +51,8 @@ public class Engine {
     private DebugDrawSystem debugDrawSystem;
     private DebugGraphSystem debugGraphSystem;
     private LabelSystem labelSystem;
+    private VisualizerSystem visualizerSystem;
+    
     @SuppressWarnings("unused")
     private Entity fpsMonitor;
     private Entity frameTimeGraph;
@@ -93,11 +96,13 @@ public class Engine {
         debugDrawSystem = new DebugDrawSystem(world, renderSystem);
         debugGraphSystem = new DebugGraphSystem(world, renderSystem);
         labelSystem = new LabelSystem(world, textRenderer, renderSystem);
+        visualizerSystem = new VisualizerSystem(world, renderSystem);
         
         // Set debug mode
         debugDrawSystem.setDebugMode(debugMode);
         debugGraphSystem.setDebugMode(debugMode);
         labelSystem.setDebugMode(debugMode);
+        visualizerSystem.setDebugMode(debugMode);
         
         // Initialize other systems
         parentSystem = new ParentSystem();
@@ -118,6 +123,7 @@ public class Engine {
         world.addSystem(debugDrawSystem);       // 7. Debug visualization
         world.addSystem(debugGraphSystem);      // 8. Debug graphs
         world.addSystem(labelSystem);           // 9. Debug labels
+        world.addSystem(visualizerSystem);      // 10. Debug visualizers
         
         // Initialize factories
         tankFactory = new TankFactory(world);
@@ -169,8 +175,10 @@ public class Engine {
             tankFactory.createTwinTank(new Vector2f(0, 0))
         );
         
-        // Add debug visualizations (combined into one component)
-        playerTank.addComponent(debugFactory.createDebugVisualizer(playerTank, 30.0f));
+        // Add debug visualizations (as separate components)
+        playerTank.addComponent(debugFactory.createVelocityVisualizer());
+        playerTank.addComponent(debugFactory.createInputVisualizer());
+        playerTank.addComponent(debugFactory.createHitboxVisualizer(30.0f));
         debugFactory.createEntityLabel(playerTank, String.format("Client (Entity ID: %d)", playerTank.getId()));
         
         // Create camera at world origin
@@ -188,6 +196,7 @@ public class Engine {
                 debugDrawSystem.setDebugMode(debugMode);
                 debugGraphSystem.setDebugMode(debugMode);
                 labelSystem.setDebugMode(debugMode);
+                visualizerSystem.setDebugMode(debugMode);
                 logger.debug("Debug mode: {}", debugMode);
             }
             

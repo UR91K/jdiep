@@ -92,7 +92,7 @@ public class Engine {
         // Initialize debug systems
         debugDrawSystem = new DebugDrawSystem(world, renderSystem);
         debugGraphSystem = new DebugGraphSystem(world, renderSystem);
-        labelSystem = new LabelSystem(world, textRenderer);
+        labelSystem = new LabelSystem(world, textRenderer, renderSystem);
         
         // Set debug mode
         debugDrawSystem.setDebugMode(debugMode);
@@ -172,7 +172,7 @@ public class Engine {
         // Add debug visualizations
         playerTank.addComponent(debugFactory.createVelocityVisualizer(playerTank));
         playerTank.addComponent(debugFactory.createHitboxVisualizer(playerTank, 30.0f));
-        debugFactory.createEntityLabel(playerTank, "Player Tank");
+        debugFactory.createEntityLabel(playerTank, String.format("Player Tank (ID: %d)", playerTank.getId()));
         
         // Create camera at world origin
         Entity camera = cameraFactory.createCamera(new Vector2f(0, 0));

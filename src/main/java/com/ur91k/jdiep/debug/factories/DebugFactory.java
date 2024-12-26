@@ -5,6 +5,7 @@ import com.ur91k.jdiep.debug.components.DebugGraphComponent;
 import com.ur91k.jdiep.debug.components.DebugLayoutComponent;
 import com.ur91k.jdiep.debug.components.LabelComponent;
 import com.ur91k.jdiep.ecs.components.movement.MovementComponent;
+import com.ur91k.jdiep.ecs.components.transform.ParentComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.ecs.core.Entity;
 import com.ur91k.jdiep.ecs.core.World;
@@ -51,11 +52,19 @@ public class DebugFactory {
         TransformComponent targetTransform = target.getComponent(TransformComponent.class);
         Vector2f offset = new Vector2f(0, 30); // Above the entity
         
+        // Add transform component to track target's position
+        TransformComponent labelTransform = new TransformComponent();
+        labelTransform.setPosition(new Vector2f(0, 30)); // Offset from parent
+        label.addComponent(labelTransform);
+        
+        // Make label follow target
+        label.addComponent(new ParentComponent(target));
+        
         label.addComponent(new LabelComponent()
             .setText(text)
-            .setOffset(offset)
             .setColor(COLOR_DEBUG)
-            .setDebug(true));
+            .setDebug(true)
+            .setScreenSpace(false));  // Explicitly set to world space
             
         return label;
     }

@@ -3,7 +3,6 @@ package com.ur91k.jdiep.debug.components;
 import com.ur91k.jdiep.ecs.core.Component;
 import com.ur91k.jdiep.ecs.core.Entity;
 import com.ur91k.jdiep.core.window.Window;
-import org.joml.Vector2f;
 
 import java.util.ArrayList;
 import java.util.List;

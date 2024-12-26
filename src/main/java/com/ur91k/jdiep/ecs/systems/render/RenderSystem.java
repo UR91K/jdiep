@@ -484,4 +484,22 @@ public class RenderSystem {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }
+
+    /**
+     * Transforms a world space position to screen space.
+     */
+    public Vector2f worldToScreen(Vector2f worldPos) {
+        // Create a point in homogeneous coordinates
+        Vector4f point = new Vector4f(worldPos.x, worldPos.y, 0, 1);
+        
+        // Transform by view and projection matrices
+        point.mul(view);
+        point.mul(projection);
+        
+        // Perspective divide and convert to screen coordinates
+        float screenX = ((point.x / point.w) + 1.0f) * 0.5f * windowWidth;
+        float screenY = ((-point.y / point.w) + 1.0f) * 0.5f * windowHeight;
+        
+        return new Vector2f(screenX, screenY);
+    }
 } 

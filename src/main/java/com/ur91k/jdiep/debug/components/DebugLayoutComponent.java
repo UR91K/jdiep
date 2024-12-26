@@ -100,7 +100,7 @@ public class DebugLayoutComponent extends Component {
             int row = i % GRAPH_COLUMNS;     // Position within current column
             
             // Calculate pixel offsets from top-right corner
-            float x = screenWidth - PADDING - (GRAPH_WIDTH + PADDING) * (column + 1);
+            float x = screenWidth - GRAPH_WIDTH - PADDING - (column * (GRAPH_WIDTH + PADDING));
             float y = PADDING + (row * (GRAPH_HEIGHT + PADDING));
             
             // Update graph position (stored as offset from top-right)

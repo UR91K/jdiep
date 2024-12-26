@@ -2,11 +2,13 @@ package com.ur91k.jdiep.debug.factories;
 
 import com.ur91k.jdiep.debug.components.DebugDrawComponent;
 import com.ur91k.jdiep.debug.components.DebugGraphComponent;
+import com.ur91k.jdiep.debug.components.DebugLayoutComponent;
 import com.ur91k.jdiep.debug.components.LabelComponent;
 import com.ur91k.jdiep.ecs.components.movement.MovementComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.ecs.core.Entity;
 import com.ur91k.jdiep.ecs.core.World;
+import com.ur91k.jdiep.core.window.Window;
 
 import org.joml.Vector2f;
 import org.joml.Vector4f;
@@ -27,9 +29,16 @@ public class DebugFactory {
         COLOR_AIM = new Vector4f(1, 0, 1, 1);                 // Magenta
     
     private final World world;
+    private final Window window;
+    private Entity layoutEntity;
     
-    public DebugFactory(World world) {
+    public DebugFactory(World world, Window window) {
         this.world = world;
+        this.window = window;
+        
+        // Create the layout entity
+        this.layoutEntity = world.createEntity();
+        this.layoutEntity.addComponent(new DebugLayoutComponent(window));
     }
     
     /**
@@ -62,6 +71,10 @@ public class DebugFactory {
             .setColor(COLOR_DEBUG)
             .setScreenSpace(true)
             .setDebug(true));
+            
+        // Add to layout
+        layoutEntity.getComponent(DebugLayoutComponent.class)
+            .addMonitor(monitor);
             
         return monitor;
     }
@@ -154,13 +167,32 @@ public class DebugFactory {
     /**
      * Creates performance graph.
      */
-    public Entity createPerformanceGraph(String id, Vector2f position) {
+    public Entity createPerformanceGraph(String id) {
         Entity graph = world.createEntity();
         
-        graph.addComponent(new DebugGraphComponent(id, position, 100)
+        graph.addComponent(new DebugGraphComponent(id, new Vector2f(0, 0), 100)  // Position will be set by layout
             .setColor(COLOR_DEBUG)
             .setDimensions(DebugGraphComponent.DEFAULT_WIDTH, DebugGraphComponent.DEFAULT_HEIGHT));
             
+        // Add to layout
+        layoutEntity.getComponent(DebugLayoutComponent.class)
+            .addGraph(graph);
+            
         return graph;
+    }
+    
+    /**
+     * @deprecated Use {@link #createPerformanceGraph(String)} instead
+     */
+    @Deprecated
+    public Entity createPerformanceGraph(String id, Vector2f position) {
+        return createPerformanceGraph(id);  // Ignore position parameter
+    }
+    
+    /**
+     * Gets the debug layout component that manages UI positioning.
+     */
+    public DebugLayoutComponent getLayoutComponent() {
+        return layoutEntity.getComponent(DebugLayoutComponent.class);
     }
 } 

@@ -47,10 +47,11 @@ public class DebugGraphComponent extends Component {
 
     /**
      * Gets the fixed screen position in pixels from the top-right corner.
+     * Returns a reference to the actual position vector, not a copy.
      * @return Vector2f containing the x,y pixel coordinates from top-right
      */
     public Vector2f getFixedScreenPosition() {
-        return new Vector2f(screenPosition);
+        return screenPosition;  // Return actual reference
     }
 
     public void addValue(float value) {

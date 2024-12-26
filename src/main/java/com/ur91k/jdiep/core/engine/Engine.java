@@ -84,6 +84,9 @@ public class Engine {
             logger.debug("Window resized to {}x{}", width, height);
             renderSystem.handleResize(width, height);
             textRenderer.handleResize(width, height);
+            
+            // Update debug layout
+            debugFactory.getLayoutComponent().handleResize(width, height);
         });
         
         // Initialize debug systems
@@ -119,7 +122,7 @@ public class Engine {
         // Initialize factories
         tankFactory = new TankFactory(world);
         cameraFactory = new CameraFactory(world);
-        debugFactory = new DebugFactory(world);
+        debugFactory = new DebugFactory(world, window);
         
         // Create debug entities
         createDebugEntities();
@@ -147,16 +150,10 @@ public class Engine {
         );
         
         // Frame time graph
-        frameTimeGraph = debugFactory.createPerformanceGraph(
-            "Frame Time",
-            new Vector2f(10, 50)
-        );
+        frameTimeGraph = debugFactory.createPerformanceGraph("Frame Time");
 
         // Velocity graph
-        velocityGraph = debugFactory.createPerformanceGraph(
-            "Velocity",
-            new Vector2f(10, 200)
-        );
+        velocityGraph = debugFactory.createPerformanceGraph("Velocity");
     }
 
     @SuppressWarnings("unused")

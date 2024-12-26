@@ -17,7 +17,7 @@ public class LabelSystem extends System {
     private static final Logger logger = Logger.getLogger(LabelSystem.class);
     private static final int CHAR_WIDTH = 8;  // BDF font character width in pixels
     private static final int CHAR_HEIGHT = 16;  // BDF font character height in pixels
-    private static final int VERTICAL_OFFSET = -40;  // Pixels above entity
+    private static final int VERTICAL_OFFSET = -40;  // in pixels
     
     private final TextRenderer textRenderer;
     private final RenderSystem renderSystem;

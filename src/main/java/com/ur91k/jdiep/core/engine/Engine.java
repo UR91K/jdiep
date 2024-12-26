@@ -114,10 +114,10 @@ public class Engine {
         world.addSystem(mouseAimSystem);        // 3. Update rotations
         world.addSystem(parentSystem);          // 4. Update child positions/rotations
         world.addSystem(cameraSystem);          // 5. Update camera
-        world.addSystem(debugDrawSystem);       // 6. Debug visualization
-        world.addSystem(debugGraphSystem);      // 7. Debug graphs
-        world.addSystem(labelSystem);           // 8. Debug labels
-        world.addSystem(entityRenderSystem);    // 9. Render everything
+        world.addSystem(entityRenderSystem);    // 6. Render entities
+        world.addSystem(debugDrawSystem);       // 7. Debug visualization
+        world.addSystem(debugGraphSystem);      // 8. Debug graphs
+        world.addSystem(labelSystem);           // 9. Debug labels
         
         // Initialize factories
         tankFactory = new TankFactory(world);

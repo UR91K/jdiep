@@ -10,7 +10,7 @@ import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.ecs.core.Entity;
 import com.ur91k.jdiep.ecs.core.World;
 import com.ur91k.jdiep.core.window.Window;
-
+import static com.ur91k.jdiep.graphics.config.RenderingConstants.rgb;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
@@ -23,8 +23,8 @@ import java.util.function.Supplier;
 public class DebugFactory {
     // Debug colors
     private static final Vector4f 
-        COLOR_DEBUG = new Vector4f(0.0f, 1.0f, 0.0f, 0.8f),    // Default debug color
-        COLOR_VELOCITY = new Vector4f(1, 0, 0, 1),             // Red
+        COLOR_DEBUG = rgb(0x0A9371),    // Default debug color
+        COLOR_VELOCITY = rgb(0x910A2E),          // Red
         COLOR_INPUT = new Vector4f(0, 0.8f, 1, 1),            // Light blue
         COLOR_HITBOX = new Vector4f(0, 1, 0, 0.5f),           // Semi-transparent green
         COLOR_DETECTION = new Vector4f(1, 1, 0, 0.3f),        // Semi-transparent yellow

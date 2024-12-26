@@ -171,7 +171,7 @@ public class Engine {
         
         // Add debug visualizations (combined into one component)
         playerTank.addComponent(debugFactory.createDebugVisualizer(playerTank, 30.0f));
-        debugFactory.createEntityLabel(playerTank, String.format("Player Tank (ID: %d)", playerTank.getId()));
+        debugFactory.createEntityLabel(playerTank, String.format("Client (Entity ID: %d)", playerTank.getId()));
         
         // Create camera at world origin
         Entity camera = cameraFactory.createCamera(new Vector2f(0, 0));

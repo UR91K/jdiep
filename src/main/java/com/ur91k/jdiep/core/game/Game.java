@@ -11,7 +11,7 @@ import com.ur91k.jdiep.ecs.systems.camera.CameraSystem;
 import com.ur91k.jdiep.ecs.systems.movement.MouseAimSystem;
 import com.ur91k.jdiep.ecs.systems.movement.MovementInputSystem;
 import com.ur91k.jdiep.ecs.systems.movement.MovementSystem;
-import com.ur91k.jdiep.ecs.systems.movement.ParentSystem;
+import com.ur91k.jdiep.ecs.systems.transform.ParentSystem;
 import com.ur91k.jdiep.ecs.systems.render.RenderingSystem;
 import com.ur91k.jdiep.graphics.core.OpenGLRenderer;
 import com.ur91k.jdiep.graphics.core.Renderer;
@@ -70,8 +70,8 @@ public class Game {
         CameraFactory cameraFactory = new CameraFactory(ashley);
 
         // Create player tank at world origin
-        //TODO: make this use makePlayerControlled instead of non-existant method
-        playerTank = tankFactory.createPlayerTank(new Vector2f(0, 0));
+        Entity basicTank = tankFactory.createBasicTank(new Vector2f(0, 0));
+        playerTank = tankFactory.makePlayerControlled(basicTank);
         
         // Create main camera following the player
         mainCamera = cameraFactory.createCamera(new Vector2f(0, 0));

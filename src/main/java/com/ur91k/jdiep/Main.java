@@ -1,16 +1,16 @@
 package com.ur91k.jdiep;
 
-import com.ur91k.jdiep.core.game.Engine;
-import com.ur91k.jdiep.core.logging.Logger;
+import com.ur91k.jdiep.core.game.Game;
+import org.tinylog.Logger;
+import org.tinylog.configuration.Configuration;
 
 public class Main {
     public static void main(String[] args) {
         // Default values
         boolean debugMode = false;
         int maxDebugFrames = 1;
-        Logger.Level logLevel = Logger.Level.DEBUG;
+        String logLevel = "DEBUG";
     
-        
         // Parse command line arguments
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toLowerCase()) {
@@ -28,10 +28,10 @@ public class Main {
                     break;
                 case "--log-level":
                     if (i + 1 < args.length) {
-                        try {
-                            logLevel = Logger.Level.valueOf(args[++i].toUpperCase());
-                        } catch (IllegalArgumentException e) {
+                        logLevel = args[++i].toUpperCase();
+                        if (!logLevel.matches("TRACE|DEBUG|INFO|WARN|ERROR")) {
                             System.err.println("Invalid log level specified. Using default: " + logLevel);
+                            logLevel = "DEBUG";
                         }
                     }
                     break;
@@ -41,8 +41,15 @@ public class Main {
             }
         }
 
-        Engine engine = new Engine("jdiep", 1280, 960, debugMode, maxDebugFrames, logLevel);
-        engine.start();
+        // Configure logging level
+        Configuration.set("level", logLevel);
+        if (debugMode) {
+            Logger.info("Debug mode enabled, running for {} frames", maxDebugFrames);
+        }
+
+        // Create and start game
+        Game game = new Game(1280, 960);
+        game.start();
     }
 
     private static void printHelp() {

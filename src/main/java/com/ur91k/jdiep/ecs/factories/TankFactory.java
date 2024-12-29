@@ -3,7 +3,6 @@ package com.ur91k.jdiep.ecs.factories;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.ur91k.jdiep.core.logging.Logger;
-import com.ur91k.jdiep.debug.components.core.DebugStateComponent;
 import com.ur91k.jdiep.ecs.components.camera.CameraTargetComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.PlayerComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.PlayerControlledComponent;

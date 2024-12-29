@@ -1,13 +1,20 @@
 package com.ur91k.jdiep.ecs.components.gameplay;
 
-import com.ur91k.jdiep.ecs.core.Component;
+import com.badlogic.ashley.core.Component;
 
-public class PlayerComponent extends Component {
-    private final String playerId;  // Unique network ID
+public class PlayerComponent implements Component {
+    private String playerId;  // Unique network ID
     private boolean isLocalPlayer;
     private String playerName;
     
-    public PlayerComponent(String playerId, boolean isLocalPlayer, String playerName) {
+    public PlayerComponent() {
+        // Default constructor for Ashley's pooling
+        this.playerId = "";
+        this.isLocalPlayer = false;
+        this.playerName = "";
+    }
+    
+    public void init(String playerId, boolean isLocalPlayer, String playerName) {
         this.playerId = playerId;
         this.isLocalPlayer = isLocalPlayer;
         this.playerName = playerName;

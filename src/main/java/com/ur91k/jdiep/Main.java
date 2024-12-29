@@ -1,6 +1,6 @@
 package com.ur91k.jdiep;
 
-import com.ur91k.jdiep.core.engine.Engine;
+import com.ur91k.jdiep.core.game.Engine;
 import com.ur91k.jdiep.core.logging.Logger;
 
 public class Main {

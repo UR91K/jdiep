@@ -1,81 +1,88 @@
 package com.ur91k.jdiep.ecs.components.rendering;
 
-import com.ur91k.jdiep.ecs.core.Component;
+import com.badlogic.ashley.core.Component;
+import org.joml.Vector2f;
 
-public class ShapeComponent extends Component {
+public class ShapeComponent implements Component {
     public enum ShapeType {
         CIRCLE,
-        TRIANGLE,
         RECTANGLE,
         POLYGON
     }
-    
+
     private ShapeType type;
-    private float[] vertices;  // For custom polygons
-    private float radius;      // For circles
-    private int sides;         // For regular polygons
-    private float width;       // For rectangles
-    private float height;      // For rectangles
-    
-    // Circle constructor
-    public ShapeComponent(float radius) {
+    private float width;   // For rectangles, or diameter for circles
+    private float height;  // For rectangles only
+    private Vector2f[] vertices;  // For polygons
+
+    public ShapeComponent() {
+        // Default constructor for Ashley's pooling
         this.type = ShapeType.CIRCLE;
-        this.radius = radius;
+        this.width = 1.0f;
+        this.height = 1.0f;
+        this.vertices = null;
     }
-    
-    // Regular polygon constructor
-    public ShapeComponent(ShapeType type, float radius, int sides) {
-        this.type = type;
-        this.radius = radius;
-        this.sides = sides;
+
+    // Initialize as circle
+    public void init(float radius) {
+        this.type = ShapeType.CIRCLE;
+        this.width = radius * 2;  // Store diameter
+        this.height = radius * 2;
+        this.vertices = null;
     }
-    
-    // Custom polygon constructor
-    public ShapeComponent(float[] vertices) {
-        this.type = ShapeType.POLYGON;
-        this.vertices = vertices;
-    }
-    
-    // Rectangle constructor
-    public ShapeComponent(float width, float height) {
+
+    // Initialize as rectangle
+    public void init(float width, float height) {
         this.type = ShapeType.RECTANGLE;
         this.width = width;
         this.height = height;
+        this.vertices = null;
+    }
+
+    // Initialize as polygon
+    public void init(Vector2f[] vertices) {
+        this.type = ShapeType.POLYGON;
+        this.vertices = vertices.clone();  // Clone to prevent external modification
+        // Calculate bounding box for width/height
+        float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE;
+        float maxX = Float.MIN_VALUE, maxY = Float.MIN_VALUE;
+        for (Vector2f v : vertices) {
+            minX = Math.min(minX, v.x);
+            minY = Math.min(minY, v.y);
+            maxX = Math.max(maxX, v.x);
+            maxY = Math.max(maxY, v.y);
+        }
+        this.width = maxX - minX;
+        this.height = maxY - minY;
     }
 
     public ShapeType getType() {
         return type;
     }
-    
-    public void setType(ShapeType type) {
-        this.type = type;
-    }
 
-    public float getRadius() {
-        return radius;
-    }
-
-    public int getSides() {
-        return sides;
-    }
-
-    public float[] getVertices() {
-        return vertices;
-    }
-    
     public float getWidth() {
         return width;
     }
-    
-    public void setWidth(float width) {
-        this.width = width;
-    }
-    
+
     public float getHeight() {
         return height;
     }
-    
-    public void setHeight(float height) {
-        this.height = height;
+
+    public float getRadius() {
+        if (type != ShapeType.CIRCLE) {
+            throw new IllegalStateException("Cannot get radius of non-circle shape");
+        }
+        return width / 2;
+    }
+
+    public Vector2f[] getVertices() {
+        if (type != ShapeType.POLYGON || vertices == null) {
+            throw new IllegalStateException("Cannot get vertices of non-polygon shape");
+        }
+        return vertices.clone();  // Return copy to prevent external modification
+    }
+
+    public Vector2f getDimensions() {
+        return new Vector2f(width, height);
     }
 }

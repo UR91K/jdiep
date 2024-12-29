@@ -1,24 +1,26 @@
 package com.ur91k.jdiep.ecs.components.gameplay;
 
-import com.ur91k.jdiep.ecs.core.Component;
+import com.badlogic.ashley.core.Component;
 import com.ur91k.jdiep.game.weapons.TurretPhase;
-
 import org.joml.Vector2f;
 
-public class TurretComponent extends Component {
+public class TurretComponent implements Component {
     private float widthRatio;        // Relative to tank diameter (0.0 - 1.0)
     private float lengthRatio;       // Relative to tank diameter
     private Vector2f offsetRatio;    // Position offset relative to tank diameter
     private float radialOffset;      // Angle offset from tank's rotation (radians)
     private TurretPhase phase;       // Firing phase info
     
-    public TurretComponent(
-        float widthRatio,
-        float lengthRatio,
-        Vector2f offsetRatio,
-        float radialOffset,
-        TurretPhase phase
-    ) {
+    public TurretComponent() {
+        // Default constructor for Ashley's pooling
+        this.widthRatio = 0.5f;
+        this.lengthRatio = 1.0f;
+        this.offsetRatio = new Vector2f(0, 0);
+        this.radialOffset = 0.0f;
+        this.phase = null;  // Will be set in init
+    }
+    
+    public void init(float widthRatio, float lengthRatio, Vector2f offsetRatio, float radialOffset, TurretPhase phase) {
         if (widthRatio <= 0 || widthRatio > 1.0f) {
             throw new IllegalArgumentException("Width ratio must be between 0 and 1");
         }

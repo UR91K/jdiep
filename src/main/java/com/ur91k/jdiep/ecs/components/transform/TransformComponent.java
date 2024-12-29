@@ -1,48 +1,44 @@
 package com.ur91k.jdiep.ecs.components.transform;
 
+import com.badlogic.ashley.core.Component;
 import org.joml.Vector2f;
 
-import com.ur91k.jdiep.ecs.core.Component;
-import com.ur91k.jdiep.ecs.core.Entity;
-
-public class TransformComponent extends Component {
+public class TransformComponent implements Component {
     private Vector2f position;
     private Vector2f scale;
-    private float rotation; // In radians
-    private Entity entity;  // Reference to owning entity
+    private float rotation;
 
     public TransformComponent() {
-        this(new Vector2f(), new Vector2f(1.0f, 1.0f), 0.0f);
+        this.position = new Vector2f();
+        this.scale = new Vector2f(1.0f, 1.0f);
+        this.rotation = 0.0f;
+    }
+
+    public TransformComponent(Vector2f position) {
+        this();
+        this.position.set(position);
+    }
+
+    public TransformComponent(Vector2f position, Vector2f scale) {
+        this(position);
+        this.scale.set(scale);
     }
 
     public TransformComponent(Vector2f position, Vector2f scale, float rotation) {
-        this.position = new Vector2f(position);
-        this.scale = new Vector2f(scale);
+        this(position, scale);
         this.rotation = rotation;
     }
 
-    public void setEntity(Entity entity) {
-        this.entity = entity;
-    }
-
-    public Entity getEntity() {
-        return entity;
-    }
-
     public Vector2f getPosition() {
-        return new Vector2f(position);
+        return position;
     }
 
     public void setPosition(Vector2f position) {
         this.position.set(position);
     }
 
-    public void translate(Vector2f delta) {
-        this.position.add(delta);
-    }
-
     public Vector2f getScale() {
-        return new Vector2f(scale);
+        return scale;
     }
 
     public void setScale(Vector2f scale) {
@@ -54,32 +50,6 @@ public class TransformComponent extends Component {
     }
 
     public void setRotation(float rotation) {
-        // Normalize rotation to [0, 2π)
-        this.rotation = (float)((rotation % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI));
-    }
-
-    public void rotate(float deltaRadians) {
-        setRotation(rotation + deltaRadians);
-    }
-
-    // Get the forward direction vector based on rotation
-    public Vector2f getForward() {
-        return new Vector2f(
-            (float)Math.cos(rotation),
-            (float)Math.sin(rotation)
-        );
-    }
-
-    // Get the right direction vector based on rotation
-    public Vector2f getRight() {
-        return new Vector2f(
-            (float)Math.cos(rotation + Math.PI/2),
-            (float)Math.sin(rotation + Math.PI/2)
-        );
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Transform(pos=%s, scale=%s, rot=%.2f)", position, scale, rotation);
+        this.rotation = rotation;
     }
 } 

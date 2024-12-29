@@ -1,5 +1,7 @@
 package com.ur91k.jdiep.ecs.factories;
 
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.ur91k.jdiep.core.logging.Logger;
 import com.ur91k.jdiep.debug.components.core.DebugStateComponent;
 import com.ur91k.jdiep.ecs.components.camera.CameraTargetComponent;
@@ -12,8 +14,6 @@ import com.ur91k.jdiep.ecs.components.rendering.ColorComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ShapeComponent;
 import com.ur91k.jdiep.ecs.components.transform.ParentComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
-import com.ur91k.jdiep.ecs.core.Entity;
-import com.ur91k.jdiep.ecs.core.World;
 import com.ur91k.jdiep.game.weapons.PhaseConfig;
 import com.ur91k.jdiep.game.weapons.TurretPhase;
 import com.ur91k.jdiep.graphics.config.RenderingConstants;
@@ -23,82 +23,87 @@ import org.joml.Vector2f;
 
 public class TankFactory {
     private static final Logger logger = Logger.getLogger(TankFactory.class);
-    private final World world;
+    private final Engine engine;
     
-    public TankFactory(World world) {
-        this.world = world;
+    public TankFactory(Engine engine) {
+        this.engine = engine;
     }
     
     // Create the tank body entity
     private Entity createTankBody(float mass, int phaseCount, float reloadTime, Vector2f position) {
-        Entity tank = world.createEntity();
+        Entity tank = engine.createEntity();
         
-        // Add core components
-        tank.addComponent(new TransformComponent());
-        tank.addComponent(new TankBodyComponent(mass, phaseCount, reloadTime));
-        tank.addComponent(new MovementComponent(200.0f, 0.9f));
+        // Add core components using pooling
+        TransformComponent transform = engine.createComponent(TransformComponent.class);
+        transform.setPosition(position);
+        tank.add(transform);
+        
+        TankBodyComponent body = engine.createComponent(TankBodyComponent.class);
+        body.init(mass, phaseCount, reloadTime);
+        tank.add(body);
+        
+        MovementComponent movement = engine.createComponent(MovementComponent.class);
+        movement.init(200.0f);  // Default speed
+        tank.add(movement);
         
         // Add rendering components
-        tank.addComponent(new ShapeComponent(30.0f)); // Base tank radius
-        tank.addComponent(new RenderLayer(RenderLayer.BODY));
-        ColorComponent bodyColor = new ColorComponent(RenderingConstants.RED_FILL_COLOR);
+        ShapeComponent shape = engine.createComponent(ShapeComponent.class);
+        shape.init(30.0f);  // Base tank radius
+        tank.add(shape);
+        
+        tank.add(engine.createComponent(RenderLayer.class));
+        
+        ColorComponent bodyColor = engine.createComponent(ColorComponent.class);
+        bodyColor.init(RenderingConstants.RED_FILL_COLOR);
         bodyColor.setOutline(RenderingConstants.RED_OUTLINE_COLOR, 4.0f);
-        tank.addComponent(bodyColor);
+        tank.add(bodyColor);
         
-        // Set position
-        tank.getComponent(TransformComponent.class).setPosition(position);
-        
+        engine.addEntity(tank);
         return tank;
     }
     
     // Create a turret entity
     private Entity createTurret(Entity tankBody, float widthRatio, float lengthRatio, 
                               Vector2f offset, float rotation, TurretPhase phase) {
-        Entity turret = world.createEntity();
-        logger.debug("Creating turret entity {} for tank {}", turret.getId(), tankBody.getId());
+        Entity turret = engine.createEntity();
+        logger.debug("Creating turret entity for tank");
         
-        // Add turret component
-        TurretComponent turretComp = new TurretComponent(
-            widthRatio, lengthRatio,
-            offset, rotation, phase
-        );
-        turret.addComponent(turretComp);
+        // Add turret component using pooling
+        TurretComponent turretComp = engine.createComponent(TurretComponent.class);
+        turretComp.init(widthRatio, lengthRatio, offset, rotation, phase);
+        turret.add(turretComp);
         
         // Add transform (will be updated by parent system)
-        TransformComponent transform = new TransformComponent();
-        transform.setPosition(tankBody.getComponent(TransformComponent.class).getPosition());
+        TransformComponent transform = engine.createComponent(TransformComponent.class);
+        transform.setPosition(new Vector2f(0, 0));  // Will be updated by ParentSystem
         transform.setRotation((float)Math.PI / 2); // Add 90-degree rotation to make length point right
-        turret.addComponent(transform);
+        turret.add(transform);
         
         // Add parent relationship
-        ParentComponent parentComp = new ParentComponent(tankBody);
-        parentComp.setLocalOffset(offset);
-        parentComp.setLocalRotation(rotation);
-        turret.addComponent(parentComp);
+        ParentComponent parentComp = engine.createComponent(ParentComponent.class);
+        parentComp.init(tankBody, offset, rotation);
+        turret.add(parentComp);
         
         // Add rendering components
-        float tankRadius = tankBody.getComponent(TankBodyComponent.class).getRadius();
+        TankBodyComponent tankBodyComp = tankBody.getComponent(TankBodyComponent.class);
+        float tankRadius = tankBodyComp.getRadius();
+        
         // Swap width and length for correct orientation
         float turretWidth = tankRadius * 2 * lengthRatio;  // Use length for width
         float turretHeight = tankRadius * 2 * widthRatio;  // Use width for height
-        ShapeComponent shape = new ShapeComponent(turretWidth, turretHeight);
-        turret.addComponent(shape);
         
-        turret.addComponent(new RenderLayer(RenderLayer.TURRET));
-        ColorComponent turretColor = new ColorComponent(RenderingConstants.TURRET_FILL_COLOR);
+        ShapeComponent shape = engine.createComponent(ShapeComponent.class);
+        shape.init(turretWidth, turretHeight);
+        turret.add(shape);
+        
+        turret.add(engine.createComponent(RenderLayer.class));
+        
+        ColorComponent turretColor = engine.createComponent(ColorComponent.class);
+        turretColor.init(RenderingConstants.TURRET_FILL_COLOR);
         turretColor.setOutline(RenderingConstants.TURRET_OUTLINE_COLOR, 4.0f);
-        turret.addComponent(turretColor);
+        turret.add(turretColor);
         
-        logger.debug("Turret {} components:", turret.getId());
-        logger.debug("- Shape: type={}, width={}, height={}", 
-            shape.getType(), shape.getWidth(), shape.getHeight());
-        logger.debug("- Transform: pos={}, rot={}", 
-            transform.getPosition(), transform.getRotation());
-        logger.debug("- Parent: offset={}, rot={}", 
-            parentComp.getLocalOffset(), parentComp.getLocalRotation());
-        logger.debug("- Color: fill={}, outline={}", 
-            turretColor.getFillColor(), turretColor.getOutlineColor());
-        
+        engine.addEntity(turret);
         return turret;
     }
     
@@ -140,12 +145,11 @@ public class TankFactory {
         createTurret(
             tankBody,
             0.067f, 0.14f,
-            new Vector2f(0.2f * tankRadius, -15.0f),  // Right turret
+            new Vector2f(0.2f * tankRadius, -15.0f),  // Left turret
             0.0f,
             new TurretPhase(phaseConfig, 2)
         );
         
-        logger.debug("Twin tank created");
         return tankBody;
     }
     
@@ -177,50 +181,15 @@ public class TankFactory {
     // Create player-controlled version of any tank
     public Entity makePlayerControlled(Entity tank) {
         logger.debug("Making tank player controlled");
-        tank.addComponent(new PlayerComponent("local", true, "Player"));
-        tank.addComponent(new PlayerControlledComponent());
-        tank.addComponent(new CameraTargetComponent());
+        
+        PlayerComponent playerComp = engine.createComponent(PlayerComponent.class);
+        playerComp.init("local", true, "Player");
+        tank.add(playerComp);
+        
+        tank.add(engine.createComponent(PlayerControlledComponent.class));
+        tank.add(engine.createComponent(CameraTargetComponent.class));
         
         logger.debug("Added player control components");
-        return tank;
-    }
-
-    protected float calculateTurretOffset(float radius, float width) {
-        // Prevent invalid math if turret width is greater than diameter
-        if (width > 2 * radius) {
-            logger.warn("Turret width ({}) is greater than tank diameter ({})", width, 2*radius);
-            width = 2 * radius;
-        }
-
-        // Use Pythagorean theorem to calculate offset where turret meets circle
-        float offset = radius - (float)Math.sqrt(radius * radius - (width/2)*(width/2));
-
-        // Debug output
-        logger.debug("Tank radius: {}", radius);
-        logger.debug("Turret width: {}", width);
-        logger.debug("Calculated offset: {}", offset);
-
-        return offset;
-    }
-
-    public Entity createTank(Vector2f position) {
-        Entity tank = world.createEntity();
-        
-        // Add existing components
-        TransformComponent transform = new TransformComponent();
-        transform.setPosition(position);
-        tank.addComponent(transform);
-        
-        MovementComponent movement = new MovementComponent();
-        tank.addComponent(movement);
-        
-        // Add debug component
-        DebugStateComponent debug = new DebugStateComponent();
-        debug.setValue("type", "Tank");
-        debug.setValue("created_at", System.currentTimeMillis());
-        tank.addComponent(debug);
-        
-        // ... rest of existing tank setup ...
         return tank;
     }
 } 

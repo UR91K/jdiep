@@ -1,12 +1,13 @@
 package com.ur91k.jdiep.graphics.core;
 
-import com.ur91k.jdiep.ecs.core.Component;
+import com.badlogic.ashley.core.Component;
 
-public class RenderLayer extends Component {
+public class RenderLayer implements Component {
     public static final int BACKGROUND = 0;
-    public static final int BODY = 1;
-    public static final int TURRET = 2;
-    public static final int FOREGROUND = 3;
+    public static final int GAME_OBJECTS = 100;
+    public static final int EFFECTS = 200;
+    public static final int UI = 300;
+    public static final int DEBUG = 400;
 
     private int layer;
 
@@ -16,5 +17,9 @@ public class RenderLayer extends Component {
 
     public int getLayer() {
         return layer;
+    }
+
+    public void setLayer(int layer) {
+        this.layer = layer;
     }
 } 

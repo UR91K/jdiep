@@ -38,7 +38,7 @@ public class FoodFactory {
         
         // Add collision (square shape)
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
-        float size = 10.0f;  // Size of tiny food
+        float size = RenderingConstants.TINY_FOOD_SIZE;
         Vector2f[] vertices = new Vector2f[] {
             new Vector2f(-size/2, -size/2),
             new Vector2f(size/2, -size/2),
@@ -65,7 +65,7 @@ public class FoodFactory {
         
         ColorComponent color = engine.createComponent(ColorComponent.class);
         color.init(RenderingConstants.T_FOOD_FILL);
-        color.setOutline(RenderingConstants.T_FOOD_OUTLINE, 2.0f);
+        color.setOutline(RenderingConstants.T_FOOD_OUTLINE, RenderingConstants.DEFAULT_OUTLINE_WIDTH);
         food.add(color);
         
         engine.addEntity(food);
@@ -88,7 +88,7 @@ public class FoodFactory {
         
         // Add collision (triangle shape)
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
-        float size = 15.0f;  // Size of small food
+        float size = RenderingConstants.SMALL_FOOD_SIZE;
         float height = size * (float)Math.sqrt(3) / 2;  // Height of equilateral triangle
         Vector2f[] vertices = new Vector2f[] {
             new Vector2f(0, height/2),  // Top
@@ -115,7 +115,7 @@ public class FoodFactory {
         
         ColorComponent color = engine.createComponent(ColorComponent.class);
         color.init(RenderingConstants.S_FOOD_FILL);
-        color.setOutline(RenderingConstants.S_FOOD_OUTLINE, 2.0f);
+        color.setOutline(RenderingConstants.S_FOOD_OUTLINE, RenderingConstants.DEFAULT_OUTLINE_WIDTH);
         food.add(color);
         
         engine.addEntity(food);
@@ -138,7 +138,7 @@ public class FoodFactory {
         
         // Add collision (pentagon shape)
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
-        float radius = 25.0f;  // Size of medium food
+        float radius = RenderingConstants.MEDIUM_FOOD_SIZE;
         Vector2f[] vertices = createPentagonVertices(radius);
         collision.init(food, vertices, CollisionFilters.CATEGORY_FOOD, CollisionFilters.MASK_FOOD);
         collision.setBodyType(BodyType.DYNAMIC);
@@ -160,7 +160,7 @@ public class FoodFactory {
         
         ColorComponent color = engine.createComponent(ColorComponent.class);
         color.init(RenderingConstants.M_FOOD_FILL);
-        color.setOutline(RenderingConstants.M_FOOD_OUTLINE, 2.0f);
+        color.setOutline(RenderingConstants.M_FOOD_OUTLINE, RenderingConstants.DEFAULT_OUTLINE_WIDTH);
         food.add(color);
         
         engine.addEntity(food);
@@ -183,7 +183,7 @@ public class FoodFactory {
         
         // Add collision (large pentagon shape)
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
-        float radius = 40.0f;  // Size of large food
+        float radius = RenderingConstants.LARGE_FOOD_SIZE;
         Vector2f[] vertices = createPentagonVertices(radius);
         collision.init(food, vertices, CollisionFilters.CATEGORY_FOOD, CollisionFilters.MASK_FOOD);
         collision.setBodyType(BodyType.DYNAMIC);
@@ -204,8 +204,8 @@ public class FoodFactory {
         food.add(layer);
         
         ColorComponent color = engine.createComponent(ColorComponent.class);
-        color.init(RenderingConstants.M_FOOD_FILL);  // Same color as medium food
-        color.setOutline(RenderingConstants.M_FOOD_OUTLINE, 3.0f);  // Thicker outline
+        color.init(RenderingConstants.L_FOOD_FILL);
+        color.setOutline(RenderingConstants.L_FOOD_OUTLINE, RenderingConstants.DEFAULT_OUTLINE_WIDTH);
         food.add(color);
         
         engine.addEntity(food);

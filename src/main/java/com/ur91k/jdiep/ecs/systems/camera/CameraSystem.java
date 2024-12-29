@@ -88,7 +88,6 @@ public class CameraSystem extends IteratingSystem {
                 }
                 
                 transform.setPosition(cameraPos);
-                Logger.debug("Camera spring update - Pos: {} Vel: {} Target: {}", cameraPos, velocity, targetPos);
             }
         }
     }

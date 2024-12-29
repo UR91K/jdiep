@@ -47,8 +47,8 @@ public class TankFactory {
         
         // Add velocity component for movement
         VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
-        velocity.setMaxSpeed(400.0f);  // Increased max speed
-        velocity.setAcceleration(1000.0f);  // Increased acceleration for better response
+        velocity.setMaxSpeed(4000.0f);  // Increased max speed
+        velocity.setAcceleration(300.0f);  // Increased acceleration for better response
         tank.add(velocity);
         
         // Add controller component
@@ -62,7 +62,7 @@ public class TankFactory {
         collision.setDensity(1.0f);  // Normal density
         collision.setFriction(0.2f);  // Low friction for smooth movement
         collision.setRestitution(0.2f);  // Low bounce
-        collision.setLinearDamping(5.0f);  // Reduced damping for better speed
+        collision.setLinearDamping(1.0f);  // Reduced damping for better speed
         collision.setAngularDamping(10.0f);  // High angular damping to prevent spinning
         tank.add(collision);
         
@@ -77,7 +77,7 @@ public class TankFactory {
         
         ColorComponent bodyColor = engine.createComponent(ColorComponent.class);
         bodyColor.init(RenderingConstants.RED_FILL_COLOR);
-        bodyColor.setOutline(RenderingConstants.RED_OUTLINE_COLOR, 4.0f);
+        bodyColor.setOutline(RenderingConstants.RED_OUTLINE_COLOR, RenderingConstants.DEFAULT_OUTLINE_WIDTH);
         tank.add(bodyColor);
         
         engine.addEntity(tank);
@@ -139,7 +139,7 @@ public class TankFactory {
         
         ColorComponent turretColor = engine.createComponent(ColorComponent.class);
         turretColor.init(RenderingConstants.TURRET_FILL_COLOR);
-        turretColor.setOutline(RenderingConstants.TURRET_OUTLINE_COLOR, 4.0f);
+        turretColor.setOutline(RenderingConstants.TURRET_OUTLINE_COLOR, RenderingConstants.DEFAULT_OUTLINE_WIDTH);
         turret.add(turretColor);
         
         engine.addEntity(turret);
@@ -155,7 +155,7 @@ public class TankFactory {
         createTurret(
             tankBody,
             0.067f,
-            0.25f,
+            0.20f,
             new Vector2f(20, 0),            // centered
             0.0f,                          // forward facing
             new TurretPhase(body.getPhaseConfig(), 1) // single phase

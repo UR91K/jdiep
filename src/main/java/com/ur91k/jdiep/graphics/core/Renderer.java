@@ -17,4 +17,8 @@ public interface Renderer {
     
     void setView(Matrix4f view);
     void drawGrid();
+    void cleanup();
+    
+    // Handle window resize
+    void handleResize(int newWidth, int newHeight);
 } 

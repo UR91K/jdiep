@@ -1,5 +1,7 @@
 package com.ur91k.jdiep.core.window;
 
+import com.ur91k.jdiep.graphics.config.RenderingConstants;
+import com.ur91k.jdiep.graphics.core.Renderer;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -19,6 +21,7 @@ public class Window {
     private int width;
     private int height;
     private String title;
+    private Renderer renderer;
 
     public Window(int width, int height, String title) {
         this.width = width;
@@ -82,9 +85,11 @@ public class Window {
         glfwShowWindow(handle);
 
         // Set clear color
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(RenderingConstants.BACKGROUND_COLOR.x(), RenderingConstants.BACKGROUND_COLOR.y(), RenderingConstants.BACKGROUND_COLOR.z(), RenderingConstants.BACKGROUND_COLOR.w());
 
         Logger.info("Window created: {}x{} - {}", width, height, title);
+
+        setupCallbacks();
     }
 
     public void pollEvents() {
@@ -124,5 +129,24 @@ public class Window {
 
     public String getTitle() {
         return title;
+    }
+
+    public void setRenderer(Renderer renderer) {
+        this.renderer = renderer;
+    }
+
+    public Renderer getRenderer() {
+        return renderer;
+    }
+
+    private void setupCallbacks() {
+        // Framebuffer size callback
+        glfwSetFramebufferSizeCallback(handle, (window, width, height) -> {
+            this.width = width;
+            this.height = height;
+            if (renderer != null) {
+                renderer.handleResize(width, height);
+            }
+        });
     }
 } 

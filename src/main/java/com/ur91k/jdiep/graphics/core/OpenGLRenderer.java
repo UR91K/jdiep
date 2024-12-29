@@ -22,16 +22,36 @@ public class OpenGLRenderer implements Renderer {
     private final int vbo;
     private final int gridVao;
     private final int gridVbo;
-    private static final int GRID_SIZE = 100;
-    private static final float GRID_SPACING = 24.0f;
+    private static final int GRID_SIZE = 1024;
+    private static final float GRID_SPACING = 26.0f;
+    private static final float BASE_VIEW_HEIGHT = 720.0f;  // Base height for consistent scale
+    private static final float MAX_ASPECT_RATIO = 1.66f;  // Maximum allowed aspect ratio
     private final Input input;
+    private int windowWidth;
+    private int windowHeight;
+    private float aspectRatio;
 
     public OpenGLRenderer(int windowWidth, int windowHeight, Input input) {
         this.input = input;
-        // Initialize matrices
+        this.windowWidth = windowWidth;
+        this.windowHeight = windowHeight;
+        float rawAspectRatio = (float)windowWidth / windowHeight;
+        
+        float viewWidth, viewHeight;
+        if (rawAspectRatio > MAX_ASPECT_RATIO) {
+            // Window is too wide - maintain max aspect ratio by increasing view height
+            viewWidth = BASE_VIEW_HEIGHT * MAX_ASPECT_RATIO;
+            viewHeight = viewWidth / rawAspectRatio;
+        } else {
+            // Normal case - use base height and actual aspect ratio
+            viewHeight = BASE_VIEW_HEIGHT;
+            viewWidth = viewHeight * rawAspectRatio;
+        }
+        
+        // Initialize projection matrix
         this.projection = new Matrix4f().ortho(
-            -windowWidth/2.0f, windowWidth/2.0f,
-            -windowHeight/2.0f, windowHeight/2.0f,
+            -viewWidth/2.0f, viewWidth/2.0f,
+            -viewHeight/2.0f, viewHeight/2.0f,
             -1, 1
         );
         this.view = new Matrix4f();
@@ -65,6 +85,38 @@ public class OpenGLRenderer implements Renderer {
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
         
         // Pass projection matrix to input system
+        if (input != null) {
+            input.setProjectionMatrix(projection);
+        }
+    }
+
+    public void handleResize(int newWidth, int newHeight) {
+        this.windowWidth = newWidth;
+        this.windowHeight = newHeight;
+        float rawAspectRatio = (float)newWidth / newHeight;
+        
+        float viewWidth, viewHeight;
+        if (rawAspectRatio > MAX_ASPECT_RATIO) {
+            // Window is too wide - maintain max aspect ratio by increasing view height
+            viewWidth = BASE_VIEW_HEIGHT * MAX_ASPECT_RATIO;
+            viewHeight = viewWidth / rawAspectRatio;
+        } else {
+            // Normal case - use base height and actual aspect ratio
+            viewHeight = BASE_VIEW_HEIGHT;
+            viewWidth = viewHeight * rawAspectRatio;
+        }
+        
+        // Update projection matrix
+        projection.identity().ortho(
+            -viewWidth/2.0f, viewWidth/2.0f,
+            -viewHeight/2.0f, viewHeight/2.0f,
+            -1, 1
+        );
+        
+        // Update viewport to use full window
+        glViewport(0, 0, newWidth, newHeight);
+        
+        // Update input system's projection matrix
         if (input != null) {
             input.setProjectionMatrix(projection);
         }
@@ -107,9 +159,11 @@ public class OpenGLRenderer implements Renderer {
         shader.setMatrix4f("model", new Matrix4f());
         shader.setVector4f("color", RenderingConstants.GRID_COLOR);
 
+        glDisable(GL_LINE_SMOOTH);
         glLineWidth(1.0f);
         glBindVertexArray(gridVao);
         glDrawArrays(GL_LINES, 0, GRID_SIZE * 4);
+        glEnable(GL_LINE_SMOOTH);
     }
 
     @Override

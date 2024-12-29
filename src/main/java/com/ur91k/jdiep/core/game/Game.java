@@ -45,6 +45,7 @@ public class Game {
         this.input = new Input(window);  // Pass window to input
         this.ashley = new Engine();
         this.renderer = new OpenGLRenderer(windowWidth, windowHeight, input);
+        this.window.setRenderer(renderer);  // Set renderer for resize handling
         this.debugManager = new ImGuiDebugManager();
         this.debugManager.init(window.getHandle());  // Initialize ImGui
         

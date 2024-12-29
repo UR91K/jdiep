@@ -4,6 +4,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
+import com.ur91k.jdiep.graphics.config.RenderingConstants;
+import com.ur91k.jdiep.core.window.Input;
 
 import java.nio.FloatBuffer;
 
@@ -22,8 +24,10 @@ public class OpenGLRenderer implements Renderer {
     private final int gridVbo;
     private static final int GRID_SIZE = 100;
     private static final float GRID_SPACING = 50.0f;
+    private final Input input;
 
-    public OpenGLRenderer(int windowWidth, int windowHeight) {
+    public OpenGLRenderer(int windowWidth, int windowHeight, Input input) {
+        this.input = input;
         // Initialize matrices
         this.projection = new Matrix4f().ortho(
             -windowWidth/2.0f, windowWidth/2.0f,
@@ -59,6 +63,11 @@ public class OpenGLRenderer implements Renderer {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        
+        // Pass projection matrix to input system
+        if (input != null) {
+            input.setProjectionMatrix(projection);
+        }
     }
 
     private void setupGrid() {
@@ -96,7 +105,7 @@ public class OpenGLRenderer implements Renderer {
         shader.setMatrix4f("projection", projection);
         shader.setMatrix4f("view", view);
         shader.setMatrix4f("model", new Matrix4f());
-        shader.setVector4f("color", new Vector4f(0.2f, 0.2f, 0.2f, 0.5f));
+        shader.setVector4f("color", RenderingConstants.GRID_COLOR);
 
         glLineWidth(1.0f);
         glBindVertexArray(gridVao);

@@ -82,7 +82,7 @@ public class Window {
         glfwShowWindow(handle);
 
         // Set clear color
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         Logger.info("Window created: {}x{} - {}", width, height, title);
     }

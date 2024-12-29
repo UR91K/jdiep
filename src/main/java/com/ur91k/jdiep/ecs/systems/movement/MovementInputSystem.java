@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.ur91k.jdiep.core.window.Input;
 import com.ur91k.jdiep.ecs.components.physics.VelocityComponent;
+import com.ur91k.jdiep.ecs.components.gameplay.PlayerControlledComponent;
 import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -13,7 +14,7 @@ public class MovementInputSystem extends IteratingSystem {
     private final ComponentMapper<VelocityComponent> velocityMapper;
 
     public MovementInputSystem(Input input) {
-        super(Family.all(VelocityComponent.class).get());
+        super(Family.all(VelocityComponent.class, PlayerControlledComponent.class).get());
         this.input = input;
         this.velocityMapper = ComponentMapper.getFor(VelocityComponent.class);
     }

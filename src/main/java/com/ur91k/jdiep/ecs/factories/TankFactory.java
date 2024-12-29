@@ -7,8 +7,10 @@ import com.ur91k.jdiep.ecs.components.camera.CameraTargetComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.PlayerComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.PlayerControlledComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.TankBodyComponent;
+import com.ur91k.jdiep.ecs.components.gameplay.TankControllerComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.TurretComponent;
 import com.ur91k.jdiep.ecs.components.movement.MovementComponent;
+import com.ur91k.jdiep.ecs.components.physics.VelocityComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ColorComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ShapeComponent;
 import com.ur91k.jdiep.ecs.components.transform.ParentComponent;
@@ -44,9 +46,18 @@ public class TankFactory {
         movement.init(200.0f);  // Default speed
         tank.add(movement);
         
+        // Add velocity component for movement
+        VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
+        velocity.setMaxSpeed(200.0f);
+        velocity.setAcceleration(500.0f);
+        tank.add(velocity);
+        
+        // Add controller component
+        tank.add(engine.createComponent(TankControllerComponent.class));
+        
         // Add rendering components
         ShapeComponent shape = engine.createComponent(ShapeComponent.class);
-        shape.init(30.0f);  // Base tank radius
+        shape.init(20.0f);  // Base tank radius (reduced from 30 to 20)
         tank.add(shape);
         
         RenderLayer layer = engine.createComponent(RenderLayer.class);
@@ -117,9 +128,9 @@ public class TankFactory {
         // Create single forward-facing turret
         createTurret(
             tankBody,
-            0.4f,                           // width ratio
-            0.8f,                           // length ratio
-            new Vector2f(0, 0),            // centered
+            0.067f,
+            0.25f,
+            new Vector2f(20, 0),            // centered
             0.0f,                          // forward facing
             new TurretPhase(body.getPhaseConfig(), 1) // single phase
         );

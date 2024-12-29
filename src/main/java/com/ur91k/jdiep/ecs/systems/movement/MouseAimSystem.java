@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.ur91k.jdiep.core.window.Input;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
+import com.ur91k.jdiep.ecs.components.gameplay.PlayerControlledComponent;
 import org.joml.Vector2f;
 
 public class MouseAimSystem extends IteratingSystem {
@@ -11,7 +12,7 @@ public class MouseAimSystem extends IteratingSystem {
     private final ComponentMapper<TransformComponent> transformMapper;
 
     public MouseAimSystem(Input input) {
-        super(Family.all(TransformComponent.class).get());
+        super(Family.all(TransformComponent.class, PlayerControlledComponent.class).get());
         this.input = input;
         this.transformMapper = ComponentMapper.getFor(TransformComponent.class);
     }

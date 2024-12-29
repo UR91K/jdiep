@@ -7,6 +7,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.ur91k.jdiep.core.window.Input;
 import com.ur91k.jdiep.ecs.components.camera.CameraComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
 public class CameraSystem extends IteratingSystem {
@@ -46,5 +47,13 @@ public class CameraSystem extends IteratingSystem {
                 transform.setPosition(currentPos);
             }
         }
+        
+        // Update view matrix
+        Matrix4f viewMatrix = new Matrix4f()
+            .translate(-transform.getPosition().x, -transform.getPosition().y, 0)
+            .scale(camera.getZoom());
+            
+        // Pass view matrix to input system
+        input.setViewMatrix(viewMatrix);
     }
 } 

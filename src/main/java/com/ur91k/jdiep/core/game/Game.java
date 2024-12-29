@@ -8,8 +8,8 @@ import com.ur91k.jdiep.debug.ImGuiDebugManager;
 import com.ur91k.jdiep.ecs.factories.CameraFactory;
 import com.ur91k.jdiep.ecs.factories.TankFactory;
 import com.ur91k.jdiep.ecs.systems.camera.CameraSystem;
-import com.ur91k.jdiep.ecs.systems.movement.MouseAimSystem;
-import com.ur91k.jdiep.ecs.systems.movement.MovementInputSystem;
+import com.ur91k.jdiep.ecs.systems.movement.LocalPlayerControlSystem;
+import com.ur91k.jdiep.ecs.systems.movement.TankMovementSystem;
 import com.ur91k.jdiep.ecs.systems.movement.MovementSystem;
 import com.ur91k.jdiep.ecs.systems.transform.ParentSystem;
 import com.ur91k.jdiep.ecs.systems.render.RenderingSystem;
@@ -41,7 +41,7 @@ public class Game {
         this.window = new Window(windowWidth, windowHeight, "JDiep");
         this.input = new Input(window);  // Pass window to input
         this.ashley = new Engine();
-        this.renderer = new OpenGLRenderer(windowWidth, windowHeight);
+        this.renderer = new OpenGLRenderer(windowWidth, windowHeight, input);
         this.debugManager = new ImGuiDebugManager();
         this.debugManager.init(window.getHandle());  // Initialize ImGui
         
@@ -56,12 +56,12 @@ public class Game {
 
     private void initializeSystems() {
         // Add systems in priority order
-        ashley.addSystem(new MovementInputSystem(input));  // Handle input first
-        ashley.addSystem(new MovementSystem());            // Update physics
-        ashley.addSystem(new MouseAimSystem(input));       // Update rotations
-        ashley.addSystem(new ParentSystem());              // Update hierarchies
-        ashley.addSystem(new CameraSystem(input));         // Update camera
-        ashley.addSystem(new RenderingSystem(renderer, input));   // Render last
+        ashley.addSystem(new LocalPlayerControlSystem(input));  // Update player input
+        ashley.addSystem(new TankMovementSystem());            // Apply tank movement
+        ashley.addSystem(new MovementSystem());                // Apply velocity to position
+        ashley.addSystem(new ParentSystem());                  // Update hierarchies
+        ashley.addSystem(new CameraSystem(input));             // Update camera
+        ashley.addSystem(new RenderingSystem(renderer, input));// Render last
         
         Logger.info("Game systems initialized");
     }
@@ -73,6 +73,9 @@ public class Game {
         // Create player tank at world origin
         Entity basicTank = tankFactory.createBasicTank(new Vector2f(0, 0));
         playerTank = tankFactory.makePlayerControlled(basicTank);
+        
+        // Create dummy tank for physics testing
+        tankFactory.createBasicTank(new Vector2f(100, 0));  // 100 units to the right of player
         
         // Create main camera following the player
         mainCamera = cameraFactory.createCamera(new Vector2f(0, 0));

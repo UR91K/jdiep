@@ -21,7 +21,7 @@ public class MouseAimSystem extends IteratingSystem {
         TransformComponent transform = transformMapper.get(entity);
         
         // Get world space mouse position
-        Vector2f mousePos = input.getMousePosition();
+        Vector2f mousePos = input.getWorldMousePosition();
         Vector2f entityPos = transform.getPosition();
         
         // Calculate direction to mouse

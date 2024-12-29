@@ -2,13 +2,12 @@ package com.ur91k.jdiep.ecs.factories;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.ur91k.jdiep.core.logging.Logger;
+import org.tinylog.Logger;
 import com.ur91k.jdiep.ecs.components.camera.CameraComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
 import org.joml.Vector2f;
 
 public class CameraFactory {
-    private static final Logger logger = Logger.getLogger(CameraFactory.class);
     private final Engine engine;
     
     public CameraFactory(Engine engine) {
@@ -16,23 +15,20 @@ public class CameraFactory {
     }
     
     public Entity createCamera(Vector2f position) {
-        logger.debug("Creating camera at position: {}", position);
+        Logger.debug("Creating camera at position: {}", position);
         
         Entity camera = engine.createEntity();
         
-        // Add transform component
         TransformComponent transform = engine.createComponent(TransformComponent.class);
         transform.setPosition(position);
         camera.add(transform);
         
-        // Add camera component
         CameraComponent cameraComp = engine.createComponent(CameraComponent.class);
         camera.add(cameraComp);
         
-        // Add to engine
         engine.addEntity(camera);
+        Logger.debug("Camera entity created and added to engine");
         
-        logger.debug("Created camera entity");
         return camera;
     }
     
@@ -44,7 +40,7 @@ public class CameraFactory {
         cameraComp.setTarget(target);
         cameraComp.setLerpFactor(followSpeed);
         
-        logger.debug("Created follow camera for target entity");
+        Logger.debug("Created follow camera for target entity");
         return camera;
     }
 } 

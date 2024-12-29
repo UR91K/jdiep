@@ -2,7 +2,7 @@ package com.ur91k.jdiep.ecs.factories;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.ur91k.jdiep.core.logging.Logger;
+import org.tinylog.Logger;
 import com.ur91k.jdiep.ecs.components.camera.CameraTargetComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.PlayerComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.PlayerControlledComponent;
@@ -21,7 +21,6 @@ import com.ur91k.jdiep.graphics.core.RenderLayer;
 import org.joml.Vector2f;
 
 public class TankFactory {
-    private static final Logger logger = Logger.getLogger(TankFactory.class);
     private final Engine engine;
     
     public TankFactory(Engine engine) {
@@ -65,7 +64,7 @@ public class TankFactory {
     private Entity createTurret(Entity tankBody, float widthRatio, float lengthRatio, 
                               Vector2f offset, float rotation, TurretPhase phase) {
         Entity turret = engine.createEntity();
-        logger.debug("Creating turret entity for tank");
+        Logger.debug("Creating turret entity for tank");
         
         // Add turret component using pooling
         TurretComponent turretComp = engine.createComponent(TurretComponent.class);
@@ -125,7 +124,7 @@ public class TankFactory {
     }
     
     public Entity createTwinTank(Vector2f position) {
-        logger.debug("Creating twin tank at position: {}", position);
+        Logger.debug("Creating twin tank at position: {}", position);
         
         Entity tankBody = createTankBody(120, 2, 1.2f, position);
         TankBodyComponent body = tankBody.getComponent(TankBodyComponent.class);
@@ -179,7 +178,7 @@ public class TankFactory {
     
     // Create player-controlled version of any tank
     public Entity makePlayerControlled(Entity tank) {
-        logger.debug("Making tank player controlled");
+        Logger.debug("Making tank player controlled");
         
         PlayerComponent playerComp = engine.createComponent(PlayerComponent.class);
         playerComp.init("local", true, "Player");
@@ -188,7 +187,7 @@ public class TankFactory {
         tank.add(engine.createComponent(PlayerControlledComponent.class));
         tank.add(engine.createComponent(CameraTargetComponent.class));
         
-        logger.debug("Added player control components");
+        Logger.debug("Added player control components");
         return tank;
     }
 } 

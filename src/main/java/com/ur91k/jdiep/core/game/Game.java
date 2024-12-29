@@ -39,10 +39,11 @@ public class Game {
     public Game(int windowWidth, int windowHeight) {
         // Initialize core components
         this.window = new Window(windowWidth, windowHeight, "JDiep");
-        this.input = new Input();
+        this.input = new Input(window);  // Pass window to input
         this.ashley = new Engine();
         this.renderer = new OpenGLRenderer(windowWidth, windowHeight);
         this.debugManager = new ImGuiDebugManager();
+        this.debugManager.init(window.getHandle());  // Initialize ImGui
         
         // Initialize systems
         initializeSystems();
@@ -60,7 +61,7 @@ public class Game {
         ashley.addSystem(new MouseAimSystem(input));       // Update rotations
         ashley.addSystem(new ParentSystem());              // Update hierarchies
         ashley.addSystem(new CameraSystem(input));         // Update camera
-        ashley.addSystem(new RenderingSystem(renderer));   // Render last
+        ashley.addSystem(new RenderingSystem(renderer, input));   // Render last
         
         Logger.info("Game systems initialized");
     }

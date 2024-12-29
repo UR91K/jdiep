@@ -11,6 +11,10 @@ public class RenderLayer implements Component {
 
     private int layer;
 
+    public RenderLayer() {
+        this.layer = GAME_OBJECTS;  // Default to game objects layer
+    }
+
     public RenderLayer(int layer) {
         this.layer = layer;
     }

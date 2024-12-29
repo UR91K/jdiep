@@ -1,26 +1,23 @@
 package com.ur91k.jdiep.graphics.text;
 
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import org.tinylog.Logger;
+import org.lwjgl.BufferUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
-import org.lwjgl.BufferUtils;
 
-import com.ur91k.jdiep.core.logging.Logger;
 import com.ur91k.jdiep.graphics.core.ShaderProgram;
-
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
 public class TextRenderer {
-    private static final Logger logger = Logger.getLogger(TextRenderer.class);
     private final int vao;
     private final int vbo;
     private final ShaderProgram shader;
@@ -43,7 +40,7 @@ public class TextRenderer {
             glValidateProgram(programId);
             if (glGetProgrami(programId, GL_VALIDATE_STATUS) != GL_TRUE) {
                 String log = glGetProgramInfoLog(programId);
-                logger.error("Shader program validation failed: {}", log);
+                Logger.error("Shader program validation failed: {}", log);
             }
             
             projection = new Matrix4f().ortho(
@@ -71,7 +68,7 @@ public class TextRenderer {
             
             // Upload font bitmap
             ByteBuffer bitmap = font.getBitmap();
-            logger.debug("Font texture size: {}x{}", font.getTextureWidth(), font.getTextureHeight());
+            Logger.debug("Font texture size: {}x{}", font.getTextureWidth(), font.getTextureHeight());
             
             glTexImage2D(
                 GL_TEXTURE_2D,
@@ -104,7 +101,7 @@ public class TextRenderer {
             
             // Verify VAO setup
             if (glGetVertexAttribi(0, GL_VERTEX_ATTRIB_ARRAY_ENABLED) != GL_TRUE) {
-                logger.error("Vertex attribute 0 is not enabled!");
+                Logger.error("Vertex attribute 0 is not enabled!");
             }
             
             // Enable blending for text
@@ -112,7 +109,7 @@ public class TextRenderer {
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             
         } catch (Exception e) {
-            logger.error("Failed to initialize text renderer", e);
+            Logger.error("Failed to initialize text renderer", e);
             throw new RuntimeException("Failed to initialize text renderer", e);
         }
     }
@@ -120,10 +117,10 @@ public class TextRenderer {
     public void renderText(String text, float x, float y, Vector4f color) {
         if (text == null || text.isEmpty()) return;
         
-        logger.trace("Rendering text: {}", text);
+        Logger.trace("Rendering text: {}", text);
         
         if (shader == null) {
-            logger.error("Shader is null");
+            Logger.error("Shader is null");
             return;
         }
         
@@ -153,7 +150,7 @@ public class TextRenderer {
         for (char c : text.toCharArray()) {
             BDFFont.Glyph glyph = font.getGlyph(c);
             if (glyph == null) {
-                logger.warn("No glyph found for character: {}", c);
+                Logger.warn("No glyph found for character: {}", c);
                 continue;
             }
             
@@ -173,7 +170,7 @@ public class TextRenderer {
             
             // Make sure we're not writing beyond buffer bounds
             if (vertices.remaining() * Float.BYTES > 4 * 4 * Float.BYTES) {
-                logger.error("Attempting to write beyond buffer bounds");
+                Logger.error("Attempting to write beyond buffer bounds");
                 continue;
             }
             

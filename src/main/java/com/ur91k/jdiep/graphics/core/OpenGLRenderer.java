@@ -18,6 +18,10 @@ public class OpenGLRenderer implements Renderer {
     private final Matrix4f view;
     private final int vao;
     private final int vbo;
+    private final int gridVao;
+    private final int gridVbo;
+    private static final int GRID_SIZE = 100;
+    private static final float GRID_SPACING = 50.0f;
 
     public OpenGLRenderer(int windowWidth, int windowHeight) {
         // Initialize matrices
@@ -41,13 +45,81 @@ public class OpenGLRenderer implements Renderer {
 
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, 1024 * Float.BYTES, GL_DYNAMIC_DRAW); // Allocate buffer
+        glBufferData(GL_ARRAY_BUFFER, 1024 * Float.BYTES, GL_DYNAMIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
+
+        // Create grid VAO/VBO
+        this.gridVao = glGenVertexArrays();
+        this.gridVbo = glGenBuffers();
+        setupGrid();
+
+        // Enable anti-aliasing
+        glEnable(GL_LINE_SMOOTH);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    }
+
+    private void setupGrid() {
+        // Generate grid vertices
+        // Each line needs 2 vertices (start and end), each vertex needs 2 floats (x,y)
+        // Total lines = (GRID_SIZE + 1) * 2 (horizontal + vertical)
+        int totalVertices = (GRID_SIZE + 1) * 2 * 2 * 2;  // (grid + 1) * (h+v) * verts * coords
+        FloatBuffer gridBuffer = BufferUtils.createFloatBuffer(totalVertices);
+        float extent = GRID_SIZE * GRID_SPACING / 2;
+        
+        // Vertical lines
+        for (int i = 0; i <= GRID_SIZE; i++) {
+            float x = -extent + i * GRID_SPACING;
+            gridBuffer.put(x).put(-extent);
+            gridBuffer.put(x).put(extent);
+        }
+        
+        // Horizontal lines
+        for (int i = 0; i <= GRID_SIZE; i++) {
+            float y = -extent + i * GRID_SPACING;
+            gridBuffer.put(-extent).put(y);
+            gridBuffer.put(extent).put(y);
+        }
+        gridBuffer.flip();
+
+        glBindVertexArray(gridVao);
+        glBindBuffer(GL_ARRAY_BUFFER, gridVbo);
+        glBufferData(GL_ARRAY_BUFFER, gridBuffer, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
     }
 
+    public void drawGrid() {
+        shader.use();
+        shader.setMatrix4f("projection", projection);
+        shader.setMatrix4f("view", view);
+        shader.setMatrix4f("model", new Matrix4f());
+        shader.setVector4f("color", new Vector4f(0.2f, 0.2f, 0.2f, 0.5f));
+
+        glLineWidth(1.0f);
+        glBindVertexArray(gridVao);
+        glDrawArrays(GL_LINES, 0, GRID_SIZE * 4);
+    }
+
     @Override
     public void drawCircle(Vector2f position, float radius, Vector4f color) {
+        drawCircle(position, radius, color, 1.0f, true);
+    }
+
+    @Override
+    public void drawRectangle(Vector2f position, Vector2f dimensions, float rotation, Vector4f color) {
+        drawRectangle(position, dimensions, rotation, color, 1.0f, true);
+    }
+
+    @Override
+    public void drawPolygon(Vector2f position, Vector2f[] vertices, float rotation, Vector4f color) {
+        drawPolygon(position, vertices, rotation, color, 1.0f, true);
+    }
+
+    @Override
+    public void drawCircle(Vector2f position, float radius, Vector4f color, float lineWidth, boolean filled) {
         shader.use();
         shader.setMatrix4f("projection", projection);
         shader.setMatrix4f("view", view);
@@ -56,23 +128,28 @@ public class OpenGLRenderer implements Renderer {
 
         // Generate circle vertices
         int segments = 32;
-        FloatBuffer circleBuffer = BufferUtils.createFloatBuffer(segments * 2);
-        for (int i = 0; i < segments; i++) {
+        FloatBuffer circleBuffer = BufferUtils.createFloatBuffer((segments + 1) * 2);
+        for (int i = 0; i <= segments; i++) {
             float angle = (float) (2.0f * Math.PI * i / segments);
             circleBuffer.put((float) Math.cos(angle) * radius);
             circleBuffer.put((float) Math.sin(angle) * radius);
         }
         circleBuffer.flip();
 
-        // Draw circle
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, circleBuffer);
+
+        if (filled) {
+            glDrawArrays(GL_TRIANGLE_FAN, 0, segments + 1);
+        }
+
+        glLineWidth(lineWidth);
         glDrawArrays(GL_LINE_LOOP, 0, segments);
     }
 
     @Override
-    public void drawRectangle(Vector2f position, Vector2f dimensions, float rotation, Vector4f color) {
+    public void drawRectangle(Vector2f position, Vector2f dimensions, float rotation, Vector4f color, float lineWidth, boolean filled) {
         shader.use();
         shader.setMatrix4f("projection", projection);
         shader.setMatrix4f("view", view);
@@ -82,8 +159,6 @@ public class OpenGLRenderer implements Renderer {
         );
         shader.setVector4f("color", color);
 
-        // Generate rectangle vertices
-        FloatBuffer rectBuffer = BufferUtils.createFloatBuffer(8);
         float halfWidth = dimensions.x / 2;
         float halfHeight = dimensions.y / 2;
         float[] vertices = new float[] {
@@ -92,17 +167,22 @@ public class OpenGLRenderer implements Renderer {
             halfWidth, halfHeight,
             -halfWidth, halfHeight
         };
-        rectBuffer.put(vertices).flip();
+        FloatBuffer rectBuffer = BufferUtils.createFloatBuffer(8).put(vertices).flip();
 
-        // Draw rectangle
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, rectBuffer);
+
+        if (filled) {
+            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        }
+
+        glLineWidth(lineWidth);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
     }
 
     @Override
-    public void drawPolygon(Vector2f position, Vector2f[] vertices, float rotation, Vector4f color) {
+    public void drawPolygon(Vector2f position, Vector2f[] vertices, float rotation, Vector4f color, float lineWidth, boolean filled) {
         shader.use();
         shader.setMatrix4f("projection", projection);
         shader.setMatrix4f("view", view);
@@ -112,7 +192,6 @@ public class OpenGLRenderer implements Renderer {
         );
         shader.setVector4f("color", color);
 
-        // Convert vertices to buffer
         FloatBuffer polyBuffer = BufferUtils.createFloatBuffer(vertices.length * 2);
         for (Vector2f vertex : vertices) {
             polyBuffer.put(vertex.x);
@@ -120,10 +199,15 @@ public class OpenGLRenderer implements Renderer {
         }
         polyBuffer.flip();
 
-        // Draw polygon
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, polyBuffer);
+
+        if (filled) {
+            glDrawArrays(GL_TRIANGLE_FAN, 0, vertices.length);
+        }
+
+        glLineWidth(lineWidth);
         glDrawArrays(GL_LINE_LOOP, 0, vertices.length);
     }
 
@@ -135,5 +219,7 @@ public class OpenGLRenderer implements Renderer {
         shader.cleanup();
         glDeleteBuffers(vbo);
         glDeleteVertexArrays(vao);
+        glDeleteBuffers(gridVbo);
+        glDeleteVertexArrays(gridVao);
     }
 } 

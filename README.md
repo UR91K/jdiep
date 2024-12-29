@@ -73,33 +73,63 @@ A multiplayer-first implementation of diep.io using Java and LWJGL, built with a
 
 ## 🏗️ Architecture
 
-### Entity Component System (ECS)
+### Core Libraries
 
-The game uses a custom ECS architecture for better performance and maintainability:
+- **Ashley ECS**: Core entity component system
+- **LWJGL**: OpenGL rendering and GLFW input
+- **JBox2D**: Physics simulation
+- **Netty**: Networking layer
+- **OpenAL**: Audio system
+- **imGUI**: Debug interface
+- **tinylog**: Logging system
 
-- **Entities**: Basic containers with unique IDs
-- **Components**: Pure data containers (e.g., Position, Movement, Render)
-- **Systems**: Logic processors that operate on entities with specific components
+### Module Organization
 
-### Key Systems
+```
+Core
+├── Engine (Ashley ECS + basic systems)
+├── Physics (JBox2D wrapper)
+├── Rendering (LWJGL/OpenGL)
+├── Input (GLFW)
+├── Audio (OpenAL)
+└── Network (Netty)
 
-- **RenderSystem**: Handles all rendering operations
-- **MovementSystem**: Processes entity movement
-- **NetworkSystem**: Manages multiplayer synchronization with client-side prediction
-- **InputSystem**: Processes user input
-- **CameraSystem**: Handles game view and viewport
-- **PhysicsSystem**: Manages rigid body physics and collision detection
-- **AISystem**: Controls bot behavior and boid simulation
-- **AudioSystem**: Handles sound synthesis and playback
+Modules
+├── Game (game-specific systems)
+├── Debug (imGUI integration)
+├── Config (configuration management)
+└── Events (event bus system)
+```
 
-## Development
+### Design Principles
+
+#### Component Design
+- Pure data containers
+- No behavior in components
+- Flat component hierarchy
+- Composition over inheritance
+
+#### System Design
+- Single responsibility per system
+- Event-based communication
+- Configurable behavior
+- Easy enable/disable support
+
+#### Core Principles
+- Modularity First: Systems should be easily swappable
+- Simple but Extensible: Core systems provide basic functionality with clear extension points
+- Data-Oriented: Focus on data transformation rather than object behavior
+- Event-Driven: Loose coupling through event-based communication
+
+### Development Guidelines
 
 The project follows these key principles:
 
 - YAGNI (You Aren't Gonna Need It)
 - KISS (Keep It Simple, Stupid)
-- Multiplayer-first design
-- Incremental feature implementation
+- Composition over Inheritance
+- Data-Oriented Design
+- Event-Driven Architecture
 
 ## Contributing
 

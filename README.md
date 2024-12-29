@@ -2,55 +2,72 @@
 
 A multiplayer-first implementation of diep.io using Java and LWJGL, built with a custom Entity Component System (ECS) architecture. This project focuses on clean, maintainable code while avoiding over-engineering.
 
-## Features (current and planned)
+## Features
 
-### Core Architecture
+### Current Features
+
+#### Core Architecture
 - Custom ECS (Entity Component System) architecture
-- Multiplayer-first design with stability-focused netcode
-- Built with LWJGL (Lightweight Java Game Library)
-- Real-time gameplay with client-side prediction
-- Debug visualization tools and performance monitoring
+  - Entity management with unique IDs
+  - Component-based data storage
+  - System-based logic processing
+- LWJGL (Lightweight Java Game Library) integration
+- Basic game loop with delta time
+- Input handling system
 
-### Physics & Gameplay Enhancements
+#### Rendering System
+- OpenGL-based rendering pipeline
+- Shape rendering (circles, rectangles, polygons)
+- Color and outline support
+- Layer-based rendering system
+- Camera system with basic movement
+
+#### Game Systems
+- Transform system with parent-child relationships
+- Movement system with velocity and acceleration
+- Basic tank implementation
+  - Tank body and turret components
+  - Transform hierarchies
+- Debug visualization tools
+  - Performance monitoring
+  - Entity state visualization
+  - Debug drawing capabilities
+
+### Planned Features
+
+#### Core Mechanics
+- Multiplayer support with client-side prediction
 - Advanced rigid body physics system
   - Broad and narrow phase collision detection
   - Quadtree spatial partitioning
   - GJK (Gilbert-Johnson-Keerthi) collision algorithm
-- Boid behavior for drone AI
+- Food system implementation
+- Drone AI with boid behavior
 - Physical modeling audio synthesis
-- Hardcore mode with optional UI disable
 
-### Extended Game Mechanics
+#### Game Content
 - New tank classes:
-  - Physics manipulator with powerful turret for pushing
-  - Stealth class with food item disguise ability
+  - Physics manipulator with powerful turret
+  - Stealth class with food disguise ability
 - Enhanced kill feed with mass transfer visualization
 - Special indicators for leaderboard kills
-- Sandbox mode for experimentation
+- Sandbox mode
 
-### Multiplayer & Community
+#### Multiplayer & Community
 - Community server support
 - Customizable server features
 - Enhanced spectating system:
   - Player follow mode
   - Free camera mode
-  - Optional stats visualizations for mass and kills
-  - Zoom in/out for all spectator modes
+  - Stats visualizations
 - Chat system with admin commands
-- Account system tracking:
-  - Mass history
-  - Kill statistics
-  - Experience points
-  - Lifetime achievements
-  - Other relevant statistics
+- Account system with statistics tracking
 
-### AI & Debug Features
+#### AI & Advanced Debug
 - Sophisticated AI bot system
-- Comprehensive debug toolkit:
-  - Performance graphs
-  - Real-time metrics
-  - Hitbox visualizations
-  - Vector displays
+- Comprehensive debug toolkit expansion:
+  - Advanced performance graphs
+  - Network statistics
   - AI behavior visualization
 - Mod support for community extensions
 

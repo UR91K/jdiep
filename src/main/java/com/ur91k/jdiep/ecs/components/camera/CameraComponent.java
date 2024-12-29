@@ -2,6 +2,7 @@ package com.ur91k.jdiep.ecs.components.camera;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
+import org.joml.Vector2f;
 
 public class CameraComponent implements Component {
     private Entity target;  // Entity to follow (optional)
@@ -11,14 +12,24 @@ public class CameraComponent implements Component {
     private float maxZoom;
     private float zoomSpeed;
     
+    // Spring properties
+    private Vector2f velocity;
+    private float springStiffness;  // k in F = -kx
+    private float damping;          // c in F = -cv
+    
     public CameraComponent() {
         // Default constructor for Ashley's pooling
         this.target = null;
-        this.lerpFactor = 0.1f;  // Default smooth follow
+        this.lerpFactor = 0.1f;
         this.zoom = 1.0f;
         this.minZoom = 0.5f;
         this.maxZoom = 2.0f;
         this.zoomSpeed = 0.1f;
+        
+        // Initialize spring properties
+        this.velocity = new Vector2f();
+        this.springStiffness = 100.0f;  // Strong spring for responsive following
+        this.damping = 10.0f;           // Moderate damping to prevent oscillation
     }
     
     public void init() {
@@ -28,6 +39,10 @@ public class CameraComponent implements Component {
         this.minZoom = 0.5f;
         this.maxZoom = 2.0f;
         this.zoomSpeed = 0.1f;
+        
+        this.velocity.zero();
+        this.springStiffness = 100.0f;
+        this.damping = 10.0f;
     }
     
     // Target entity methods
@@ -38,6 +53,14 @@ public class CameraComponent implements Component {
     // Movement smoothing
     public float getLerpFactor() { return lerpFactor; }
     public void setLerpFactor(float factor) { this.lerpFactor = factor; }
+    
+    // Spring properties
+    public Vector2f getVelocity() { return velocity; }
+    public void setVelocity(Vector2f velocity) { this.velocity.set(velocity); }
+    public float getSpringStiffness() { return springStiffness; }
+    public void setSpringStiffness(float stiffness) { this.springStiffness = stiffness; }
+    public float getDamping() { return damping; }
+    public void setDamping(float damping) { this.damping = damping; }
     
     // Zoom controls
     public float getZoom() { return zoom; }

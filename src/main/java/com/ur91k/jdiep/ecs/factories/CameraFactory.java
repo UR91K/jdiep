@@ -24,6 +24,7 @@ public class CameraFactory {
         camera.add(transform);
         
         CameraComponent cameraComp = engine.createComponent(CameraComponent.class);
+        cameraComp.init();
         camera.add(cameraComp);
         
         engine.addEntity(camera);
@@ -39,8 +40,9 @@ public class CameraFactory {
         CameraComponent cameraComp = camera.getComponent(CameraComponent.class);
         cameraComp.setTarget(target);
         cameraComp.setLerpFactor(followSpeed);
+        cameraComp.setZoom(0.7f);
         
-        Logger.debug("Created follow camera for target entity");
+        Logger.debug("Created follow camera for target entity: {}", target);
         return camera;
     }
 } 

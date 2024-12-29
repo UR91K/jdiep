@@ -76,20 +76,24 @@ public class Input {
     public Vector2f getWorldMousePosition() {
         if (window == null) return new Vector2f();
         
-        // Convert screen coordinates to normalized device coordinates (-1 to 1)
-        float ndcX = (2.0f * mousePos.x) / window.getWidth() - 1.0f;
-        float ndcY = 1.0f - (2.0f * mousePos.y) / window.getHeight();
+        // Get window center in screen coordinates
+        float centerX = window.getWidth() / 2.0f;
+        float centerY = window.getHeight() / 2.0f;
         
-        // Create inverse view-projection matrix
-        Matrix4f invViewProj = new Matrix4f();
-        projectionMatrix.mul(viewMatrix, invViewProj);
-        invViewProj.invert();
+        // Convert mouse position to be relative to center
+        float relX = mousePos.x - centerX;
+        float relY = centerY - mousePos.y;  // Flip Y since screen coordinates are Y-down
         
-        // Transform to world coordinates
-        Vector3f worldPos = new Vector3f(ndcX, ndcY, 0);
-        Vector3f result = invViewProj.transformPosition(new Vector3f(worldPos));
+        // Apply inverse view matrix transformations
+        float zoom = viewMatrix.m00();  // Scale is in the diagonal elements
+        float camX = -viewMatrix.m30() / zoom;  // Translation is in the last column
+        float camY = -viewMatrix.m31() / zoom;
         
-        return new Vector2f(result.x, result.y);
+        // Convert to world coordinates
+        float worldX = relX / zoom + camX;
+        float worldY = relY / zoom + camY;
+        
+        return new Vector2f(worldX, worldY);
     }
 
     public float getScrollY() {

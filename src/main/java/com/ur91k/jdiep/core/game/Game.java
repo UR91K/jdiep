@@ -6,11 +6,14 @@ import com.ur91k.jdiep.core.window.Input;
 import com.ur91k.jdiep.core.window.Window;
 import com.ur91k.jdiep.debug.ImGuiDebugManager;
 import com.ur91k.jdiep.ecs.factories.CameraFactory;
+import com.ur91k.jdiep.ecs.factories.FoodFactory;
 import com.ur91k.jdiep.ecs.factories.TankFactory;
 import com.ur91k.jdiep.ecs.systems.camera.CameraSystem;
+import com.ur91k.jdiep.ecs.systems.gameplay.FoodDriftSystem;
 import com.ur91k.jdiep.ecs.systems.movement.LocalPlayerControlSystem;
 import com.ur91k.jdiep.ecs.systems.movement.TankMovementSystem;
 import com.ur91k.jdiep.ecs.systems.movement.MovementSystem;
+import com.ur91k.jdiep.ecs.systems.physics.PhysicsSystem;
 import com.ur91k.jdiep.ecs.systems.transform.ParentSystem;
 import com.ur91k.jdiep.ecs.systems.render.RenderingSystem;
 import com.ur91k.jdiep.graphics.core.OpenGLRenderer;
@@ -55,10 +58,15 @@ public class Game {
     }
 
     private void initializeSystems() {
+        // Create physics world
+        PhysicsSystem physicsSystem = new PhysicsSystem();
+        ashley.addSystem(physicsSystem);
+        
         // Add systems in priority order
         ashley.addSystem(new LocalPlayerControlSystem(input));  // Update player input
         ashley.addSystem(new TankMovementSystem());            // Apply tank movement
         ashley.addSystem(new MovementSystem());                // Apply velocity to position
+        ashley.addSystem(new FoodDriftSystem(physicsSystem.getWorld())); // Food movement
         ashley.addSystem(new ParentSystem());                  // Update hierarchies
         ashley.addSystem(new CameraSystem(input));             // Update camera
         ashley.addSystem(new RenderingSystem(renderer, input));// Render last
@@ -67,7 +75,10 @@ public class Game {
     }
 
     private void createInitialEntities() {
+        // Create factories with physics world
+        PhysicsSystem physicsSystem = ashley.getSystem(PhysicsSystem.class);
         TankFactory tankFactory = new TankFactory(ashley);
+        FoodFactory foodFactory = new FoodFactory(ashley);
         CameraFactory cameraFactory = new CameraFactory(ashley);
 
         // Create player tank at world origin
@@ -77,8 +88,12 @@ public class Game {
         // Create dummy tank for physics testing
         tankFactory.createBasicTank(new Vector2f(100, 0));  // 100 units to the right of player
         
+        // Create some test food
+        foodFactory.createTinyFood(new Vector2f(-50, 50));
+        foodFactory.createSmallFood(new Vector2f(50, 50));
+        
         // Create main camera following the player
-        mainCamera = cameraFactory.createCamera(new Vector2f(0, 0));
+        mainCamera = cameraFactory.createFollowCamera(playerTank, 0.1f);
         
         Logger.info("Initial entities created");
     }

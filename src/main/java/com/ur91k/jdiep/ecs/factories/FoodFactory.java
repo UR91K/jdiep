@@ -2,109 +2,226 @@ package com.ur91k.jdiep.ecs.factories;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.ur91k.jdiep.ecs.components.gameplay.HealthComponent;
+import com.ur91k.jdiep.ecs.components.gameplay.FoodComponent;
+import com.ur91k.jdiep.ecs.components.gameplay.FoodType;
 import com.ur91k.jdiep.ecs.components.physics.CollisionComponent;
+import com.ur91k.jdiep.ecs.components.physics.CollisionFilters;
+import com.ur91k.jdiep.ecs.components.physics.PhysicsProperties;
 import com.ur91k.jdiep.ecs.components.rendering.ColorComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ShapeComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
+import com.ur91k.jdiep.graphics.config.RenderingConstants;
+import com.ur91k.jdiep.graphics.core.RenderLayer;
+import org.jbox2d.dynamics.BodyType;
 import org.joml.Vector2f;
-import org.joml.Vector4f;
+import org.tinylog.Logger;
 
 public class FoodFactory {
     private final Engine engine;
-    
-    public enum FoodType {
-        SQUARE(10),      // Basic food
-        TRIANGLE(25),    // Medium food
-        PENTAGON(130),   // Large food
-        ALPHA_PENTAGON(3000); // Boss food
-        
-        private final float mass;
-        FoodType(float mass) { this.mass = mass; }
-        public float getMass() { return mass; }
-    }
     
     public FoodFactory(Engine engine) {
         this.engine = engine;
     }
     
-    public Entity createFood(FoodType type, Vector2f position) {
+    public Entity createTinyFood(Vector2f position) {
         Entity food = engine.createEntity();
         
-        // Add transform component
+        // Add transform
         TransformComponent transform = engine.createComponent(TransformComponent.class);
         transform.setPosition(position);
         food.add(transform);
         
-        // Add health component based on mass
-        HealthComponent health = engine.createComponent(HealthComponent.class);
-        health.init(type.getMass());
-        food.add(health);
+        // Add food component
+        FoodComponent foodComp = engine.createComponent(FoodComponent.class);
+        foodComp.init(10, FoodType.TINY);  // 10 XP for tiny food
+        food.add(foodComp);
         
-        // Add collision component
+        // Add collision (square shape)
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
-        collision.init(calculateRadius(type.getMass()));
+        float size = 10.0f;  // Size of tiny food
+        Vector2f[] vertices = new Vector2f[] {
+            new Vector2f(-size/2, -size/2),
+            new Vector2f(size/2, -size/2),
+            new Vector2f(size/2, size/2),
+            new Vector2f(-size/2, size/2)
+        };
+        collision.init(food, vertices, CollisionFilters.CATEGORY_FOOD, CollisionFilters.MASK_FOOD);
+        collision.setBodyType(BodyType.DYNAMIC);
+        collision.setDensity(0.5f);
+        collision.setFriction(0.1f);
+        collision.setRestitution(0.5f);
+        collision.setLinearDamping(0.5f);
+        collision.setAngularDamping(0.5f);
         food.add(collision);
         
-        // Add shape component based on type
+        // Add rendering components
         ShapeComponent shape = engine.createComponent(ShapeComponent.class);
-        switch (type) {
-            case SQUARE:
-                float size = calculateSize(type.getMass());
-                shape.init(size, size);
-                break;
-            case TRIANGLE:
-                shape.init(new Vector2f[] {
-                    new Vector2f(-15, -15),
-                    new Vector2f(15, -15),
-                    new Vector2f(0, 15)
-                });
-                break;
-            case PENTAGON:
-            case ALPHA_PENTAGON:
-                float radius = calculateRadius(type.getMass());
-                Vector2f[] vertices = new Vector2f[5];
-                for (int i = 0; i < 5; i++) {
-                    float angle = (float) (2 * Math.PI * i / 5);
-                    vertices[i] = new Vector2f(
-                        (float) (radius * Math.cos(angle)),
-                        (float) (radius * Math.sin(angle))
-                    );
-                }
-                shape.init(vertices);
-                break;
-        }
+        shape.init(size, size);  // Square shape
         food.add(shape);
         
-        // Add color component
+        RenderLayer layer = engine.createComponent(RenderLayer.class);
+        layer.setLayer(RenderLayer.GAME_OBJECTS - 1);  // Render below tanks
+        food.add(layer);
+        
         ColorComponent color = engine.createComponent(ColorComponent.class);
-        color.init(getFoodColor(type));
+        color.init(RenderingConstants.T_FOOD_FILL);
+        color.setOutline(RenderingConstants.T_FOOD_OUTLINE, 2.0f);
         food.add(color);
         
         engine.addEntity(food);
+        Logger.debug("Created tiny food at position: {}", position);
         return food;
     }
     
-    private float calculateRadius(float mass) {
-        return (float) Math.sqrt(mass / Math.PI) * 2;
+    public Entity createSmallFood(Vector2f position) {
+        Entity food = engine.createEntity();
+        
+        // Add transform
+        TransformComponent transform = engine.createComponent(TransformComponent.class);
+        transform.setPosition(position);
+        food.add(transform);
+        
+        // Add food component
+        FoodComponent foodComp = engine.createComponent(FoodComponent.class);
+        foodComp.init(25, FoodType.SMALL);  // 25 XP for small food
+        food.add(foodComp);
+        
+        // Add collision (triangle shape)
+        CollisionComponent collision = engine.createComponent(CollisionComponent.class);
+        float size = 15.0f;  // Size of small food
+        float height = size * (float)Math.sqrt(3) / 2;  // Height of equilateral triangle
+        Vector2f[] vertices = new Vector2f[] {
+            new Vector2f(0, height/2),  // Top
+            new Vector2f(-size/2, -height/2),  // Bottom left
+            new Vector2f(size/2, -height/2)   // Bottom right
+        };
+        collision.init(food, vertices, CollisionFilters.CATEGORY_FOOD, CollisionFilters.MASK_FOOD);
+        collision.setBodyType(BodyType.DYNAMIC);
+        collision.setDensity(0.5f);
+        collision.setFriction(0.1f);
+        collision.setRestitution(0.5f);
+        collision.setLinearDamping(0.5f);
+        collision.setAngularDamping(0.5f);
+        food.add(collision);
+        
+        // Add rendering components
+        ShapeComponent shape = engine.createComponent(ShapeComponent.class);
+        shape.init(vertices);  // Triangle shape
+        food.add(shape);
+        
+        RenderLayer layer = engine.createComponent(RenderLayer.class);
+        layer.setLayer(RenderLayer.GAME_OBJECTS - 1);
+        food.add(layer);
+        
+        ColorComponent color = engine.createComponent(ColorComponent.class);
+        color.init(RenderingConstants.S_FOOD_FILL);
+        color.setOutline(RenderingConstants.S_FOOD_OUTLINE, 2.0f);
+        food.add(color);
+        
+        engine.addEntity(food);
+        Logger.debug("Created small food at position: {}", position);
+        return food;
     }
     
-    private float calculateSize(float mass) {
-        return (float) Math.sqrt(mass) * 2;
+    public Entity createMediumFood(Vector2f position) {
+        Entity food = engine.createEntity();
+        
+        // Add transform
+        TransformComponent transform = engine.createComponent(TransformComponent.class);
+        transform.setPosition(position);
+        food.add(transform);
+        
+        // Add food component
+        FoodComponent foodComp = engine.createComponent(FoodComponent.class);
+        foodComp.init(130, FoodType.MEDIUM);  // 130 XP for medium food
+        food.add(foodComp);
+        
+        // Add collision (pentagon shape)
+        CollisionComponent collision = engine.createComponent(CollisionComponent.class);
+        float radius = 25.0f;  // Size of medium food
+        Vector2f[] vertices = createPentagonVertices(radius);
+        collision.init(food, vertices, CollisionFilters.CATEGORY_FOOD, CollisionFilters.MASK_FOOD);
+        collision.setBodyType(BodyType.DYNAMIC);
+        collision.setDensity(0.5f);
+        collision.setFriction(0.1f);
+        collision.setRestitution(0.5f);
+        collision.setLinearDamping(0.5f);
+        collision.setAngularDamping(0.5f);
+        food.add(collision);
+        
+        // Add rendering components
+        ShapeComponent shape = engine.createComponent(ShapeComponent.class);
+        shape.init(vertices);  // Pentagon shape
+        food.add(shape);
+        
+        RenderLayer layer = engine.createComponent(RenderLayer.class);
+        layer.setLayer(RenderLayer.GAME_OBJECTS - 1);
+        food.add(layer);
+        
+        ColorComponent color = engine.createComponent(ColorComponent.class);
+        color.init(RenderingConstants.M_FOOD_FILL);
+        color.setOutline(RenderingConstants.M_FOOD_OUTLINE, 2.0f);
+        food.add(color);
+        
+        engine.addEntity(food);
+        Logger.debug("Created medium food at position: {}", position);
+        return food;
     }
     
-    private Vector4f getFoodColor(FoodType type) {
-        switch (type) {
-            case SQUARE:
-                return new Vector4f(0.8f, 0.8f, 0.8f, 1.0f);  // Light gray
-            case TRIANGLE:
-                return new Vector4f(0.8f, 0.8f, 0.2f, 1.0f);  // Yellow
-            case PENTAGON:
-                return new Vector4f(0.4f, 0.4f, 1.0f, 1.0f);  // Blue
-            case ALPHA_PENTAGON:
-                return new Vector4f(0.8f, 0.2f, 0.8f, 1.0f);  // Purple
-            default:
-                return new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);  // White
+    public Entity createLargeFood(Vector2f position) {
+        Entity food = engine.createEntity();
+        
+        // Add transform
+        TransformComponent transform = engine.createComponent(TransformComponent.class);
+        transform.setPosition(position);
+        food.add(transform);
+        
+        // Add food component
+        FoodComponent foodComp = engine.createComponent(FoodComponent.class);
+        foodComp.init(500, FoodType.LARGE);  // 500 XP for large food
+        food.add(foodComp);
+        
+        // Add collision (large pentagon shape)
+        CollisionComponent collision = engine.createComponent(CollisionComponent.class);
+        float radius = 40.0f;  // Size of large food
+        Vector2f[] vertices = createPentagonVertices(radius);
+        collision.init(food, vertices, CollisionFilters.CATEGORY_FOOD, CollisionFilters.MASK_FOOD);
+        collision.setBodyType(BodyType.DYNAMIC);
+        collision.setDensity(0.5f);
+        collision.setFriction(0.1f);
+        collision.setRestitution(0.5f);
+        collision.setLinearDamping(0.5f);
+        collision.setAngularDamping(0.5f);
+        food.add(collision);
+        
+        // Add rendering components
+        ShapeComponent shape = engine.createComponent(ShapeComponent.class);
+        shape.init(vertices);  // Large pentagon shape
+        food.add(shape);
+        
+        RenderLayer layer = engine.createComponent(RenderLayer.class);
+        layer.setLayer(RenderLayer.GAME_OBJECTS - 1);
+        food.add(layer);
+        
+        ColorComponent color = engine.createComponent(ColorComponent.class);
+        color.init(RenderingConstants.M_FOOD_FILL);  // Same color as medium food
+        color.setOutline(RenderingConstants.M_FOOD_OUTLINE, 3.0f);  // Thicker outline
+        food.add(color);
+        
+        engine.addEntity(food);
+        Logger.debug("Created large food at position: {}", position);
+        return food;
+    }
+    
+    private Vector2f[] createPentagonVertices(float radius) {
+        Vector2f[] vertices = new Vector2f[5];
+        for (int i = 0; i < 5; i++) {
+            float angle = (float) (2 * Math.PI * i / 5 - Math.PI / 2);  // Start at top point
+            vertices[i] = new Vector2f(
+                (float) (radius * Math.cos(angle)),
+                (float) (radius * Math.sin(angle))
+            );
         }
+        return vertices;
     }
 } 

@@ -2,6 +2,7 @@ package com.ur91k.jdiep.ecs.factories;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
 import org.tinylog.Logger;
 import com.ur91k.jdiep.ecs.components.camera.CameraTargetComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.PlayerComponent;
@@ -9,8 +10,10 @@ import com.ur91k.jdiep.ecs.components.gameplay.PlayerControlledComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.TankBodyComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.TankControllerComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.TurretComponent;
-import com.ur91k.jdiep.ecs.components.movement.MovementComponent;
 import com.ur91k.jdiep.ecs.components.physics.VelocityComponent;
+import com.ur91k.jdiep.ecs.components.physics.CollisionComponent;
+import com.ur91k.jdiep.ecs.components.physics.CollisionFilters;
+import com.ur91k.jdiep.ecs.components.physics.PhysicsProperties;
 import com.ur91k.jdiep.ecs.components.rendering.ColorComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ShapeComponent;
 import com.ur91k.jdiep.ecs.components.transform.ParentComponent;
@@ -19,7 +22,7 @@ import com.ur91k.jdiep.game.weapons.PhaseConfig;
 import com.ur91k.jdiep.game.weapons.TurretPhase;
 import com.ur91k.jdiep.graphics.config.RenderingConstants;
 import com.ur91k.jdiep.graphics.core.RenderLayer;
-
+import org.jbox2d.dynamics.BodyType;
 import org.joml.Vector2f;
 
 public class TankFactory {
@@ -42,22 +45,30 @@ public class TankFactory {
         body.init(mass, phaseCount, reloadTime);
         tank.add(body);
         
-        MovementComponent movement = engine.createComponent(MovementComponent.class);
-        movement.init(200.0f);  // Default speed
-        tank.add(movement);
-        
         // Add velocity component for movement
         VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
-        velocity.setMaxSpeed(200.0f);
-        velocity.setAcceleration(500.0f);
+        velocity.setMaxSpeed(400.0f);  // Increased max speed
+        velocity.setAcceleration(1000.0f);  // Increased acceleration for better response
         tank.add(velocity);
         
         // Add controller component
         tank.add(engine.createComponent(TankControllerComponent.class));
         
+        // Add collision component
+        CollisionComponent collision = engine.createComponent(CollisionComponent.class);
+        float radius = RenderingConstants.DEFAULT_TANK_RADIUS;  // Use standard tank size
+        collision.init(tank, radius, CollisionFilters.CATEGORY_TANK, CollisionFilters.MASK_TANK);
+        collision.setBodyType(BodyType.DYNAMIC);
+        collision.setDensity(1.0f);  // Normal density
+        collision.setFriction(0.2f);  // Low friction for smooth movement
+        collision.setRestitution(0.2f);  // Low bounce
+        collision.setLinearDamping(5.0f);  // Reduced damping for better speed
+        collision.setAngularDamping(10.0f);  // High angular damping to prevent spinning
+        tank.add(collision);
+        
         // Add rendering components
         ShapeComponent shape = engine.createComponent(ShapeComponent.class);
-        shape.init(20.0f);  // Base tank radius (reduced from 30 to 20)
+        shape.init(radius);  // Use same radius as collision
         tank.add(shape);
         
         RenderLayer layer = engine.createComponent(RenderLayer.class);
@@ -102,6 +113,21 @@ public class TankFactory {
         // Swap width and length for correct orientation
         float turretWidth = tankRadius * 2 * lengthRatio;  // Use length for width
         float turretHeight = tankRadius * 2 * widthRatio;  // Use width for height
+        
+        // Add collision component (kinematic - moved by code)
+        CollisionComponent collision = engine.createComponent(CollisionComponent.class);
+        Vector2f[] vertices = new Vector2f[] {
+            new Vector2f(-turretWidth/2, -turretHeight/2),
+            new Vector2f(turretWidth/2, -turretHeight/2),
+            new Vector2f(turretWidth/2, turretHeight/2),
+            new Vector2f(-turretWidth/2, turretHeight/2)
+        };
+        collision.init(turret, vertices, CollisionFilters.CATEGORY_TURRET, CollisionFilters.MASK_TURRET);
+        collision.setBodyType(BodyType.KINEMATIC);
+        collision.setDensity(PhysicsProperties.TURRET_DENSITY);
+        collision.setFriction(PhysicsProperties.TURRET_FRICTION);
+        collision.setRestitution(PhysicsProperties.TURRET_RESTITUTION);
+        turret.add(collision);
         
         ShapeComponent shape = engine.createComponent(ShapeComponent.class);
         shape.init(turretWidth, turretHeight);
@@ -202,7 +228,20 @@ public class TankFactory {
         tank.add(engine.createComponent(PlayerControlledComponent.class));
         tank.add(engine.createComponent(CameraTargetComponent.class));
         
-        Logger.debug("Added player control components");
+        // Set higher render layer for player tank
+        RenderLayer tankLayer = tank.getComponent(RenderLayer.class);
+        tankLayer.setLayer(RenderLayer.GAME_OBJECTS + 100);  // Player tank renders above all other tanks
+        
+        // Update turret render layers too
+        for (Entity turret : engine.getEntitiesFor(Family.all(TurretComponent.class, ParentComponent.class).get())) {
+            ParentComponent parentComp = turret.getComponent(ParentComponent.class);
+            if (parentComp.getParent() == tank) {
+                RenderLayer turretLayer = turret.getComponent(RenderLayer.class);
+                turretLayer.setLayer(RenderLayer.GAME_OBJECTS + 99);  // Turrets render above tank
+            }
+        }
+        
+        Logger.debug("Added player control components and updated render layers");
         return tank;
     }
 } 

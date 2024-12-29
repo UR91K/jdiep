@@ -23,7 +23,7 @@ public class OpenGLRenderer implements Renderer {
     private final int gridVao;
     private final int gridVbo;
     private static final int GRID_SIZE = 100;
-    private static final float GRID_SPACING = 50.0f;
+    private static final float GRID_SPACING = 24.0f;
     private final Input input;
 
     public OpenGLRenderer(int windowWidth, int windowHeight, Input input) {

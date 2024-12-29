@@ -119,4 +119,8 @@ public class PhysicsSystem extends IteratingSystem implements ContactListener {
         }
         super.removedFromEngine(engine);
     }
+    
+    public World getWorld() {
+        return world;
+    }
 } 

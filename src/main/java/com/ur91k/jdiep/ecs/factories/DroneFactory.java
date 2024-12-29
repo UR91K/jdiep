@@ -3,98 +3,85 @@ package com.ur91k.jdiep.ecs.factories;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.ur91k.jdiep.ecs.components.gameplay.DroneComponent;
-import com.ur91k.jdiep.ecs.components.gameplay.HealthComponent;
-import com.ur91k.jdiep.ecs.components.movement.MovementComponent;
 import com.ur91k.jdiep.ecs.components.physics.CollisionComponent;
+import com.ur91k.jdiep.ecs.components.physics.CollisionFilters;
+import com.ur91k.jdiep.ecs.components.physics.VelocityComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ColorComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ShapeComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
+import com.ur91k.jdiep.graphics.config.RenderingConstants;
+import com.ur91k.jdiep.graphics.core.RenderLayer;
+import org.jbox2d.dynamics.BodyType;
 import org.joml.Vector2f;
-import org.joml.Vector4f;
+import org.tinylog.Logger;
 
 public class DroneFactory {
     private final Engine engine;
-    
-    public enum DroneType {
-        GUARD,      // Neutral guard drone
-        BASE,       // Team base drone
-        OVERLORD,   // Player controlled triangle drone
-        NECRO       // Converted square drone
-    }
     
     public DroneFactory(Engine engine) {
         this.engine = engine;
     }
     
-    public Entity createDrone(DroneType type, Vector2f position) {
+    public Entity createDrone(Vector2f position, Entity owner) {
         Entity drone = engine.createEntity();
         
-        // Add transform component
+        // Add transform
         TransformComponent transform = engine.createComponent(TransformComponent.class);
         transform.setPosition(position);
         drone.add(transform);
         
-        // Add movement component
-        MovementComponent movement = engine.createComponent(MovementComponent.class);
-        movement.init(150.0f);  // Default drone speed
-        drone.add(movement);
-        
-        // Add health component
-        HealthComponent health = engine.createComponent(HealthComponent.class);
-        health.init(100.0f);  // Default drone health
-        drone.add(health);
-        
-        // Add collision component
-        CollisionComponent collision = engine.createComponent(CollisionComponent.class);
-        collision.init(20.0f);  // Default drone radius
-        drone.add(collision);
-        
-        // Add shape component
-        ShapeComponent shape = engine.createComponent(ShapeComponent.class);
-        switch (type) {
-            case OVERLORD:
-                shape.init(new Vector2f[] {  // Triangle shape
-                    new Vector2f(-10, -10),
-                    new Vector2f(10, -10),
-                    new Vector2f(0, 10)
-                });
-                break;
-            default:
-                shape.init(20.0f);  // Circle shape
-        }
-        drone.add(shape);
-        
-        // Add color component
-        ColorComponent color = engine.createComponent(ColorComponent.class);
-        color.init(new Vector4f(0.7f, 0.7f, 0.7f, 1.0f));  // Default gray color
-        drone.add(color);
-        
-        // Add drone behavior component
+        // Add drone component
         DroneComponent droneComp = engine.createComponent(DroneComponent.class);
-        droneComp.init(type);
+        droneComp.init(owner);
         drone.add(droneComp);
         
+        // Add velocity for movement
+        VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
+        velocity.setMaxSpeed(150.0f);  // Drones are fast but not as fast as tanks
+        velocity.setAcceleration(400.0f);
+        drone.add(velocity);
+        
+        // Add collision (octagon shape for drones)
+        CollisionComponent collision = engine.createComponent(CollisionComponent.class);
+        float radius = 15.0f;  // Size of drone
+        Vector2f[] vertices = createOctagonVertices(radius);
+        collision.init(drone, vertices, CollisionFilters.CATEGORY_DRONE, CollisionFilters.MASK_DRONE);
+        collision.setBodyType(BodyType.DYNAMIC);
+        collision.setDensity(0.3f);  // Lighter than tanks
+        collision.setFriction(0.1f);
+        collision.setRestitution(0.3f);
+        collision.setLinearDamping(0.5f);
+        collision.setAngularDamping(0.8f);
+        drone.add(collision);
+        
+        // Add rendering components
+        ShapeComponent shape = engine.createComponent(ShapeComponent.class);
+        shape.init(vertices);  // Octagon shape
+        drone.add(shape);
+        
+        RenderLayer layer = engine.createComponent(RenderLayer.class);
+        layer.setLayer(RenderLayer.GAME_OBJECTS);
+        drone.add(layer);
+        
+        ColorComponent color = engine.createComponent(ColorComponent.class);
+        color.init(RenderingConstants.DRONE_FILL_COLOR);
+        color.setOutline(RenderingConstants.DRONE_OUTLINE_COLOR, 2.0f);
+        drone.add(color);
+        
         engine.addEntity(drone);
+        Logger.debug("Created drone at position: {} for owner: {}", position, owner);
         return drone;
     }
     
-    public Entity convertFoodToDrone(Entity foodEntity) {
-        if (foodEntity == null) {
-            return null;
+    private Vector2f[] createOctagonVertices(float radius) {
+        Vector2f[] vertices = new Vector2f[8];
+        for (int i = 0; i < 8; i++) {
+            float angle = (float) (2 * Math.PI * i / 8);
+            vertices[i] = new Vector2f(
+                (float) (radius * Math.cos(angle)),
+                (float) (radius * Math.sin(angle))
+            );
         }
-        
-        // Check if the entity has a transform component (basic validation)
-        TransformComponent foodTransform = foodEntity.getComponent(TransformComponent.class);
-        if (foodTransform == null) {
-            return null;
-        }
-        
-        // Create new drone at food's position
-        Entity drone = createDrone(DroneType.NECRO, foodTransform.getPosition());
-        
-        // Remove the food entity
-        engine.removeEntity(foodEntity);
-        
-        return drone;
+        return vertices;
     }
 } 

@@ -49,7 +49,9 @@ public class TankFactory {
         shape.init(30.0f);  // Base tank radius
         tank.add(shape);
         
-        tank.add(engine.createComponent(RenderLayer.class));
+        RenderLayer layer = engine.createComponent(RenderLayer.class);
+        layer.setLayer(RenderLayer.GAME_OBJECTS);  // Base layer for tank body
+        tank.add(layer);
         
         ColorComponent bodyColor = engine.createComponent(ColorComponent.class);
         bodyColor.init(RenderingConstants.RED_FILL_COLOR);
@@ -94,7 +96,9 @@ public class TankFactory {
         shape.init(turretWidth, turretHeight);
         turret.add(shape);
         
-        turret.add(engine.createComponent(RenderLayer.class));
+        RenderLayer layer = engine.createComponent(RenderLayer.class);
+        layer.setLayer(RenderLayer.GAME_OBJECTS - 1);  // Render turret above tank body
+        turret.add(layer);
         
         ColorComponent turretColor = engine.createComponent(ColorComponent.class);
         turretColor.init(RenderingConstants.TURRET_FILL_COLOR);

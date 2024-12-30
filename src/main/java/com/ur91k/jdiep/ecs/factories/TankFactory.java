@@ -9,10 +9,8 @@ import com.ur91k.jdiep.ecs.components.gameplay.PlayerComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.PlayerControlledComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.TankBodyComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.TankControllerComponent;
-import com.ur91k.jdiep.ecs.components.physics.VelocityComponent;
 import com.ur91k.jdiep.ecs.components.physics.CollisionComponent;
 import com.ur91k.jdiep.ecs.components.physics.CollisionFilters;
-import com.ur91k.jdiep.ecs.components.physics.PhysicsProperties;
 import com.ur91k.jdiep.ecs.components.rendering.ColorComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ShapeComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
@@ -49,13 +47,7 @@ public class TankFactory {
                                           float restitution, float velocityFriction) {
                 // Update all existing tanks
                 for (Entity tank : engine.getEntitiesFor(Family.all(TankBodyComponent.class).get())) {
-                    VelocityComponent velocity = tank.getComponent(VelocityComponent.class);
                     CollisionComponent collision = tank.getComponent(CollisionComponent.class);
-                    
-                    if (velocity != null) {
-                        velocity.setAcceleration(acceleration);
-                        velocity.setFriction(velocityFriction);
-                    }
                     
                     if (collision != null) {
                         collision.setFriction(friction);
@@ -84,14 +76,7 @@ public class TankFactory {
         body.init(mass, phaseCount, reloadTime);
         tank.add(body);
         
-        // Add velocity component for movement
-        VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
-        velocity.setAcceleration(12.0f);   // 4 m/s² - gentler acceleration
-        velocity.setMaxSpeed(3.0f);       // 3 m/s max speed
-        velocity.setFriction(0.95f);      // Keep friction as is since it's a multiplier
-        tank.add(velocity);
-        
-        // Add controller component
+        // Add controller component for input handling
         TankControllerComponent controller = engine.createComponent(TankControllerComponent.class);
         tank.add(controller);
         
@@ -100,11 +85,12 @@ public class TankFactory {
         float radius = body.getRadius();  // Use TankScaling radius based on mass
         collision.init(tank, radius, CollisionFilters.CATEGORY_TANK, CollisionFilters.MASK_TANK);
         collision.setBodyType(BodyType.DYNAMIC);
-        collision.setDensity(1.0f);       // Keep standard density
-        collision.setFriction(0.2f);      // Slightly more friction for better control
-        collision.setRestitution(0.2f);   // Keep slight bounce
-        collision.setLinearDamping(1.0f); // Add linear damping for smoother stops
-        collision.setAngularDamping(4.0f);// Higher angular damping for better turning control
+        collision.setDensity(1.0f);       // Standard density for mass calculation
+        collision.setFriction(0.2f);      // Low friction for smooth movement
+        collision.setRestitution(0.2f);   // Slight bounce
+        collision.setLinearDamping(1.0f); // Damping for smooth movement
+        collision.setAngularDamping(4.0f);// Higher angular damping for better control
+        collision.setBullet(true);        // Enable continuous collision detection
         tank.add(collision);
         
         // Add shape component for rendering
@@ -156,41 +142,6 @@ public class TankFactory {
         tankLayer.setLayer(RenderLayer.GAME_OBJECTS + 100);  // Player tank renders above all other tanks
         
         Logger.debug("Added player control components and updated render layers");
-        return tank;
-    }
-    
-    public Entity createTank() {
-        Entity tank = engine.createEntity();
-        
-        // Transform component
-        TransformComponent transform = engine.createComponent(TransformComponent.class);
-        tank.add(transform);
-        
-        // Shape component for tank body
-        ShapeComponent shape = engine.createComponent(ShapeComponent.class);
-        shape.init(GameUnits.Tank.BODY_RADIUS);  // Initialize as circle with radius
-        tank.add(shape);
-        
-        // Velocity component with Box2D-friendly values
-        VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
-        velocity.setMaxSpeed(10.0f);  // 10 m/s is a reasonable Box2D speed
-        velocity.setAcceleration(30.0f);  // Good acceleration for Box2D
-        velocity.setFriction(0.95f);  // Keep friction as is since it's a multiplier
-        tank.add(velocity);
-        
-        // Collision component with Box2D-friendly values
-        CollisionComponent collision = engine.createComponent(CollisionComponent.class);
-        collision.setFriction(0.1f);  // Standard Box2D friction
-        collision.setLinearDamping(0.5f);  // Moderate damping
-        collision.setAngularDamping(3.0f);  // Higher angular damping for better control
-        collision.setDensity(1.0f);  // Standard density of 1 kg/m²
-        collision.setRestitution(0.2f);  // Slight bounce
-        tank.add(collision);
-        
-        // Tank controller component
-        TankControllerComponent controller = engine.createComponent(TankControllerComponent.class);
-        tank.add(controller);
-        
         return tank;
     }
 } 

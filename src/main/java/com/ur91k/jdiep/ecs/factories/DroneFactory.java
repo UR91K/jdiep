@@ -3,9 +3,9 @@ package com.ur91k.jdiep.ecs.factories;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.ur91k.jdiep.ecs.components.gameplay.DroneComponent;
+import com.ur91k.jdiep.ecs.components.gameplay.DroneControllerComponent;
 import com.ur91k.jdiep.ecs.components.physics.CollisionComponent;
 import com.ur91k.jdiep.ecs.components.physics.CollisionFilters;
-import com.ur91k.jdiep.ecs.components.physics.VelocityComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ColorComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ShapeComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
@@ -35,10 +35,11 @@ public class DroneFactory {
         droneComp.init(owner);
         drone.add(droneComp);
         
-        // Add velocity for movement
-        VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
-        velocity.setAcceleration(400.0f);
-        drone.add(velocity);
+        // Add drone controller for physics-based movement
+        DroneControllerComponent controller = engine.createComponent(DroneControllerComponent.class);
+        controller.setMaxForce(400.0f);  // Adjust for desired acceleration
+        controller.setMaxTorque(200.0f); // Adjust for desired rotation speed
+        drone.add(controller);
         
         // Add collision (octagon shape for drones)
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
@@ -51,6 +52,7 @@ public class DroneFactory {
         collision.setRestitution(0.3f);
         collision.setLinearDamping(0.5f);
         collision.setAngularDamping(0.8f);
+        collision.setBullet(true);  // Enable continuous collision detection
         drone.add(collision);
         
         // Add rendering components

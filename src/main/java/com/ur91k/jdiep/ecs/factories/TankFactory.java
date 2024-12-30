@@ -14,7 +14,6 @@ import com.ur91k.jdiep.ecs.components.physics.VelocityComponent;
 import com.ur91k.jdiep.ecs.components.physics.CollisionComponent;
 import com.ur91k.jdiep.ecs.components.physics.CollisionFilters;
 import com.ur91k.jdiep.ecs.components.physics.PhysicsProperties;
-import com.ur91k.jdiep.ecs.components.physics.RevoluteJointComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ColorComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ShapeComponent;
 import com.ur91k.jdiep.ecs.components.transform.ParentComponent;
@@ -164,7 +163,7 @@ public class TankFactory {
         parentComp.init(tankBody, offset, rotation);
         turret.add(parentComp);
         
-        // Add collision component (now DYNAMIC for physics interaction)
+        // Add collision component (kinematic - moved by code)
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
         Vector2f[] vertices = new Vector2f[] {
             new Vector2f(0, -turretHeight/2),      // Rear left
@@ -173,24 +172,11 @@ public class TankFactory {
             new Vector2f(0, turretHeight/2)        // Rear right
         };
         collision.init(turret, vertices, CollisionFilters.CATEGORY_TURRET, CollisionFilters.MASK_TURRET);
-        collision.setBodyType(BodyType.DYNAMIC);  // Changed from KINEMATIC to DYNAMIC
-        collision.setDensity(0.1f);  // Very light density, like balsa wood
+        collision.setBodyType(BodyType.KINEMATIC);
+        collision.setDensity(1.0f);  // Standard density
         collision.setFriction(0.1f);  // Standard Box2D friction
         collision.setRestitution(0.2f);  // Slight bounce
-        collision.setAngularDamping(0.5f);  // Add angular damping for smoother rotation
         turret.add(collision);
-        
-        // Add revolute joint component
-        RevoluteJointComponent jointComp = engine.createComponent(RevoluteJointComponent.class);
-        // Set anchor point at the rear center of turret (where it connects to tank)
-        jointComp.setAnchorPoint(new Vector2f(0, 0));
-        // Configure motor properties based on tank mass
-        float tankMass = tankBodyComp.getMass();
-        float maxTorque = tankMass * 50.0f;  // Scale torque with tank mass
-        jointComp.setMaxMotorTorque(maxTorque);
-        jointComp.setMotorSpeed(2.0f);  // 2 radians per second
-        jointComp.setMotorEnabled(true);
-        turret.add(jointComp);
         
         ShapeComponent shape = engine.createComponent(ShapeComponent.class);
         // Set origin at rear center by using vertices

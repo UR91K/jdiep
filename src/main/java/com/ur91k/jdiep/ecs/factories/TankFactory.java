@@ -174,7 +174,7 @@ public class TankFactory {
         };
         collision.init(turret, vertices, CollisionFilters.CATEGORY_TURRET, CollisionFilters.MASK_TURRET);
         collision.setBodyType(BodyType.DYNAMIC);  // Changed from KINEMATIC to DYNAMIC
-        collision.setDensity(0.5f);  // Lower density than tank for realistic physics
+        collision.setDensity(0.1f);  // Very light density, like balsa wood
         collision.setFriction(0.1f);  // Standard Box2D friction
         collision.setRestitution(0.2f);  // Slight bounce
         collision.setAngularDamping(0.5f);  // Add angular damping for smoother rotation

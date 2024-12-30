@@ -123,9 +123,9 @@ public class ImGuiDebugManager {
                 if (velY == null) velY = new float[1];
                 if (speed == null) speed = new float[1];
                 
-                ImGui.plotLines("##Velocity X", velX, velX.length, 0, "Velocity X", -1000, 1000, 300, 80);
-                ImGui.plotLines("##Velocity Y", velY, velY.length, 0, "Velocity Y", -1000, 1000, 300, 80);
-                ImGui.plotLines("##Speed", speed, speed.length, 0, "Speed", 0, 1000, 300, 80);
+                ImGui.plotLines("##Velocity X", velX, velX.length, 0, "Velocity X", -1000, 70, 300, 80);
+                ImGui.plotLines("##Velocity Y", velY, velY.length, 0, "Velocity Y", -1000, 70, 300, 80);
+                ImGui.plotLines("##Speed", speed, speed.length, 0, "Speed", 0, 70, 300, 80);
             }
             
             // Group acceleration graphs
@@ -172,13 +172,6 @@ public class ImGuiDebugManager {
             
             ImGui.end();
         }
-
-        // Labels Window
-        ImGui.begin("Debug Info", ImGuiWindowFlags.AlwaysAutoResize);
-        for (var entry : labels.entrySet()) {
-            ImGui.text(entry.getKey() + ": " + entry.getValue());
-        }
-        ImGui.end();
 
         // Tank Physics Debug Window
         if (showTankPhysicsDebugger) {

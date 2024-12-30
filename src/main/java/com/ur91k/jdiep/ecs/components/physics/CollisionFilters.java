@@ -13,7 +13,7 @@ public final class CollisionFilters {
     public static final short CATEGORY_FOOD = 0x0004;
     public static final short CATEGORY_DRONE = 0x0008;
     public static final short CATEGORY_BULLET = 0x0010;
-    public static final short CATEGORY_WALL = 0x0020;
+    public static final short CATEGORY_WALL = 0x0040;
     
     // Collision Masks (what each category can collide with)
     public static final short MASK_TANK = 
@@ -30,5 +30,5 @@ public final class CollisionFilters {
     public static final short MASK_BULLET = 
         CATEGORY_TANK | CATEGORY_DRONE | CATEGORY_WALL;
     
-    public static final short MASK_WALL = -1;  // Collide with everything
+    public static final short MASK_WALL = CATEGORY_TANK | CATEGORY_FOOD | CATEGORY_BULLET | CATEGORY_DRONE;
 } 

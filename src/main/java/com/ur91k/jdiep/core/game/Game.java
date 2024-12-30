@@ -8,6 +8,7 @@ import com.ur91k.jdiep.debug.ImGuiDebugManager;
 import com.ur91k.jdiep.ecs.factories.CameraFactory;
 import com.ur91k.jdiep.ecs.factories.FoodFactory;
 import com.ur91k.jdiep.ecs.factories.TankFactory;
+import com.ur91k.jdiep.ecs.factories.WorldBoundsFactory;
 import com.ur91k.jdiep.ecs.systems.camera.CameraSystem;
 import com.ur91k.jdiep.ecs.systems.gameplay.FoodDriftSystem;
 import com.ur91k.jdiep.ecs.systems.movement.LocalPlayerControlSystem;
@@ -82,7 +83,11 @@ public class Game {
         TankFactory tankFactory = new TankFactory(ashley, debugManager);  // Pass debugManager
         FoodFactory foodFactory = new FoodFactory(ashley);
         CameraFactory cameraFactory = new CameraFactory(ashley);
+        WorldBoundsFactory worldBoundsFactory = new WorldBoundsFactory(ashley);
 
+        // Create world boundaries
+        worldBoundsFactory.createWorldBounds();
+        
         // Create player tank at world origin
         Entity basicTank = tankFactory.createBasicTank(new Vector2f(0, 0));
         playerTank = tankFactory.makePlayerControlled(basicTank);

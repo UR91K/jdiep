@@ -88,11 +88,11 @@ public class Game {
         playerTank = tankFactory.makePlayerControlled(basicTank);
         
         // Create dummy tank for physics testing
-        tankFactory.createBasicTank(new Vector2f(100, 0));  // 100 units to the right of player
+        tankFactory.createBasicTank(new Vector2f(10, 0));  // 100 units to the right of player
         
         // Create some test food
-        foodFactory.createTinyFood(new Vector2f(-50, 50));
-        foodFactory.createSmallFood(new Vector2f(50, 50));
+        foodFactory.createTinyFood(new Vector2f(-5, 5));
+        foodFactory.createSmallFood(new Vector2f(5, 5));
         
         // Create main camera following the player
         mainCamera = cameraFactory.createFollowCamera(playerTank, 0.1f);

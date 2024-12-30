@@ -19,5 +19,11 @@ public final class GameConstants {
     public static final float ZOOM_SPEED = 0.1f;           // Zoom speed multiplier
     
     // World bounds
-    public static final float WORLD_BOUNDS = 5000.0f;      // World boundary size (half-width/height)
+    public static final float WORLD_BOUNDS = 1024.0f;      // World boundary size (half-width/height)
+
+    // Food sizes
+    public static final float TINY_FOOD_SIZE = 1.56f;     // Square side length
+    public static final float SMALL_FOOD_SIZE = 1.87f;    // Triangle side length
+    public static final float MEDIUM_FOOD_SIZE = 1.72f;   // Pentagon side length
+    public static final float LARGE_FOOD_SIZE = 4.80f;    // Large pentagon side length
 } 

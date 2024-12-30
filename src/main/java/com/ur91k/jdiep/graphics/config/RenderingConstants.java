@@ -43,12 +43,4 @@ public class RenderingConstants {
     
     // Default sizes
     public static final float DEFAULT_OUTLINE_WIDTH = 4.0f;
-    public static final float DEFAULT_TANK_RADIUS = 27.0f;
-    public static final float DEFAULT_BULLET_RADIUS = 5.0f;
-    
-    // Food sizes
-    public static final float TINY_FOOD_SIZE = 40.0f;     // Square side length
-    public static final float SMALL_FOOD_SIZE = 50.0f;    // Triangle side length
-    public static final float MEDIUM_FOOD_SIZE = 35.0f;   // Pentagon radius
-    public static final float LARGE_FOOD_SIZE = 50.0f;    // Large pentagon radius
 } 

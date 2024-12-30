@@ -10,6 +10,7 @@ import com.ur91k.jdiep.ecs.components.physics.PhysicsProperties;
 import com.ur91k.jdiep.ecs.components.rendering.ColorComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ShapeComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
+import com.ur91k.jdiep.game.config.GameConstants;
 import com.ur91k.jdiep.graphics.config.RenderingConstants;
 import com.ur91k.jdiep.graphics.core.RenderLayer;
 import org.jbox2d.dynamics.BodyType;
@@ -38,7 +39,7 @@ public class FoodFactory {
         
         // Add collision (square shape)
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
-        float size = RenderingConstants.TINY_FOOD_SIZE;
+        float size = GameConstants.TINY_FOOD_SIZE;
         Vector2f[] vertices = new Vector2f[] {
             new Vector2f(-size/2, -size/2),
             new Vector2f(size/2, -size/2),
@@ -88,7 +89,7 @@ public class FoodFactory {
         
         // Add collision (triangle shape)
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
-        float size = RenderingConstants.SMALL_FOOD_SIZE;
+        float size = GameConstants.SMALL_FOOD_SIZE;
         float height = size * (float)Math.sqrt(3) / 2;  // Height of equilateral triangle
         Vector2f[] vertices = new Vector2f[] {
             new Vector2f(0, height/2),  // Top
@@ -138,8 +139,8 @@ public class FoodFactory {
         
         // Add collision (pentagon shape)
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
-        float radius = RenderingConstants.MEDIUM_FOOD_SIZE;
-        Vector2f[] vertices = createPentagonVertices(radius);
+        float sideLength = GameConstants.MEDIUM_FOOD_SIZE;
+        Vector2f[] vertices = createPentagonVertices(sideLength);
         collision.init(food, vertices, CollisionFilters.CATEGORY_FOOD, CollisionFilters.MASK_FOOD);
         collision.setBodyType(BodyType.DYNAMIC);
         collision.setDensity(0.5f);
@@ -183,8 +184,8 @@ public class FoodFactory {
         
         // Add collision (large pentagon shape)
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
-        float radius = RenderingConstants.LARGE_FOOD_SIZE;
-        Vector2f[] vertices = createPentagonVertices(radius);
+        float sideLength = GameConstants.LARGE_FOOD_SIZE;
+        Vector2f[] vertices = createPentagonVertices(sideLength);
         collision.init(food, vertices, CollisionFilters.CATEGORY_FOOD, CollisionFilters.MASK_FOOD);
         collision.setBodyType(BodyType.DYNAMIC);
         collision.setDensity(0.5f);
@@ -213,7 +214,10 @@ public class FoodFactory {
         return food;
     }
     
-    private Vector2f[] createPentagonVertices(float radius) {
+    private Vector2f[] createPentagonVertices(float sideLength) {
+        // Calculate radius from side length for a regular pentagon
+        float radius = sideLength / (2 * (float)Math.sin(Math.PI / 5));
+        
         Vector2f[] vertices = new Vector2f[5];
         for (int i = 0; i < 5; i++) {
             float angle = (float) (2 * Math.PI * i / 5 - Math.PI / 2);  // Start at top point

@@ -37,7 +37,7 @@ public class TankFactory {
         
         // Set initial physics values in debug window
         debugManager.setTankPhysicsValues(
-            4.0f,    // acceleration (m/s²)
+            12.0f,    // acceleration (m/s²)
             0.2f,    // friction
             1.0f,    // linear damping
             4.0f,    // angular damping
@@ -90,7 +90,7 @@ public class TankFactory {
         
         // Add velocity component for movement
         VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
-        velocity.setAcceleration(4.0f);   // 4 m/s² - gentler acceleration
+        velocity.setAcceleration(12.0f);   // 4 m/s² - gentler acceleration
         velocity.setMaxSpeed(3.0f);       // 3 m/s max speed
         velocity.setFriction(0.95f);      // Keep friction as is since it's a multiplier
         tank.add(velocity);

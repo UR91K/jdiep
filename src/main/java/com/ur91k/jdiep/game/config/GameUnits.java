@@ -13,7 +13,7 @@ public class GameUnits {
     public static final float WORLD_HEIGHT = 1024.0f;
     
     // Line thicknesses in meters
-    public static final float DEFAULT_LINE_THICKNESS = 0.18f;
+    public static final float DEFAULT_LINE_THICKNESS = 0.3f;
     
     // Grid
     public static final float GRID_CELL_SIZE = 1.0f;  // 1 meter per grid cell

@@ -1,8 +1,10 @@
 package com.ur91k.jdiep.core.window;
 
+import com.ur91k.jdiep.game.config.GameUnits;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
@@ -77,24 +79,24 @@ public class Input {
     public Vector2f getWorldMousePosition() {
         if (window == null) return new Vector2f();
         
-        // Get window center in screen coordinates
-        float centerX = window.getWidth() / 2.0f;
-        float centerY = window.getHeight() / 2.0f;
+        // Get raw mouse position in screen coordinates
+        float screenX = mousePos.x;
+        float screenY = mousePos.y;
         
-        // Convert mouse position to be relative to center
-        float relX = mousePos.x - centerX;
-        float relY = centerY - mousePos.y;  // Flip Y since screen coordinates are Y-down
+        // Convert to normalized device coordinates (-1 to 1)
+        float ndcX = (2.0f * screenX) / window.getWidth() - 1.0f;
+        float ndcY = 1.0f - (2.0f * screenY) / window.getHeight();  // Flip Y since screen coordinates are Y-down
         
-        // Apply inverse view matrix transformations
+        // Get zoom from view matrix
         float zoom = viewMatrix.m00();  // Scale is in the diagonal elements
-        float camX = -viewMatrix.m30() / zoom;  // Translation is in the last column
-        float camY = -viewMatrix.m31() / zoom;
         
-        // Convert to world coordinates
-        float worldX = relX / zoom + camX;
-        float worldY = relY / zoom + camY;
+        // Get the inverse of the combined view-projection matrix
+        Matrix4f invViewProj = new Matrix4f(projectionMatrix).mul(viewMatrix).invert();
         
-        return new Vector2f(worldX, worldY);
+        // Transform NDC coordinates to world space
+        Vector4f worldPos = new Vector4f(ndcX, ndcY, 0, 1.0f).mul(invViewProj);
+        
+        return new Vector2f(worldPos.x, worldPos.y);
     }
 
     public float getScrollY() {

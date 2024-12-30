@@ -102,11 +102,11 @@ public class TankFactory {
         };
         collision.init(turret, vertices, CollisionFilters.CATEGORY_TURRET, CollisionFilters.MASK_TURRET);
         collision.setBodyType(BodyType.DYNAMIC);
-        collision.setDensity(0.5f);       // Lighter than tank body
-        collision.setFriction(0.1f);      // Low friction
-        collision.setRestitution(0.2f);   // Some bounce
-        collision.setLinearDamping(0.5f); // Some damping
-        collision.setAngularDamping(2.0f);// Higher angular damping for stable rotation
+        collision.setDensity(0.15f);      // Very light, like balsa wood (tank body is 1.0)
+        collision.setFriction(0.1f);      // Keep low friction
+        collision.setRestitution(0.2f);   // Keep some bounce
+        collision.setLinearDamping(0.5f); // Keep some damping
+        collision.setAngularDamping(1.0f);// Reduce angular damping for more responsive rotation
         turret.add(collision);
         
         // Add rendering components

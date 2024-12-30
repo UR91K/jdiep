@@ -31,12 +31,26 @@ public class ShapeComponent implements Component {
         this.vertices = null;
     }
 
-    // Initialize as rectangle
+    // Initialize as rectangle with centered origin
     public void init(float width, float height) {
         this.type = ShapeType.RECTANGLE;
         this.width = width;
         this.height = height;
         this.vertices = null;
+    }
+
+    // Initialize as rectangle with custom origin point (x, y relative to dimensions)
+    public void init(float width, float height, Vector2f origin) {
+        this.type = ShapeType.RECTANGLE;
+        this.width = width;
+        this.height = height;
+        // Store vertices for custom origin rectangles
+        this.vertices = new Vector2f[] {
+            new Vector2f(origin.x, origin.y),
+            new Vector2f(origin.x + width, origin.y),
+            new Vector2f(origin.x + width, origin.y + height),
+            new Vector2f(origin.x, origin.y + height)
+        };
     }
 
     // Initialize as polygon

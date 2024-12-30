@@ -25,6 +25,7 @@ import com.ur91k.jdiep.graphics.core.RenderLayer;
 import org.jbox2d.dynamics.BodyType;
 import org.joml.Vector2f;
 import com.ur91k.jdiep.debug.ImGuiDebugManager;
+import com.ur91k.jdiep.game.config.GameUnits;
 
 public class TankFactory {
     private final Engine engine;
@@ -35,7 +36,14 @@ public class TankFactory {
         this.debugManager = debugManager;
         
         // Set initial physics values in debug window
-        debugManager.setTankPhysicsValues(800.0f, 0.05f, 0.2f, 3.0f, 1.0f, 0.5f);
+        debugManager.setTankPhysicsValues(
+            4.0f,    // acceleration (m/s²)
+            0.2f,    // friction
+            1.0f,    // linear damping
+            4.0f,    // angular damping
+            1.0f,    // density (kg/m²)
+            0.2f     // restitution
+        );
         
         // Register callback for physics value updates
         debugManager.setTankPhysicsCallback(new ImGuiDebugManager.TankPhysicsCallback() {
@@ -68,49 +76,58 @@ public class TankFactory {
     // Create the tank body entity
     private Entity createTankBody(float mass, int phaseCount, float reloadTime, Vector2f position) {
         Entity tank = engine.createEntity();
+        Logger.debug("Creating tank body entity");
         
-        // Add core components using pooling
+        // Add transform component
         TransformComponent transform = engine.createComponent(TransformComponent.class);
         transform.setPosition(position);
         tank.add(transform);
         
+        // Add tank body component
         TankBodyComponent body = engine.createComponent(TankBodyComponent.class);
         body.init(mass, phaseCount, reloadTime);
         tank.add(body);
         
         // Add velocity component for movement
         VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
-        velocity.setAcceleration(800.0f);  // Default acceleration
+        velocity.setAcceleration(4.0f);   // 4 m/s² - gentler acceleration
+        velocity.setMaxSpeed(3.0f);       // 3 m/s max speed
+        velocity.setFriction(0.95f);      // Keep friction as is since it's a multiplier
         tank.add(velocity);
         
         // Add controller component
-        tank.add(engine.createComponent(TankControllerComponent.class));
+        TankControllerComponent controller = engine.createComponent(TankControllerComponent.class);
+        controller.setTurretRadius(GameUnits.Tank.getTurretRadius());
+        controller.setTurretLength(GameUnits.Tank.getTurretLength());
+        tank.add(controller);
         
-        // Add collision component
+        // Add collision component with Box2D-friendly values
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
-        float radius = RenderingConstants.DEFAULT_TANK_RADIUS;  // Use standard tank size
+        float radius = body.getRadius();  // Use TankScaling radius based on mass
         collision.init(tank, radius, CollisionFilters.CATEGORY_TANK, CollisionFilters.MASK_TANK);
         collision.setBodyType(BodyType.DYNAMIC);
-        collision.setDensity(1.0f);  // Normal density
-        collision.setFriction(0.05f);  // Reduced friction for smoother movement
-        collision.setRestitution(0.5f);  // Low bounce
-        collision.setLinearDamping(0.2f);  // Significantly reduced damping
-        collision.setAngularDamping(3.0f);  // Keep high angular damping to prevent spinning
+        collision.setDensity(1.0f);       // Keep standard density
+        collision.setFriction(0.2f);      // Slightly more friction for better control
+        collision.setRestitution(0.2f);   // Keep slight bounce
+        collision.setLinearDamping(1.0f); // Add linear damping for smoother stops
+        collision.setAngularDamping(4.0f);// Higher angular damping for better turning control
         tank.add(collision);
         
-        // Add rendering components
+        // Add shape component for rendering
         ShapeComponent shape = engine.createComponent(ShapeComponent.class);
         shape.init(radius);  // Use same radius as collision
         tank.add(shape);
         
-        RenderLayer layer = engine.createComponent(RenderLayer.class);
-        layer.setLayer(RenderLayer.GAME_OBJECTS);  // Base layer for tank body
-        tank.add(layer);
+        // Add color component
+        ColorComponent color = engine.createComponent(ColorComponent.class);
+        color.init(RenderingConstants.RED_FILL_COLOR);
+        color.setOutline(RenderingConstants.RED_OUTLINE_COLOR, RenderingConstants.DEFAULT_OUTLINE_WIDTH);
+        tank.add(color);
         
-        ColorComponent bodyColor = engine.createComponent(ColorComponent.class);
-        bodyColor.init(RenderingConstants.RED_FILL_COLOR);
-        bodyColor.setOutline(RenderingConstants.RED_OUTLINE_COLOR, RenderingConstants.DEFAULT_OUTLINE_WIDTH);
-        tank.add(bodyColor);
+        // Add render layer
+        RenderLayer layer = engine.createComponent(RenderLayer.class);
+        layer.setLayer(RenderLayer.GAME_OBJECTS);
+        tank.add(layer);
         
         engine.addEntity(tank);
         return tank;
@@ -127,42 +144,49 @@ public class TankFactory {
         turretComp.init(widthRatio, lengthRatio, offset, rotation, phase);
         turret.add(turretComp);
         
+        // Get tank body component to calculate turret dimensions
+        TankBodyComponent tankBodyComp = tankBody.getComponent(TankBodyComponent.class);
+        float tankRadius = tankBodyComp.getRadius();
+        
+        // Calculate turret dimensions based on ratios
+        float turretWidth = tankRadius * lengthRatio;  // Use length for width (no *2)
+        float turretHeight = tankRadius * widthRatio * 1.5f;  // Use width for height (no *2)
+        
         // Add transform (will be updated by parent system)
         TransformComponent transform = engine.createComponent(TransformComponent.class);
         transform.setPosition(new Vector2f(0, 0));  // Will be updated by ParentSystem
         transform.setRotation((float)Math.PI / 2); // Add 90-degree rotation to make length point right
         turret.add(transform);
         
-        // Add parent relationship
+        // Add parent relationship with offset at rear of turret
         ParentComponent parentComp = engine.createComponent(ParentComponent.class);
         parentComp.init(tankBody, offset, rotation);
         turret.add(parentComp);
         
-        // Add rendering components
-        TankBodyComponent tankBodyComp = tankBody.getComponent(TankBodyComponent.class);
-        float tankRadius = tankBodyComp.getRadius();
-        
-        // Swap width and length for correct orientation
-        float turretWidth = tankRadius * 2 * lengthRatio;  // Use length for width
-        float turretHeight = tankRadius * 2 * widthRatio;  // Use width for height
-        
         // Add collision component (kinematic - moved by code)
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
         Vector2f[] vertices = new Vector2f[] {
-            new Vector2f(-turretWidth/2, -turretHeight/2),
-            new Vector2f(turretWidth/2, -turretHeight/2),
-            new Vector2f(turretWidth/2, turretHeight/2),
-            new Vector2f(-turretWidth/2, turretHeight/2)
+            new Vector2f(0, -turretHeight/2),      // Rear left
+            new Vector2f(turretWidth, -turretHeight/2), // Front left
+            new Vector2f(turretWidth, turretHeight/2),  // Front right
+            new Vector2f(0, turretHeight/2)        // Rear right
         };
         collision.init(turret, vertices, CollisionFilters.CATEGORY_TURRET, CollisionFilters.MASK_TURRET);
         collision.setBodyType(BodyType.KINEMATIC);
-        collision.setDensity(PhysicsProperties.TURRET_DENSITY);
-        collision.setFriction(PhysicsProperties.TURRET_FRICTION);
-        collision.setRestitution(PhysicsProperties.TURRET_RESTITUTION);
+        collision.setDensity(1.0f);  // Standard density
+        collision.setFriction(0.1f);  // Standard Box2D friction
+        collision.setRestitution(0.2f);  // Slight bounce
         turret.add(collision);
         
         ShapeComponent shape = engine.createComponent(ShapeComponent.class);
-        shape.init(turretWidth, turretHeight);
+        // Set origin at rear center by using vertices
+        Vector2f[] shapeVertices = new Vector2f[] {
+            new Vector2f(0, -turretHeight/2),      // Rear left
+            new Vector2f(turretWidth, -turretHeight/2), // Front left
+            new Vector2f(turretWidth, turretHeight/2),  // Front right
+            new Vector2f(0, turretHeight/2)        // Rear right
+        };
+        shape.init(shapeVertices);
         turret.add(shape);
         
         RenderLayer layer = engine.createComponent(RenderLayer.class);
@@ -186,19 +210,17 @@ public class TankFactory {
         // Create single forward-facing turret
         createTurret(
             tankBody,
-            0.067f,
-            0.20f,
-            new Vector2f(20, 0),            // centered
-            0.0f,                          // forward facing
-            new TurretPhase(body.getPhaseConfig(), 1) // single phase
+            GameUnits.Tank.TURRET_RADIUS_RATIO * 0.5f,  // Convert from radius ratio to diameter ratio
+            GameUnits.Tank.TURRET_LENGTH_RATIO,
+            new Vector2f(0, 0),  // Centered on tank
+            0.0f,                // Forward facing
+            new TurretPhase(body.getPhaseConfig(), 1)
         );
         
         return tankBody;
     }
     
-    public Entity createTwinTank(Vector2f position) {
-        Logger.debug("Creating twin tank at position: {}", position);
-        
+    public Entity createTwin(Vector2f position) {
         Entity tankBody = createTankBody(120, 2, 1.2f, position);
         TankBodyComponent body = tankBody.getComponent(TankBodyComponent.class);
         PhaseConfig phaseConfig = body.getPhaseConfig();
@@ -207,16 +229,18 @@ public class TankFactory {
         // Create twin turrets with offsets relative to tank radius
         createTurret(
             tankBody,
-            0.067f, 0.14f,
-            new Vector2f(0.2f * tankRadius, 15.0f),  // Right turret
+            GameUnits.Tank.TURRET_RADIUS_RATIO * 0.5f,  // Convert from radius ratio to diameter ratio
+            GameUnits.Tank.TURRET_LENGTH_RATIO,
+            new Vector2f(0, 0.3f * tankRadius),  // Right turret, offset by 30% of tank radius
             0.0f,
-            new TurretPhase(phaseConfig, 2)
+            new TurretPhase(phaseConfig, 1)
         );
-
+        
         createTurret(
             tankBody,
-            0.067f, 0.14f,
-            new Vector2f(0.2f * tankRadius, -15.0f),  // Left turret
+            GameUnits.Tank.TURRET_RADIUS_RATIO * 0.5f,  // Convert from radius ratio to diameter ratio
+            GameUnits.Tank.TURRET_LENGTH_RATIO,
+            new Vector2f(0, -0.3f * tankRadius),  // Left turret, offset by 30% of tank radius
             0.0f,
             new TurretPhase(phaseConfig, 2)
         );
@@ -232,16 +256,18 @@ public class TankFactory {
         // Create front and back turrets
         createTurret(
             tankBody,
-            0.4f, 0.8f,
-            new Vector2f(0, 0),
+            GameUnits.Tank.TURRET_RADIUS_RATIO * 0.5f,  // Convert from radius ratio to diameter ratio
+            GameUnits.Tank.TURRET_LENGTH_RATIO,
+            new Vector2f(0, 0),  // Front turret centered
             0.0f,
             new TurretPhase(phaseConfig, 1)
         );
         
         createTurret(
             tankBody,
-            0.3f, 0.6f,
-            new Vector2f(0, 0),
+            GameUnits.Tank.TURRET_RADIUS_RATIO * 0.375f,  // 75% of front turret width
+            GameUnits.Tank.TURRET_LENGTH_RATIO * 0.75f,
+            new Vector2f(0, 0),  // Back turret centered
             (float)Math.PI,  // 180 degrees
             new TurretPhase(phaseConfig, 2)
         );
@@ -274,6 +300,45 @@ public class TankFactory {
         }
         
         Logger.debug("Added player control components and updated render layers");
+        return tank;
+    }
+    
+    public Entity createTank() {
+        Entity tank = engine.createEntity();
+        
+        // Transform component
+        TransformComponent transform = engine.createComponent(TransformComponent.class);
+        tank.add(transform);
+        
+        // Shape component for tank body
+        ShapeComponent shape = engine.createComponent(ShapeComponent.class);
+        shape.init(GameUnits.Tank.BODY_RADIUS);  // Initialize as circle with radius
+        tank.add(shape);
+        
+        // Velocity component with Box2D-friendly values
+        VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
+        velocity.setMaxSpeed(10.0f);  // 10 m/s is a reasonable Box2D speed
+        velocity.setAcceleration(30.0f);  // Good acceleration for Box2D
+        velocity.setFriction(0.95f);  // Keep friction as is since it's a multiplier
+        tank.add(velocity);
+        
+        // Collision component with Box2D-friendly values
+        CollisionComponent collision = engine.createComponent(CollisionComponent.class);
+        collision.setFriction(0.1f);  // Standard Box2D friction
+        collision.setLinearDamping(0.5f);  // Moderate damping
+        collision.setAngularDamping(3.0f);  // Higher angular damping for better control
+        collision.setDensity(1.0f);  // Standard density of 1 kg/m²
+        collision.setRestitution(0.2f);  // Slight bounce
+        tank.add(collision);
+        
+        // Tank controller component
+        TankControllerComponent controller = engine.createComponent(TankControllerComponent.class);
+        controller.setTurretRadius(GameUnits.Tank.getTurretRadius());
+        controller.setTurretLength(GameUnits.Tank.getTurretLength());
+        tank.add(controller);
+        
+        // Add other components...
+        
         return tank;
     }
 } 

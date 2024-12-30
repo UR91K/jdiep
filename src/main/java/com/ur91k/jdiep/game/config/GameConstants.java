@@ -4,13 +4,13 @@ public final class GameConstants {
     private GameConstants() {} // Prevent instantiation
     
     // Base game units (in world space)
-    public static final float BASE_VIEW_HEIGHT = 1000.0f;  // Height of the game view in world units
-    public static final float DEFAULT_TANK_SIZE = 30.0f;   // Base tank size in world units
-    public static final float GRID_SIZE = 40.0f;           // Size of grid cells in world units
+    public static final float BASE_VIEW_HEIGHT = GameUnits.pixelsToMeters(720.0f);  // Height of the game view in meters
+    public static final float DEFAULT_TANK_SIZE = GameUnits.Tank.BODY_RADIUS * 2;   // Base tank size in meters
+    public static final float GRID_SIZE = GameUnits.GRID_CELL_SIZE;                 // Size of grid cells in meters
     
-    // UI constants (in screen space)
-    public static final float UI_PADDING = 10.0f;          // Padding between UI elements in pixels
-    public static final float UI_SCALE = 1.0f;             // Base UI scale factor
+    // UI constants (in meters for consistent scaling)
+    public static final float UI_PADDING = GameUnits.pixelsToMeters(10.0f);         // Padding between UI elements in meters
+    public static final float UI_SCALE = 1.0f;                                      // Base UI scale factor
     
     // Scaling constants
     public static final float MIN_ZOOM = 0.1f;             // Minimum zoom level

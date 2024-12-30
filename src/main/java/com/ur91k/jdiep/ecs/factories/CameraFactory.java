@@ -40,7 +40,9 @@ public class CameraFactory {
         CameraComponent cameraComp = camera.getComponent(CameraComponent.class);
         cameraComp.setTarget(target);
         cameraComp.setLerpFactor(followSpeed);
-        cameraComp.setZoom(0.7f);
+        cameraComp.setZoom(1.0f);
+        cameraComp.setMinZoom(0.5f);
+        cameraComp.setMaxZoom(2.0f);
         
         Logger.debug("Created follow camera for target entity: {}", target);
         return camera;

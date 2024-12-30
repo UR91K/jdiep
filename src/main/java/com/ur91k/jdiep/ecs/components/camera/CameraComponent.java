@@ -21,15 +21,15 @@ public class CameraComponent implements Component {
         // Default constructor for Ashley's pooling
         this.target = null;
         this.lerpFactor = 0.1f;
-        this.zoom = 1.0f;
-        this.minZoom = 0.5f;
-        this.maxZoom = 2.0f;
+        this.zoom = 1.0f;  // 1.0 zoom means 1 meter = 30 pixels
+        this.minZoom = 0.5f;  // Can zoom out to see more of the world
+        this.maxZoom = 2.0f;  // Can zoom in for detail
         this.zoomSpeed = 0.1f;
         
         // Initialize spring properties
         this.velocity = new Vector2f();
-        this.springStiffness = 100.0f;  // Strong spring for responsive following
-        this.damping = 10.0f;           // Moderate damping to prevent oscillation
+        this.springStiffness = 20.0f;  // Reduced for smoother following in meter-based units
+        this.damping = 8.0f;           // Adjusted damping for meter-based units
     }
     
     public void init() {
@@ -41,8 +41,8 @@ public class CameraComponent implements Component {
         this.zoomSpeed = 0.1f;
         
         this.velocity.zero();
-        this.springStiffness = 100.0f;
-        this.damping = 10.0f;
+        this.springStiffness = 20.0f;
+        this.damping = 8.0f;
     }
     
     // Target entity methods

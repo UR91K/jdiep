@@ -186,13 +186,13 @@ public class ImGuiDebugManager {
             
             boolean changed = false;
             
-            changed |= ImGui.sliderFloat("Acceleration", tankAcceleration, 100.0f, 5000.0f);
+            changed |= ImGui.sliderFloat("Acceleration (m/s²)", tankAcceleration, 0.0f, 60.0f);
             changed |= ImGui.sliderFloat("Box2D Friction", tankFriction, 0.0f, 1.0f);
-            changed |= ImGui.sliderFloat("Linear Damping", tankLinearDamping, 0.0f, 1.0f);
-            changed |= ImGui.sliderFloat("Angular Damping", tankAngularDamping, 0.0f, 5.0f);
-            changed |= ImGui.sliderFloat("Density", tankDensity, 0.1f, 10.0f);
+            changed |= ImGui.sliderFloat("Linear Damping", tankLinearDamping, 0.0f, 16.0f);
+            changed |= ImGui.sliderFloat("Angular Damping", tankAngularDamping, 0.0f, 20.0f);
+            changed |= ImGui.sliderFloat("Density (kg/m²)", tankDensity, 0.1f, 20.0f);
             changed |= ImGui.sliderFloat("Restitution", tankRestitution, 0.0f, 1.0f);
-            changed |= ImGui.sliderFloat("Velocity Friction", tankVelocityFriction, 0.9f, 1.0f);
+            changed |= ImGui.sliderFloat("Velocity Friction", tankVelocityFriction, 0.8f, 1.0f);
             
             if (changed && tankPhysicsCallback != null) {
                 tankPhysicsCallback.onTankPhysicsUpdate(

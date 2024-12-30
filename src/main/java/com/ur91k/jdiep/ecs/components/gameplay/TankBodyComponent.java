@@ -11,7 +11,7 @@ public class TankBodyComponent implements Component {
     
     public TankBodyComponent() {
         // Default constructor for Ashley's pooling
-        this.mass = 1.0f;
+        this.mass = 0.0f;
         this.rotation = 0.0f;
         this.phaseConfig = new PhaseConfig(1, 1.0f);
     }
@@ -27,8 +27,8 @@ public class TankBodyComponent implements Component {
     }
     
     public void setMass(float mass) {
-        if (mass <= 0) {
-            throw new IllegalArgumentException("Mass must be positive");
+        if (mass < 0) {
+            throw new IllegalArgumentException("Mass cannot be negative");
         }
         this.mass = mass;
     }

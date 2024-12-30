@@ -6,6 +6,7 @@ import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import com.ur91k.jdiep.graphics.config.RenderingConstants;
 import com.ur91k.jdiep.core.window.Input;
+import com.ur91k.jdiep.game.config.GameUnits;
 
 import java.nio.FloatBuffer;
 
@@ -23,8 +24,9 @@ public class OpenGLRenderer implements Renderer {
     private final int gridVao;
     private final int gridVbo;
     private static final int GRID_SIZE = 1024;
-    private static final float GRID_SPACING = 26.0f;
-    private static final float BASE_VIEW_HEIGHT = 720.0f;  // Base height for consistent scale
+    private static final int CIRCLE_SEGMENTS = 32;
+    private static final float GRID_SPACING = GameUnits.GRID_CELL_SIZE;  // 1 meter per grid cell
+    private static final float BASE_VIEW_HEIGHT = GameUnits.pixelsToMeters(720.0f);  // Convert default height to meters
     private static final float MAX_ASPECT_RATIO = 16.0f / 9.0f;  // Maximum allowed aspect ratio
     private final Input input;
     private int windowWidth;
@@ -159,8 +161,10 @@ public class OpenGLRenderer implements Renderer {
         shader.setMatrix4f("model", new Matrix4f());
         shader.setVector4f("color", RenderingConstants.GRID_COLOR);
 
-        glDisable(GL_LINE_SMOOTH);
+        // Grid lines should always be 1 pixel wide
         glLineWidth(1.0f);
+
+        glDisable(GL_LINE_SMOOTH);
         glBindVertexArray(gridVao);
         glDrawArrays(GL_LINES, 0, GRID_SIZE * 4);
         glEnable(GL_LINE_SMOOTH);
@@ -181,97 +185,208 @@ public class OpenGLRenderer implements Renderer {
         drawPolygon(position, vertices, rotation, color, 1.0f, true);
     }
 
+    private Vector2f getNormal(Vector2f v1, Vector2f v2) {
+        float dx = v2.x - v1.x;
+        float dy = v2.y - v1.y;
+        float len = (float)Math.sqrt(dx * dx + dy * dy);
+        if (len < 0.0001f) return new Vector2f(1, 0); // Prevent division by zero
+        return new Vector2f(-dy / len, dx / len);
+    }
+
+    private Vector2f getMiterNormal(Vector2f prev, Vector2f curr, Vector2f next) {
+        Vector2f n1 = getNormal(prev, curr);
+        Vector2f n2 = getNormal(curr, next);
+        
+        // Calculate the angle between the normals
+        float dot = n1.x * n2.x + n1.y * n2.y;
+        float angle = (float)Math.acos(Math.max(-1.0f, Math.min(1.0f, dot)));
+        
+        // Calculate miter length (1/sin(angle/2))
+        float miterLength = angle < 0.0001f ? 1.0f : (float)(1.0f / Math.sin(angle / 2.0f));
+        
+        // If miter length is too long (angle too sharp), fall back to bevel
+        if (miterLength > 2.4f) {  // Limit miter length to avoid very sharp corners
+            return new Vector2f((n1.x + n2.x) * 0.5f, (n1.y + n2.y) * 0.5f).normalize();
+        }
+        
+        // Average the two normals
+        Vector2f miter = new Vector2f(
+            (n1.x + n2.x) * 0.5f,
+            (n1.y + n2.y) * 0.5f
+        );
+        
+        // Normalize and scale the miter vector
+        float len = (float)Math.sqrt(miter.x * miter.x + miter.y * miter.y);
+        if (len < 0.0001f) return n1; // Fallback to edge normal if miter is too small
+        
+        float scale = miterLength / len;
+        miter.mul(scale);
+        return miter;
+    }
+
+    private void generateOutlineTriangles(FloatBuffer buffer, Vector2f[] vertices, float lineWidth) {
+        float halfWidth = lineWidth / 2.0f;
+        
+        // For each edge in the shape
+        for (int i = 0; i < vertices.length; i++) {
+            Vector2f curr = vertices[i];
+            Vector2f next = vertices[(i + 1) % vertices.length];
+            Vector2f prev = vertices[(i + vertices.length - 1) % vertices.length];
+            
+            // Get miter normals for both vertices of this edge
+            Vector2f startNormal = getMiterNormal(prev, curr, next);
+            Vector2f endNormal = getMiterNormal(curr, next, vertices[(i + 2) % vertices.length]);
+            
+            // First triangle (start of edge)
+            buffer.put(curr.x + startNormal.x * halfWidth);
+            buffer.put(curr.y + startNormal.y * halfWidth);
+            buffer.put(curr.x - startNormal.x * halfWidth);
+            buffer.put(curr.y - startNormal.y * halfWidth);
+            buffer.put(next.x + endNormal.x * halfWidth);
+            buffer.put(next.y + endNormal.y * halfWidth);
+            
+            // Second triangle (end of edge)
+            buffer.put(curr.x - startNormal.x * halfWidth);
+            buffer.put(curr.y - startNormal.y * halfWidth);
+            buffer.put(next.x - endNormal.x * halfWidth);
+            buffer.put(next.y - endNormal.y * halfWidth);
+            buffer.put(next.x + endNormal.x * halfWidth);
+            buffer.put(next.y + endNormal.y * halfWidth);
+        }
+    }
+
     @Override
     public void drawCircle(Vector2f position, float radius, Vector4f color, float lineWidth, boolean filled) {
         shader.use();
-        shader.setMatrix4f("projection", projection);
-        shader.setMatrix4f("view", view);
-        shader.setMatrix4f("model", new Matrix4f().translate(position.x, position.y, 0));
+        shader.setMatrix4f("viewMatrix", view);
+        shader.setMatrix4f("projectionMatrix", projection);
         shader.setVector4f("color", color);
-
-        // Generate circle vertices
-        int segments = 32;
-        FloatBuffer circleBuffer = BufferUtils.createFloatBuffer((segments + 1) * 2);
-        for (int i = 0; i <= segments; i++) {
-            float angle = (float) (2.0f * Math.PI * i / segments);
-            circleBuffer.put((float) Math.cos(angle) * radius);
-            circleBuffer.put((float) Math.sin(angle) * radius);
-        }
-        circleBuffer.flip();
-
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, circleBuffer);
-
+        
         if (filled) {
-            glDrawArrays(GL_TRIANGLE_FAN, 0, segments + 1);
+            // Generate circle vertices for filled circle
+            FloatBuffer vertices = BufferUtils.createFloatBuffer(CIRCLE_SEGMENTS * 2);
+            for (int i = 0; i < CIRCLE_SEGMENTS; i++) {
+                float angle = (float) (2.0f * Math.PI * i / CIRCLE_SEGMENTS);
+                vertices.put(position.x + radius * (float)Math.cos(angle));
+                vertices.put(position.y + radius * (float)Math.sin(angle));
+            }
+            vertices.flip();
+            
+            glBindVertexArray(vao);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
+            glDrawArrays(GL_TRIANGLE_FAN, 0, CIRCLE_SEGMENTS);
+        } else {
+            // Convert circle to polygon points
+            Vector2f[] circlePoints = new Vector2f[CIRCLE_SEGMENTS];
+            for (int i = 0; i < CIRCLE_SEGMENTS; i++) {
+                float angle = (float) (2.0f * Math.PI * i / CIRCLE_SEGMENTS);
+                float x = position.x + radius * (float)Math.cos(angle);
+                float y = position.y + radius * (float)Math.sin(angle);
+                circlePoints[i] = new Vector2f(x, y);
+            }
+            
+            // Generate outline using unified method
+            FloatBuffer vertices = BufferUtils.createFloatBuffer(CIRCLE_SEGMENTS * 6 * 2); // 6 vertices per edge (2 triangles)
+            generateOutlineTriangles(vertices, circlePoints, lineWidth);
+            vertices.flip();
+            
+            glBindVertexArray(vao);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
+            glDrawArrays(GL_TRIANGLES, 0, CIRCLE_SEGMENTS * 6);
         }
-
-        glLineWidth(lineWidth);
-        glDrawArrays(GL_LINE_LOOP, 0, segments);
     }
 
     @Override
     public void drawRectangle(Vector2f position, Vector2f dimensions, float rotation, Vector4f color, float lineWidth, boolean filled) {
         shader.use();
-        shader.setMatrix4f("projection", projection);
-        shader.setMatrix4f("view", view);
-        shader.setMatrix4f("model", new Matrix4f()
-            .translate(position.x, position.y, 0)
-            .rotate(rotation, 0, 0, 1)
-        );
+        shader.setMatrix4f("viewMatrix", view);
+        shader.setMatrix4f("projectionMatrix", projection);
         shader.setVector4f("color", color);
-
-        float halfWidth = dimensions.x / 2;
-        float halfHeight = dimensions.y / 2;
-        float[] vertices = new float[] {
-            -halfWidth, -halfHeight,
-            halfWidth, -halfHeight,
-            halfWidth, halfHeight,
-            -halfWidth, halfHeight
-        };
-        FloatBuffer rectBuffer = BufferUtils.createFloatBuffer(8).put(vertices).flip();
-
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, rectBuffer);
-
+        
+        float halfWidth = dimensions.x / 2.0f;
+        float halfHeight = dimensions.y / 2.0f;
+        float cos = (float)Math.cos(rotation);
+        float sin = (float)Math.sin(rotation);
+        
+        // Generate rectangle corners
+        Vector2f[] corners = new Vector2f[4];
+        corners[0] = new Vector2f(position.x + (-halfWidth * cos - halfHeight * sin),
+                                position.y + (-halfWidth * sin + halfHeight * cos)); // Top-left
+        corners[1] = new Vector2f(position.x + (halfWidth * cos - halfHeight * sin),
+                                position.y + (halfWidth * sin + halfHeight * cos));  // Top-right
+        corners[2] = new Vector2f(position.x + (halfWidth * cos + halfHeight * sin),
+                                position.y + (halfWidth * sin - halfHeight * cos));  // Bottom-right
+        corners[3] = new Vector2f(position.x + (-halfWidth * cos + halfHeight * sin),
+                                position.y + (-halfWidth * sin - halfHeight * cos)); // Bottom-left
+        
         if (filled) {
+            FloatBuffer vertices = BufferUtils.createFloatBuffer(8);
+            for (Vector2f corner : corners) {
+                vertices.put(corner.x);
+                vertices.put(corner.y);
+            }
+            vertices.flip();
+            
+            glBindVertexArray(vao);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        } else {
+            // Generate outline using unified method
+            FloatBuffer vertices = BufferUtils.createFloatBuffer(4 * 6 * 2); // 4 edges, 6 vertices per edge
+            generateOutlineTriangles(vertices, corners, lineWidth);
+            vertices.flip();
+            
+            glBindVertexArray(vao);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
+            glDrawArrays(GL_TRIANGLES, 0, 24); // 4 edges * 6 vertices
         }
-
-        glLineWidth(lineWidth);
-        glDrawArrays(GL_LINE_LOOP, 0, 4);
     }
 
     @Override
     public void drawPolygon(Vector2f position, Vector2f[] vertices, float rotation, Vector4f color, float lineWidth, boolean filled) {
         shader.use();
-        shader.setMatrix4f("projection", projection);
-        shader.setMatrix4f("view", view);
-        shader.setMatrix4f("model", new Matrix4f()
-            .translate(position.x, position.y, 0)
-            .rotate(rotation, 0, 0, 1)
-        );
+        shader.setMatrix4f("viewMatrix", view);
+        shader.setMatrix4f("projectionMatrix", projection);
         shader.setVector4f("color", color);
-
-        FloatBuffer polyBuffer = BufferUtils.createFloatBuffer(vertices.length * 2);
-        for (Vector2f vertex : vertices) {
-            polyBuffer.put(vertex.x);
-            polyBuffer.put(vertex.y);
+        
+        float cos = (float)Math.cos(rotation);
+        float sin = (float)Math.sin(rotation);
+        
+        // Transform vertices to world space
+        Vector2f[] worldVertices = new Vector2f[vertices.length];
+        for (int i = 0; i < vertices.length; i++) {
+            float x = vertices[i].x * cos - vertices[i].y * sin + position.x;
+            float y = vertices[i].x * sin + vertices[i].y * cos + position.y;
+            worldVertices[i] = new Vector2f(x, y);
         }
-        polyBuffer.flip();
-
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, polyBuffer);
-
+        
         if (filled) {
+            FloatBuffer transformedVertices = BufferUtils.createFloatBuffer(vertices.length * 2);
+            for (Vector2f vertex : worldVertices) {
+                transformedVertices.put(vertex.x);
+                transformedVertices.put(vertex.y);
+            }
+            transformedVertices.flip();
+            
+            glBindVertexArray(vao);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, transformedVertices);
             glDrawArrays(GL_TRIANGLE_FAN, 0, vertices.length);
+        } else {
+            // Generate outline using unified method
+            FloatBuffer transformedVertices = BufferUtils.createFloatBuffer(vertices.length * 6 * 2);
+            generateOutlineTriangles(transformedVertices, worldVertices, lineWidth);
+            transformedVertices.flip();
+            
+            glBindVertexArray(vao);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, transformedVertices);
+            glDrawArrays(GL_TRIANGLES, 0, vertices.length * 6);
         }
-
-        glLineWidth(lineWidth);
-        glDrawArrays(GL_LINE_LOOP, 0, vertices.length);
     }
 
     public void setView(Matrix4f view) {

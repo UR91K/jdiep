@@ -10,6 +10,7 @@ import com.ur91k.jdiep.ecs.components.rendering.ShapeComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
 import com.ur91k.jdiep.graphics.core.RenderLayer;
 import com.ur91k.jdiep.graphics.core.Renderer;
+import com.ur91k.jdiep.game.config.GameUnits;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
@@ -76,73 +77,71 @@ public class RenderingSystem extends SortedIteratingSystem {
         ShapeComponent shape = shapeMapper.get(entity);
         ColorComponent color = colorMapper.get(entity);
         
-        switch (shape.getType()) {
-            case CIRCLE:
-                // Draw filled circle
+        // Draw shape
+        if (shape.getType() == ShapeComponent.ShapeType.CIRCLE) {
+            float radius = shape.getRadius();
+            if (color.hasOutline()) {
+                // Draw outline
                 renderer.drawCircle(
                     transform.getPosition(),
-                    shape.getRadius(),
-                    color.getFillColor(),
-                    color.getOutlineWidth(),
-                    true
+                    radius,
+                    color.getOutlineColor(),
+                    GameUnits.DEFAULT_LINE_THICKNESS,
+                    false
                 );
-                // Draw outline if needed
-                if (color.getOutlineWidth() > 0) {
-                    renderer.drawCircle(
-                        transform.getPosition(),
-                        shape.getRadius(),
-                        color.getOutlineColor(),
-                        color.getOutlineWidth(),
-                        false
-                    );
-                }
-                break;
-                
-            case RECTANGLE:
-                // Draw filled rectangle
+            }
+            // Draw fill
+            renderer.drawCircle(
+                transform.getPosition(),
+                radius,
+                color.getFillColor(),
+                GameUnits.DEFAULT_LINE_THICKNESS,
+                true
+            );
+        } else if (shape.getType() == ShapeComponent.ShapeType.RECTANGLE) {
+            Vector2f dimensions = shape.getDimensions();
+            if (color.hasOutline()) {
+                // Draw outline
                 renderer.drawRectangle(
                     transform.getPosition(),
-                    shape.getDimensions(),
+                    dimensions,
                     transform.getRotation(),
-                    color.getFillColor(),
-                    color.getOutlineWidth(),
-                    true
+                    color.getOutlineColor(),
+                    GameUnits.DEFAULT_LINE_THICKNESS,
+                    false
                 );
-                // Draw outline if needed
-                if (color.getOutlineWidth() > 0) {
-                    renderer.drawRectangle(
-                        transform.getPosition(),
-                        shape.getDimensions(),
-                        transform.getRotation(),
-                        color.getOutlineColor(),
-                        color.getOutlineWidth(),
-                        false
-                    );
-                }
-                break;
-                
-            case POLYGON:
-                // Draw filled polygon
+            }
+            // Draw fill
+            renderer.drawRectangle(
+                transform.getPosition(),
+                dimensions,
+                transform.getRotation(),
+                color.getFillColor(),
+                GameUnits.DEFAULT_LINE_THICKNESS,
+                true
+            );
+        } else if (shape.getType() == ShapeComponent.ShapeType.POLYGON) {
+            Vector2f[] vertices = shape.getVertices();
+            if (color.hasOutline()) {
+                // Draw outline
                 renderer.drawPolygon(
                     transform.getPosition(),
-                    shape.getVertices(),
+                    vertices,
                     transform.getRotation(),
-                    color.getFillColor(),
-                    color.getOutlineWidth(),
-                    true
+                    color.getOutlineColor(),
+                    GameUnits.DEFAULT_LINE_THICKNESS,
+                    false
                 );
-                // Draw outline if needed
-                if (color.getOutlineWidth() > 0) {
-                    renderer.drawPolygon(
-                        transform.getPosition(),
-                        shape.getVertices(),
-                        transform.getRotation(),
-                        color.getOutlineColor(),
-                        color.getOutlineWidth(),
-                        false
-                    );
-                }
-                break;
+            }
+            // Draw fill
+            renderer.drawPolygon(
+                transform.getPosition(),
+                vertices,
+                transform.getRotation(),
+                color.getFillColor(),
+                GameUnits.DEFAULT_LINE_THICKNESS,
+                true
+            );
         }
     }
 } 

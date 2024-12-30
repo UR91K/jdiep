@@ -172,17 +172,17 @@ public class OpenGLRenderer implements Renderer {
 
     @Override
     public void drawCircle(Vector2f position, float radius, Vector4f color) {
-        drawCircle(position, radius, color, 1.0f, true);
+        drawCircle(position, radius, color, GameUnits.DEFAULT_LINE_THICKNESS, true);
     }
 
     @Override
     public void drawRectangle(Vector2f position, Vector2f dimensions, float rotation, Vector4f color) {
-        drawRectangle(position, dimensions, rotation, color, 1.0f, true);
+        drawRectangle(position, dimensions, rotation, color, GameUnits.DEFAULT_LINE_THICKNESS, true);
     }
 
     @Override
     public void drawPolygon(Vector2f position, Vector2f[] vertices, float rotation, Vector4f color) {
-        drawPolygon(position, vertices, rotation, color, 1.0f, true);
+        drawPolygon(position, vertices, rotation, color, GameUnits.DEFAULT_LINE_THICKNESS, true);
     }
 
     private Vector2f getNormal(Vector2f v1, Vector2f v2) {
@@ -201,13 +201,17 @@ public class OpenGLRenderer implements Renderer {
         float dot = n1.x * n2.x + n1.y * n2.y;
         float angle = (float)Math.acos(Math.max(-1.0f, Math.min(1.0f, dot)));
         
+        // For very sharp angles (like in triangles), use a different approach
+        if (angle < 0.5f) { // About 30 degrees
+            // Use the average of the two edges' normals
+            return new Vector2f(
+                (n1.x + n2.x) * 0.5f,
+                (n1.y + n2.y) * 0.5f
+            ).normalize();
+        }
+        
         // Calculate miter length (1/sin(angle/2))
         float miterLength = angle < 0.0001f ? 1.0f : (float)(1.0f / Math.sin(angle / 2.0f));
-        
-        // If miter length is too long (angle too sharp), fall back to bevel
-        if (miterLength > 2.4f) {  // Limit miter length to avoid very sharp corners
-            return new Vector2f((n1.x + n2.x) * 0.5f, (n1.y + n2.y) * 0.5f).normalize();
-        }
         
         // Average the two normals
         Vector2f miter = new Vector2f(
@@ -219,15 +223,73 @@ public class OpenGLRenderer implements Renderer {
         float len = (float)Math.sqrt(miter.x * miter.x + miter.y * miter.y);
         if (len < 0.0001f) return n1; // Fallback to edge normal if miter is too small
         
-        float scale = miterLength / len;
-        miter.mul(scale);
+        miter.mul(miterLength / len);
         return miter;
     }
 
     private void generateOutlineTriangles(FloatBuffer buffer, Vector2f[] vertices, float lineWidth) {
         float halfWidth = lineWidth / 2.0f;
         
-        // For each edge in the shape
+        // Special case for triangles
+        if (vertices.length == 3) {
+            for (int i = 0; i < 3; i++) {
+                Vector2f curr = vertices[i];
+                Vector2f next = vertices[(i + 1) % 3];
+                Vector2f prev = vertices[(i + 2) % 3];  // For triangles, prev is the third vertex
+                
+                // Calculate edge directions
+                Vector2f currEdge = new Vector2f(next).sub(new Vector2f(curr));
+                Vector2f prevEdge = new Vector2f(curr).sub(new Vector2f(prev));
+                
+                // Calculate unit normals for the edges
+                Vector2f currNormal = new Vector2f(-currEdge.y, currEdge.x).normalize();
+                Vector2f prevNormal = new Vector2f(-prevEdge.y, prevEdge.x).normalize();
+                
+                // Calculate miter by averaging the normals
+                Vector2f miter = new Vector2f(
+                    (prevNormal.x + currNormal.x),
+                    (prevNormal.y + currNormal.y)
+                ).normalize();
+                
+                // Calculate next vertex's miter
+                Vector2f nextEdge = new Vector2f(vertices[(i + 2) % 3]).sub(new Vector2f(next));
+                Vector2f nextNormal = new Vector2f(-nextEdge.y, nextEdge.x).normalize();
+                Vector2f nextMiter = new Vector2f(
+                    (currNormal.x + nextNormal.x),
+                    (currNormal.y + nextNormal.y)
+                ).normalize();
+                
+                // Scale miter length to maintain consistent thickness
+                float angle = (float)Math.acos(Math.max(-1.0f, Math.min(1.0f, 
+                    prevNormal.x * currNormal.x + prevNormal.y * currNormal.y)));
+                float scale = (float)(1.0f / Math.cos(angle / 2.0f));
+                miter.mul(scale);
+                
+                float nextAngle = (float)Math.acos(Math.max(-1.0f, Math.min(1.0f,
+                    currNormal.x * nextNormal.x + currNormal.y * nextNormal.y)));
+                float nextScale = (float)(1.0f / Math.cos(nextAngle / 2.0f));
+                nextMiter.mul(nextScale);
+                
+                // First triangle (start of edge)
+                buffer.put(curr.x + miter.x * halfWidth);
+                buffer.put(curr.y + miter.y * halfWidth);
+                buffer.put(curr.x - miter.x * halfWidth);
+                buffer.put(curr.y - miter.y * halfWidth);
+                buffer.put(next.x + nextMiter.x * halfWidth);
+                buffer.put(next.y + nextMiter.y * halfWidth);
+                
+                // Second triangle (end of edge)
+                buffer.put(curr.x - miter.x * halfWidth);
+                buffer.put(curr.y - miter.y * halfWidth);
+                buffer.put(next.x - nextMiter.x * halfWidth);
+                buffer.put(next.y - nextMiter.y * halfWidth);
+                buffer.put(next.x + nextMiter.x * halfWidth);
+                buffer.put(next.y + nextMiter.y * halfWidth);
+            }
+            return;
+        }
+        
+        // Original code for other polygons
         for (int i = 0; i < vertices.length; i++) {
             Vector2f curr = vertices[i];
             Vector2f next = vertices[(i + 1) % vertices.length];
@@ -258,8 +320,9 @@ public class OpenGLRenderer implements Renderer {
     @Override
     public void drawCircle(Vector2f position, float radius, Vector4f color, float lineWidth, boolean filled) {
         shader.use();
-        shader.setMatrix4f("viewMatrix", view);
-        shader.setMatrix4f("projectionMatrix", projection);
+        shader.setMatrix4f("projection", projection);
+        shader.setMatrix4f("view", view);
+        shader.setMatrix4f("model", new Matrix4f());
         shader.setVector4f("color", color);
         
         if (filled) {
@@ -301,8 +364,9 @@ public class OpenGLRenderer implements Renderer {
     @Override
     public void drawRectangle(Vector2f position, Vector2f dimensions, float rotation, Vector4f color, float lineWidth, boolean filled) {
         shader.use();
-        shader.setMatrix4f("viewMatrix", view);
-        shader.setMatrix4f("projectionMatrix", projection);
+        shader.setMatrix4f("projection", projection);
+        shader.setMatrix4f("view", view);
+        shader.setMatrix4f("model", new Matrix4f());
         shader.setVector4f("color", color);
         
         float halfWidth = dimensions.x / 2.0f;
@@ -349,8 +413,9 @@ public class OpenGLRenderer implements Renderer {
     @Override
     public void drawPolygon(Vector2f position, Vector2f[] vertices, float rotation, Vector4f color, float lineWidth, boolean filled) {
         shader.use();
-        shader.setMatrix4f("viewMatrix", view);
-        shader.setMatrix4f("projectionMatrix", projection);
+        shader.setMatrix4f("projection", projection);
+        shader.setMatrix4f("view", view);
+        shader.setMatrix4f("model", new Matrix4f());
         shader.setVector4f("color", color);
         
         float cos = (float)Math.cos(rotation);

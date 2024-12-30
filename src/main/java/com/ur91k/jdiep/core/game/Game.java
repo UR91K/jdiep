@@ -14,6 +14,7 @@ import com.ur91k.jdiep.ecs.systems.gameplay.FoodDriftSystem;
 import com.ur91k.jdiep.ecs.systems.physics.PhysicsPlayerControlSystem;
 import com.ur91k.jdiep.ecs.systems.physics.PhysicsDroneControlSystem;
 import com.ur91k.jdiep.ecs.systems.physics.PhysicsSystem;
+import com.ur91k.jdiep.ecs.systems.physics.TurretJointSystem;
 import com.ur91k.jdiep.ecs.systems.render.RenderingSystem;
 import com.ur91k.jdiep.graphics.core.OpenGLRenderer;
 import com.ur91k.jdiep.graphics.core.Renderer;
@@ -69,6 +70,7 @@ public class Game {
         // Add systems in priority order
         ashley.addSystem(new PhysicsPlayerControlSystem(input, debugManager));  // Player physics control
         ashley.addSystem(new PhysicsDroneControlSystem());                      // Drone physics control
+        ashley.addSystem(new TurretJointSystem(physicsSystem.getWorld()));      // Turret joint control
         ashley.addSystem(new FoodDriftSystem(physicsSystem.getWorld()));       // Food movement
         ashley.addSystem(new CameraSystem(input));                             // Update camera
         ashley.addSystem(new RenderingSystem(renderer, input));                // Render last
@@ -78,25 +80,19 @@ public class Game {
         /*
          * TODO: Implement these physics-based systems:
          * 
-         * 1. TurretJointSystem
-         *    - Create revolute joints between tank and turrets
-         *    - Apply motor forces for turret rotation
-         *    - Handle turret collision interactions
-         *    - Manage joint constraints and limits
-         * 
-         * 2. ProjectilePhysicsSystem
+         * 1. ProjectilePhysicsSystem
          *    - Handle bullet lifetime and cleanup
          *    - Manage bullet penetration physics
          *    - Handle ricochet mechanics
          *    - Apply damage on collision
          * 
-         * 3. CollisionHandlingSystem
+         * 2. CollisionHandlingSystem
          *    - Process collision events from PhysicsSystem
          *    - Apply damage between entities
          *    - Handle special collision cases (bullets, food, etc.)
          *    - Manage collision filtering
          * 
-         * 4. PhysicsDebugSystem
+         * 3. PhysicsDebugSystem
          *    - Visualize physics bodies and joints
          *    - Show force vectors and collision points
          *    - Display joint motor stats

@@ -9,8 +9,10 @@ import com.ur91k.jdiep.ecs.components.gameplay.PlayerComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.PlayerControlledComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.TankBodyComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.TankControllerComponent;
+import com.ur91k.jdiep.ecs.components.gameplay.TurretComponent;
 import com.ur91k.jdiep.ecs.components.physics.CollisionComponent;
 import com.ur91k.jdiep.ecs.components.physics.CollisionFilters;
+import com.ur91k.jdiep.ecs.components.physics.TurretJointComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ColorComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ShapeComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
@@ -59,6 +61,70 @@ public class TankFactory {
                 }
             }
         });
+    }
+    
+    private Entity createTurret(Entity tankBody, Vector2f mountPoint, float mountAngleOffset, 
+                              float width, float length, float reloadTime, float recoilForce, int phase) {
+        Entity turret = engine.createEntity();
+        Logger.debug("Creating physics-based turret for tank");
+        
+        // Add transform component (will be updated by physics)
+        TransformComponent transform = engine.createComponent(TransformComponent.class);
+        transform.setPosition(mountPoint);  // Initial position at mount point
+        transform.setRotation(mountAngleOffset - (float)Math.PI/2);  // Subtract 90 degrees for clockwise rotation
+        turret.add(transform);
+        
+        // Add turret component
+        TurretComponent turretComp = engine.createComponent(TurretComponent.class);
+        turretComp.init(tankBody, width, length, reloadTime, recoilForce, phase);
+        turret.add(turretComp);
+        
+        // Add joint component
+        TurretJointComponent jointComp = engine.createComponent(TurretJointComponent.class);
+        jointComp.init(
+            mountPoint,
+            mountAngleOffset - (float)Math.PI/2,  // Subtract 90 degrees for clockwise rotation
+            2.0f,           // Motor speed (rad/s)
+            1000.0f,        // Max motor torque
+            -3.14159f,      // Lower angle limit (full rotation)
+            3.14159f        // Upper angle limit
+        );
+        turret.add(jointComp);
+        
+        // Add collision component (rectangle shape for turret)
+        CollisionComponent collision = engine.createComponent(CollisionComponent.class);
+        // Move origin to base of turret and rotate 90 degrees
+        Vector2f[] vertices = new Vector2f[] {
+            new Vector2f(-width/2, 0),          // Bottom left (at mount point)
+            new Vector2f(width/2, 0),           // Bottom right (at mount point)
+            new Vector2f(width/2, length),      // Top right
+            new Vector2f(-width/2, length)      // Top left
+        };
+        collision.init(turret, vertices, CollisionFilters.CATEGORY_TURRET, CollisionFilters.MASK_TURRET);
+        collision.setBodyType(BodyType.DYNAMIC);
+        collision.setDensity(0.5f);       // Lighter than tank body
+        collision.setFriction(0.1f);      // Low friction
+        collision.setRestitution(0.2f);   // Some bounce
+        collision.setLinearDamping(0.5f); // Some damping
+        collision.setAngularDamping(2.0f);// Higher angular damping for stable rotation
+        turret.add(collision);
+        
+        // Add rendering components
+        ShapeComponent shape = engine.createComponent(ShapeComponent.class);
+        shape.init(vertices);
+        turret.add(shape);
+        
+        RenderLayer layer = engine.createComponent(RenderLayer.class);
+        layer.setLayer(RenderLayer.GAME_OBJECTS + 1);  // Render above tank
+        turret.add(layer);
+        
+        ColorComponent color = engine.createComponent(ColorComponent.class);
+        color.init(RenderingConstants.TURRET_FILL_COLOR);
+        color.setOutline(RenderingConstants.TURRET_OUTLINE_COLOR, RenderingConstants.DEFAULT_OUTLINE_WIDTH);
+        turret.add(color);
+        
+        engine.addEntity(turret);
+        return turret;
     }
     
     // Create the tank body entity
@@ -115,15 +181,25 @@ public class TankFactory {
     
     // Tank class presets
     public Entity createBasicTank(Vector2f position) {
-        return createTankBody(100, 1, 1.0f, position);
-    }
-    
-    public Entity createTwin(Vector2f position) {
-        return createTankBody(120, 2, 1.2f, position);
-    }
-    
-    public Entity createFlankGuard(Vector2f position) {
-        return createTankBody(110, 2, 1.5f, position);
+        // Create tank body
+        Entity tankBody = createTankBody(100, 1, 1.0f, position);
+        TankBodyComponent body = tankBody.getComponent(TankBodyComponent.class);
+        
+        // Create single centered turret
+        float turretWidth = body.getRadius() * 0.6f;   // 60% of tank radius
+        float turretLength = body.getRadius() * 2.0f;  // 2x tank radius
+        createTurret(
+            tankBody,
+            position,                 // Mount at tank position
+            0.0f,                    // No angle offset
+            turretWidth,
+            turretLength,
+            1.0f,                    // 1 second reload time
+            100.0f,                  // Recoil force
+            1                        // Single phase
+        );
+        
+        return tankBody;
     }
     
     // Create player-controlled version of any tank

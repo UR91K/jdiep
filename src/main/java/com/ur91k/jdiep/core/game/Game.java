@@ -19,6 +19,7 @@ import com.ur91k.jdiep.ecs.systems.render.RenderingSystem;
 import com.ur91k.jdiep.graphics.core.OpenGLRenderer;
 import com.ur91k.jdiep.graphics.core.Renderer;
 import org.joml.Vector2f;
+import org.lwjgl.glfw.GLFW;
 import org.tinylog.Logger;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
@@ -64,7 +65,7 @@ public class Game {
         ashley.addSystem(physicsSystem);
         
         // Add systems in priority order
-        ashley.addSystem(new LocalPlayerControlSystem(input));  // Update player input
+        ashley.addSystem(new LocalPlayerControlSystem(input, debugManager));  // Update player input
         ashley.addSystem(new TankMovementSystem());            // Apply tank movement
         ashley.addSystem(new MovementSystem());                // Apply velocity to position
         ashley.addSystem(new FoodDriftSystem(physicsSystem.getWorld())); // Food movement
@@ -78,7 +79,7 @@ public class Game {
     private void createInitialEntities() {
         // Create factories with physics world
         PhysicsSystem physicsSystem = ashley.getSystem(PhysicsSystem.class);
-        TankFactory tankFactory = new TankFactory(ashley);
+        TankFactory tankFactory = new TankFactory(ashley, debugManager);  // Pass debugManager
         FoodFactory foodFactory = new FoodFactory(ashley);
         CameraFactory cameraFactory = new CameraFactory(ashley);
 
@@ -125,7 +126,8 @@ public class Game {
 
             // Process input
             window.pollEvents();
-
+            input.update();  // Update input state
+            
             // Update game state with fixed timestep
             while (accumulator >= dt) {
                 ashley.update(dt);

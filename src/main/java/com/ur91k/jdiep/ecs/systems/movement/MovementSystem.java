@@ -26,8 +26,7 @@ public class MovementSystem extends IteratingSystem {
         Vector2f deltaPosition = new Vector2f(velocity.getVelocity()).mul(deltaTime);
         transform.getPosition().add(deltaPosition);
         
-        // Apply drag
-        float drag = 0.95f;  // Can be moved to a configuration or component
-        velocity.getVelocity().mul(drag);
+        // Apply friction from velocity component
+        velocity.getVelocity().mul(velocity.getFriction());
     }
 } 

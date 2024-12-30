@@ -25,7 +25,7 @@ public class OpenGLRenderer implements Renderer {
     private static final int GRID_SIZE = 1024;
     private static final float GRID_SPACING = 26.0f;
     private static final float BASE_VIEW_HEIGHT = 720.0f;  // Base height for consistent scale
-    private static final float MAX_ASPECT_RATIO = 1.66f;  // Maximum allowed aspect ratio
+    private static final float MAX_ASPECT_RATIO = 16.0f / 9.0f;  // Maximum allowed aspect ratio
     private final Input input;
     private int windowWidth;
     private int windowHeight;

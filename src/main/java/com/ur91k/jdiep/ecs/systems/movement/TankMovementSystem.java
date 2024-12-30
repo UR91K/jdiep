@@ -36,11 +36,6 @@ public class TankMovementSystem extends IteratingSystem {
         Vector2f currentVel = velocity.getVelocity();
         currentVel.add(moveDir);
         
-        // Apply max speed limit
-        if (currentVel.length() > velocity.getMaxSpeed()) {
-            currentVel.normalize().mul(velocity.getMaxSpeed());
-        }
-        
         // Apply aim rotation
         transform.setRotation(controller.getAimAngle());
     }

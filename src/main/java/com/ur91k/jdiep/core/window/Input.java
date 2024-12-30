@@ -15,6 +15,7 @@ public class Input {
     private final Window window;
     private final Vector2f mousePos = new Vector2f();
     private final boolean[] keys = new boolean[GLFW_KEY_LAST];
+    private final boolean[] prevKeys = new boolean[GLFW_KEY_LAST];
     private final boolean[] mouseButtons = new boolean[GLFW_MOUSE_BUTTON_LAST];
     private float scrollY;
     private Matrix4f viewMatrix = new Matrix4f();
@@ -116,5 +117,14 @@ public class Input {
         glfwSetMouseButtonCallback(windowHandle, null);
         glfwSetCursorPosCallback(windowHandle, null);
         glfwSetScrollCallback(windowHandle, null);
+    }
+
+    public void update() {
+        // Store previous frame's key states
+        System.arraycopy(keys, 0, prevKeys, 0, GLFW_KEY_LAST);
+    }
+    
+    public boolean isKeyJustPressed(int key) {
+        return key >= 0 && key < GLFW_KEY_LAST && keys[key] && !prevKeys[key];
     }
 }

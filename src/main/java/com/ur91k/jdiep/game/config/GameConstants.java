@@ -6,7 +6,7 @@ public final class GameConstants {
     // Base game units (in world space)
     public static final float BASE_VIEW_HEIGHT = 1000.0f;  // Height of the game view in world units
     public static final float DEFAULT_TANK_SIZE = 30.0f;   // Base tank size in world units
-    public static final float GRID_SIZE = 25.0f;           // Size of grid cells in world units
+    public static final float GRID_SIZE = 40.0f;           // Size of grid cells in world units
     
     // UI constants (in screen space)
     public static final float UI_PADDING = 10.0f;          // Padding between UI elements in pixels

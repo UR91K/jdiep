@@ -24,12 +24,45 @@ import com.ur91k.jdiep.graphics.config.RenderingConstants;
 import com.ur91k.jdiep.graphics.core.RenderLayer;
 import org.jbox2d.dynamics.BodyType;
 import org.joml.Vector2f;
+import com.ur91k.jdiep.debug.ImGuiDebugManager;
 
 public class TankFactory {
     private final Engine engine;
+    private final ImGuiDebugManager debugManager;
     
-    public TankFactory(Engine engine) {
+    public TankFactory(Engine engine, ImGuiDebugManager debugManager) {
         this.engine = engine;
+        this.debugManager = debugManager;
+        
+        // Set initial physics values in debug window
+        debugManager.setTankPhysicsValues(800.0f, 0.05f, 0.2f, 3.0f, 1.0f, 0.5f);
+        
+        // Register callback for physics value updates
+        debugManager.setTankPhysicsCallback(new ImGuiDebugManager.TankPhysicsCallback() {
+            @Override
+            public void onTankPhysicsUpdate(float acceleration, float friction,
+                                          float linearDamping, float angularDamping, float density,
+                                          float restitution, float velocityFriction) {
+                // Update all existing tanks
+                for (Entity tank : engine.getEntitiesFor(Family.all(TankBodyComponent.class).get())) {
+                    VelocityComponent velocity = tank.getComponent(VelocityComponent.class);
+                    CollisionComponent collision = tank.getComponent(CollisionComponent.class);
+                    
+                    if (velocity != null) {
+                        velocity.setAcceleration(acceleration);
+                        velocity.setFriction(velocityFriction);
+                    }
+                    
+                    if (collision != null) {
+                        collision.setFriction(friction);
+                        collision.setLinearDamping(linearDamping);
+                        collision.setAngularDamping(angularDamping);
+                        collision.setDensity(density);
+                        collision.setRestitution(restitution);
+                    }
+                }
+            }
+        });
     }
     
     // Create the tank body entity
@@ -47,8 +80,7 @@ public class TankFactory {
         
         // Add velocity component for movement
         VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
-        velocity.setMaxSpeed(4000.0f);  // Increased max speed
-        velocity.setAcceleration(300.0f);  // Increased acceleration for better response
+        velocity.setAcceleration(800.0f);  // Default acceleration
         tank.add(velocity);
         
         // Add controller component
@@ -60,10 +92,10 @@ public class TankFactory {
         collision.init(tank, radius, CollisionFilters.CATEGORY_TANK, CollisionFilters.MASK_TANK);
         collision.setBodyType(BodyType.DYNAMIC);
         collision.setDensity(1.0f);  // Normal density
-        collision.setFriction(0.2f);  // Low friction for smooth movement
-        collision.setRestitution(0.2f);  // Low bounce
-        collision.setLinearDamping(1.0f);  // Reduced damping for better speed
-        collision.setAngularDamping(10.0f);  // High angular damping to prevent spinning
+        collision.setFriction(0.05f);  // Reduced friction for smoother movement
+        collision.setRestitution(0.5f);  // Low bounce
+        collision.setLinearDamping(0.2f);  // Significantly reduced damping
+        collision.setAngularDamping(3.0f);  // Keep high angular damping to prevent spinning
         tank.add(collision);
         
         // Add rendering components

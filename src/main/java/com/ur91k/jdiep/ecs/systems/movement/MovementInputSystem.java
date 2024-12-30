@@ -39,10 +39,5 @@ public class MovementInputSystem extends IteratingSystem {
         moveDir.mul(velocity.getAcceleration() * deltaTime);
         Vector2f currentVel = velocity.getVelocity();
         currentVel.add(moveDir);
-
-        // Apply max speed limit
-        if (currentVel.length() > velocity.getMaxSpeed()) {
-            currentVel.normalize().mul(velocity.getMaxSpeed());
-        }
     }
 } 

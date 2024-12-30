@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.ur91k.jdiep.core.window.Input;
+import com.ur91k.jdiep.debug.ImGuiDebugManager;
 import com.ur91k.jdiep.ecs.components.gameplay.PlayerControlledComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.TankControllerComponent;
 import com.ur91k.jdiep.ecs.components.physics.CollisionComponent;
@@ -21,8 +22,13 @@ public class LocalPlayerControlSystem extends IteratingSystem {
     private final ComponentMapper<VelocityComponent> velocityMapper;
     private final ComponentMapper<TankControllerComponent> controllerMapper;
     private final ComponentMapper<TransformComponent> transformMapper;
+    private final ImGuiDebugManager debugManager;
     
-    public LocalPlayerControlSystem(Input input) {
+    // Store previous values for derivative calculations
+    private Vec2 prevVelocity = new Vec2();
+    private Vec2 prevAcceleration = new Vec2();
+    
+    public LocalPlayerControlSystem(Input input, ImGuiDebugManager debugManager) {
         super(Family.all(
             PlayerControlledComponent.class,
             CollisionComponent.class,
@@ -32,6 +38,7 @@ public class LocalPlayerControlSystem extends IteratingSystem {
         ).get());
         
         this.input = input;
+        this.debugManager = debugManager;
         this.collisionMapper = ComponentMapper.getFor(CollisionComponent.class);
         this.velocityMapper = ComponentMapper.getFor(VelocityComponent.class);
         this.controllerMapper = ComponentMapper.getFor(TankControllerComponent.class);
@@ -68,14 +75,6 @@ public class LocalPlayerControlSystem extends IteratingSystem {
         Vec2 center = collision.getBody().getWorldCenter();
         collision.getBody().applyLinearImpulse(impulse, center);
         
-        // Limit velocity to max speed
-        Vec2 currentVel = collision.getBody().getLinearVelocity();
-        float currentSpeed = currentVel.length();
-        if (currentSpeed > velocity.getMaxSpeed()) {
-            currentVel.mulLocal(velocity.getMaxSpeed() / currentSpeed);
-            collision.getBody().setLinearVelocity(currentVel);
-        }
-        
         // Update aim angle from mouse position
         Vector2f mousePos = input.getWorldMousePosition();
         Vector2f entityPos = transform.getPosition();
@@ -85,5 +84,34 @@ public class LocalPlayerControlSystem extends IteratingSystem {
         
         // Update shooting state
         controller.setShooting(input.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT));
+        
+        // Calculate and graph derivatives
+        if (deltaTime > 0) {
+            // Get current velocity
+            Vec2 currentVel = collision.getBody().getLinearVelocity();
+            
+            // Calculate acceleration (change in velocity)
+            Vec2 currentAcc = new Vec2();
+            currentAcc.x = (currentVel.x - prevVelocity.x) / deltaTime;
+            currentAcc.y = (currentVel.y - prevVelocity.y) / deltaTime;
+            
+            // Calculate jerk (change in acceleration)
+            Vec2 jerk = new Vec2();
+            jerk.x = (currentAcc.x - prevAcceleration.x) / deltaTime;
+            jerk.y = (currentAcc.y - prevAcceleration.y) / deltaTime;
+            
+            // Update graphs
+            debugManager.addGraphValue("Velocity X", currentVel.x);
+            debugManager.addGraphValue("Velocity Y", currentVel.y);
+            debugManager.addGraphValue("Acceleration X", currentAcc.x);
+            debugManager.addGraphValue("Acceleration Y", currentAcc.y);
+            debugManager.addGraphValue("Jerk X", jerk.x);
+            debugManager.addGraphValue("Jerk Y", jerk.y);
+            debugManager.addGraphValue("Speed", currentVel.length());
+            
+            // Store current values for next frame
+            prevVelocity.set(currentVel);
+            prevAcceleration.set(currentAcc);
+        }
     }
 } 

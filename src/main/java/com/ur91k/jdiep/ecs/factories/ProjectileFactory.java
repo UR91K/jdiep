@@ -40,7 +40,6 @@ public class ProjectileFactory {
         // Add velocity for movement
         VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
         velocity.setVelocity(new Vector2f(direction).mul(speed));
-        velocity.setMaxSpeed(speed);  // Bullets maintain constant speed
         bullet.add(velocity);
         
         // Add collision (small circle for bullets)

@@ -37,7 +37,6 @@ public class DroneFactory {
         
         // Add velocity for movement
         VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
-        velocity.setMaxSpeed(150.0f);  // Drones are fast but not as fast as tanks
         velocity.setAcceleration(400.0f);
         drone.add(velocity);
         

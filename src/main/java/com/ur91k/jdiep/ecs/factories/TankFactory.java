@@ -9,17 +9,13 @@ import com.ur91k.jdiep.ecs.components.gameplay.PlayerComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.PlayerControlledComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.TankBodyComponent;
 import com.ur91k.jdiep.ecs.components.gameplay.TankControllerComponent;
-import com.ur91k.jdiep.ecs.components.gameplay.TurretComponent;
 import com.ur91k.jdiep.ecs.components.physics.VelocityComponent;
 import com.ur91k.jdiep.ecs.components.physics.CollisionComponent;
 import com.ur91k.jdiep.ecs.components.physics.CollisionFilters;
 import com.ur91k.jdiep.ecs.components.physics.PhysicsProperties;
 import com.ur91k.jdiep.ecs.components.rendering.ColorComponent;
 import com.ur91k.jdiep.ecs.components.rendering.ShapeComponent;
-import com.ur91k.jdiep.ecs.components.transform.ParentComponent;
 import com.ur91k.jdiep.ecs.components.transform.TransformComponent;
-import com.ur91k.jdiep.game.weapons.PhaseConfig;
-import com.ur91k.jdiep.game.weapons.TurretPhase;
 import com.ur91k.jdiep.graphics.config.RenderingConstants;
 import com.ur91k.jdiep.graphics.core.RenderLayer;
 import org.jbox2d.dynamics.BodyType;
@@ -97,8 +93,6 @@ public class TankFactory {
         
         // Add controller component
         TankControllerComponent controller = engine.createComponent(TankControllerComponent.class);
-        controller.setTurretRadius(GameUnits.Tank.getTurretRadius());
-        controller.setTurretLength(GameUnits.Tank.getTurretLength());
         tank.add(controller);
         
         // Add collision component with Box2D-friendly values
@@ -133,146 +127,17 @@ public class TankFactory {
         return tank;
     }
     
-    // Create a turret entity
-    private Entity createTurret(Entity tankBody, float widthRatio, float lengthRatio, 
-                              Vector2f offset, float rotation, TurretPhase phase) {
-        Entity turret = engine.createEntity();
-        Logger.debug("Creating turret entity for tank");
-        
-        // Add turret component using pooling
-        TurretComponent turretComp = engine.createComponent(TurretComponent.class);
-        turretComp.init(widthRatio, lengthRatio, offset, rotation, phase);
-        turret.add(turretComp);
-        
-        // Get tank body component to calculate turret dimensions
-        TankBodyComponent tankBodyComp = tankBody.getComponent(TankBodyComponent.class);
-        float tankRadius = tankBodyComp.getRadius();
-        
-        // Calculate turret dimensions based on ratios
-        float turretWidth = tankRadius * lengthRatio;  // Use length for width (no *2)
-        float turretHeight = tankRadius * widthRatio * 1.5f;  // Use width for height (no *2)
-        
-        // Add transform (will be updated by parent system)
-        TransformComponent transform = engine.createComponent(TransformComponent.class);
-        transform.setPosition(new Vector2f(0, 0));  // Will be updated by ParentSystem
-        transform.setRotation((float)Math.PI / 2); // Add 90-degree rotation to make length point right
-        turret.add(transform);
-        
-        // Add parent relationship with offset at rear of turret
-        ParentComponent parentComp = engine.createComponent(ParentComponent.class);
-        parentComp.init(tankBody, offset, rotation);
-        turret.add(parentComp);
-        
-        // Add collision component (kinematic - moved by code)
-        CollisionComponent collision = engine.createComponent(CollisionComponent.class);
-        Vector2f[] vertices = new Vector2f[] {
-            new Vector2f(0, -turretHeight/2),      // Rear left
-            new Vector2f(turretWidth, -turretHeight/2), // Front left
-            new Vector2f(turretWidth, turretHeight/2),  // Front right
-            new Vector2f(0, turretHeight/2)        // Rear right
-        };
-        collision.init(turret, vertices, CollisionFilters.CATEGORY_TURRET, CollisionFilters.MASK_TURRET);
-        collision.setBodyType(BodyType.KINEMATIC);
-        collision.setDensity(1.0f);  // Standard density
-        collision.setFriction(0.1f);  // Standard Box2D friction
-        collision.setRestitution(0.2f);  // Slight bounce
-        turret.add(collision);
-        
-        ShapeComponent shape = engine.createComponent(ShapeComponent.class);
-        // Set origin at rear center by using vertices
-        Vector2f[] shapeVertices = new Vector2f[] {
-            new Vector2f(0, -turretHeight/2),      // Rear left
-            new Vector2f(turretWidth, -turretHeight/2), // Front left
-            new Vector2f(turretWidth, turretHeight/2),  // Front right
-            new Vector2f(0, turretHeight/2)        // Rear right
-        };
-        shape.init(shapeVertices);
-        turret.add(shape);
-        
-        RenderLayer layer = engine.createComponent(RenderLayer.class);
-        layer.setLayer(RenderLayer.GAME_OBJECTS - 1);  // Render turret above tank body
-        turret.add(layer);
-        
-        ColorComponent turretColor = engine.createComponent(ColorComponent.class);
-        turretColor.init(RenderingConstants.TURRET_FILL_COLOR);
-        turretColor.setOutline(RenderingConstants.TURRET_OUTLINE_COLOR, RenderingConstants.DEFAULT_OUTLINE_WIDTH);
-        turret.add(turretColor);
-        
-        engine.addEntity(turret);
-        return turret;
-    }
-    
     // Tank class presets
     public Entity createBasicTank(Vector2f position) {
-        Entity tankBody = createTankBody(100, 1, 1.0f, position);
-        TankBodyComponent body = tankBody.getComponent(TankBodyComponent.class);
-        
-        // Create single forward-facing turret
-        createTurret(
-            tankBody,
-            GameUnits.Tank.TURRET_RADIUS_RATIO * 0.5f,  // Convert from radius ratio to diameter ratio
-            GameUnits.Tank.TURRET_LENGTH_RATIO,
-            new Vector2f(0, 0),  // Centered on tank
-            0.0f,                // Forward facing
-            new TurretPhase(body.getPhaseConfig(), 1)
-        );
-        
-        return tankBody;
+        return createTankBody(100, 1, 1.0f, position);
     }
     
     public Entity createTwin(Vector2f position) {
-        Entity tankBody = createTankBody(120, 2, 1.2f, position);
-        TankBodyComponent body = tankBody.getComponent(TankBodyComponent.class);
-        PhaseConfig phaseConfig = body.getPhaseConfig();
-        float tankRadius = body.getRadius();
-        
-        // Create twin turrets with offsets relative to tank radius
-        createTurret(
-            tankBody,
-            GameUnits.Tank.TURRET_RADIUS_RATIO * 0.5f,  // Convert from radius ratio to diameter ratio
-            GameUnits.Tank.TURRET_LENGTH_RATIO,
-            new Vector2f(0, 0.3f * tankRadius),  // Right turret, offset by 30% of tank radius
-            0.0f,
-            new TurretPhase(phaseConfig, 1)
-        );
-        
-        createTurret(
-            tankBody,
-            GameUnits.Tank.TURRET_RADIUS_RATIO * 0.5f,  // Convert from radius ratio to diameter ratio
-            GameUnits.Tank.TURRET_LENGTH_RATIO,
-            new Vector2f(0, -0.3f * tankRadius),  // Left turret, offset by 30% of tank radius
-            0.0f,
-            new TurretPhase(phaseConfig, 2)
-        );
-        
-        return tankBody;
+        return createTankBody(120, 2, 1.2f, position);
     }
     
     public Entity createFlankGuard(Vector2f position) {
-        Entity tankBody = createTankBody(110, 2, 1.5f, position);
-        TankBodyComponent body = tankBody.getComponent(TankBodyComponent.class);
-        PhaseConfig phaseConfig = body.getPhaseConfig();
-        
-        // Create front and back turrets
-        createTurret(
-            tankBody,
-            GameUnits.Tank.TURRET_RADIUS_RATIO * 0.5f,  // Convert from radius ratio to diameter ratio
-            GameUnits.Tank.TURRET_LENGTH_RATIO,
-            new Vector2f(0, 0),  // Front turret centered
-            0.0f,
-            new TurretPhase(phaseConfig, 1)
-        );
-        
-        createTurret(
-            tankBody,
-            GameUnits.Tank.TURRET_RADIUS_RATIO * 0.375f,  // 75% of front turret width
-            GameUnits.Tank.TURRET_LENGTH_RATIO * 0.75f,
-            new Vector2f(0, 0),  // Back turret centered
-            (float)Math.PI,  // 180 degrees
-            new TurretPhase(phaseConfig, 2)
-        );
-        
-        return tankBody;
+        return createTankBody(110, 2, 1.5f, position);
     }
     
     // Create player-controlled version of any tank
@@ -289,15 +154,6 @@ public class TankFactory {
         // Set higher render layer for player tank
         RenderLayer tankLayer = tank.getComponent(RenderLayer.class);
         tankLayer.setLayer(RenderLayer.GAME_OBJECTS + 100);  // Player tank renders above all other tanks
-        
-        // Update turret render layers too
-        for (Entity turret : engine.getEntitiesFor(Family.all(TurretComponent.class, ParentComponent.class).get())) {
-            ParentComponent parentComp = turret.getComponent(ParentComponent.class);
-            if (parentComp.getParent() == tank) {
-                RenderLayer turretLayer = turret.getComponent(RenderLayer.class);
-                turretLayer.setLayer(RenderLayer.GAME_OBJECTS + 99);  // Turrets render above tank
-            }
-        }
         
         Logger.debug("Added player control components and updated render layers");
         return tank;
@@ -333,11 +189,7 @@ public class TankFactory {
         
         // Tank controller component
         TankControllerComponent controller = engine.createComponent(TankControllerComponent.class);
-        controller.setTurretRadius(GameUnits.Tank.getTurretRadius());
-        controller.setTurretLength(GameUnits.Tank.getTurretLength());
         tank.add(controller);
-        
-        // Add other components...
         
         return tank;
     }

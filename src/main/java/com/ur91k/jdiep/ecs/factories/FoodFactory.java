@@ -51,8 +51,8 @@ public class FoodFactory {
         collision.setDensity(0.5f);
         collision.setFriction(0.1f);
         collision.setRestitution(0.5f);
-        collision.setLinearDamping(0.5f);
-        collision.setAngularDamping(0.5f);
+        collision.setLinearDamping(2.0f);
+        collision.setAngularDamping(1.0f);
         food.add(collision);
         
         // Add rendering components
@@ -101,8 +101,8 @@ public class FoodFactory {
         collision.setDensity(0.5f);
         collision.setFriction(0.1f);
         collision.setRestitution(0.5f);
-        collision.setLinearDamping(0.5f);
-        collision.setAngularDamping(0.5f);
+        collision.setLinearDamping(2.0f);
+        collision.setAngularDamping(1.0f);
         food.add(collision);
         
         // Add rendering components
@@ -146,8 +146,8 @@ public class FoodFactory {
         collision.setDensity(0.5f);
         collision.setFriction(0.1f);
         collision.setRestitution(0.5f);
-        collision.setLinearDamping(0.5f);
-        collision.setAngularDamping(0.5f);
+        collision.setLinearDamping(2.0f);
+        collision.setAngularDamping(1.0f);
         food.add(collision);
         
         // Add rendering components
@@ -191,8 +191,8 @@ public class FoodFactory {
         collision.setDensity(0.5f);
         collision.setFriction(0.1f);
         collision.setRestitution(0.5f);
-        collision.setLinearDamping(0.5f);
-        collision.setAngularDamping(0.5f);
+        collision.setLinearDamping(2.0f);
+        collision.setAngularDamping(1.0f);
         food.add(collision);
         
         // Add rendering components

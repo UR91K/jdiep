@@ -25,6 +25,8 @@ import org.tinylog.Logger;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.opengl.GL11.*;
 
+import java.util.Random;
+
 /**
  * Main game class that handles initialization and the game loop
  */
@@ -115,12 +117,21 @@ public class Game {
         Entity basicTank = tankFactory.createBasicTank(new Vector2f(0, 0));
         playerTank = tankFactory.makePlayerControlled(basicTank);
         
-        // Create dummy tank for physics testing
-        tankFactory.createBasicTank(new Vector2f(10, 0));  // 100 units to the right of player
+        // // Create dummy tank for physics testing
+        // tankFactory.createBasicTank(new Vector2f(10, 0));  // 100 units to the right of player
         
         // Create some test food
-        foodFactory.createTinyFood(new Vector2f(-5, 5));
-        foodFactory.createSmallFood(new Vector2f(5, 5));
+        Random random = new Random();
+        for (int i = 0; i < 20; i++) {
+            float x = random.nextFloat() * 40 - 20;
+            float y = random.nextFloat() * 40 - 20;
+            foodFactory.createTinyFood(new Vector2f(x, y));
+        }
+        for (int i = 0; i < 5; i++) {
+            float x = random.nextFloat() * 40 - 20;
+            float y = random.nextFloat() * 40 - 20;
+            foodFactory.createSmallFood(new Vector2f(x, y));
+        }
         
         // Create main camera following the player
         mainCamera = cameraFactory.createFollowCamera(playerTank, 0.1f);
